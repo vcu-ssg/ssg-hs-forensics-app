@@ -4,13 +4,20 @@
     "href": "example1.html",
     "title": "Example 1",
     "section": "",
-    "text": "This is a quick-hit report summarizing a run of segment-anything"
+    "text": "PLACEHOLDER\nIn this placeholder we’ll drop a working example of the jupyter notebook converted to a quarto document."
   },
   {
     "objectID": "index.html",
     "href": "index.html",
     "title": "Welcome",
     "section": "",
-    "text": "this is the home page. See example 1 for stuff."
+    "text": "First draft of a working website documenting our work on this project."
+  },
+  {
+    "objectID": "index.html#intro-presentation",
+    "href": "index.html#intro-presentation",
+    "title": "Welcome",
+    "section": "Intro presentation",
+    "text": "Intro presentation\nBelow is the intro presentation shared by Alina. Here a direct link to the google slides source."
   }
 ]

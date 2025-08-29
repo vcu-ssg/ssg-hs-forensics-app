@@ -2,4 +2,17 @@
 title: Welcome
 ---
 
-this is the home page.  See example 1 for stuff.
+First draft of a working website documenting our work on this project.
+
+
+## Intro presentation
+
+Below is the intro presentation shared by Alina.  Here a [direct link to the google slides](https://docs.google.com/presentation/d/1Dvj30uIWChAgkIMVAGFMYwBHVhdFYcJw6l3nDvWGdbM/edit?slide=id.p#slide=id.p) source.
+
+```{=html}
+<iframe 
+src="https://docs.google.com/presentation/d/1Dvj30uIWChAgkIMVAGFMYwBHVhdFYcJw6l3nDvWGdbM/preview?slide=id.p"
+frameborder="0" width="960" height="569" 
+allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"
+></iframe>
+```

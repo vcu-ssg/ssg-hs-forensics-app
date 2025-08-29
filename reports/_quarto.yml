@@ -10,6 +10,8 @@ website:
         text: Home
       - href: example1.qmd
         text: Example 1
+      - href: https://github.com/vcu-ssg/ssg-hs-forensics-app
+        text: Repository
 
 format:
   html:

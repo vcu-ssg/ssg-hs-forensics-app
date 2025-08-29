@@ -1,0 +1,16 @@
+[
+  {
+    "objectID": "example1.html",
+    "href": "example1.html",
+    "title": "Example 1",
+    "section": "",
+    "text": "This is a quick-hit report summarizing a run of segment-anything"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Welcome",
+    "section": "",
+    "text": "this is the home page. See example 1 for stuff."
+  }
+]

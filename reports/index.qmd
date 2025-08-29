@@ -1,0 +1,5 @@
+---
+title: Welcome
+---
+
+this is the home page.  See example 1 for stuff.

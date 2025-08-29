@@ -1,0 +1,18 @@
+project:
+  type: website
+  output-dir: ../docs
+
+website:
+  title: "SSG - HS Forensics"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - href: example1.qmd
+        text: Example 1
+
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+    toc: true

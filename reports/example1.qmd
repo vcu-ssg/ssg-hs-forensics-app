@@ -1,0 +1,5 @@
+---
+title: Example 1
+---
+This is a quick-hit report summarizing a run of segment-anything
+

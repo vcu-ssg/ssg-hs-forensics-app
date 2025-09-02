@@ -1,0 +1,52 @@
+# -----------------
+# Python ignores
+# -----------------
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+.env
+
+# Poetry / pipenv
+.poetry/
+.poetry_cache/
+Pipfile.lock
+
+# Distribution / packaging
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# -----------------
+# Quarto ignores
+# -----------------
+
+# Quarto cache folders
+*_cache/
+.quarto/
+
+# -----------------
+# OS / Editor ignores
+# -----------------
+.DS_Store
+Thumbs.db
+
+# VSCode / IDE
+.vscode/
+.idea/
+*.swp
+
+# -----------------
+# SAM models
+# -----------------
+sam*.pth

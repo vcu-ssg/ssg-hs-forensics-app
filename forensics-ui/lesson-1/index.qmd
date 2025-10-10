@@ -1,0 +1,20 @@
+---
+title: "Lesson 1: Important Cells in Forensics"
+format:
+  html:
+    css: styles.css
+---
+
+<div class="lesson-card">
+  <p>
+    Before diving into forensics, it's best to have a foundational understanding of 
+    the common cell types found at crime scenes.
+  </p>
+  <p>
+    This lesson introduces a number of important cell types found in forensics 
+    including saliva, buccal, blood, and skin.
+  </p>
+  <a href="1-objectives.html">
+    <button class="btn">Get Started</button>
+  </a>
+</div>

@@ -1,0 +1,38 @@
+---
+title: ""
+page-layout: full
+toc: false
+css: styles2.css
+---
+
+```{=html}
+<div class="shell">
+  <main class="card">
+    <h1 class="title">SSG Forensics</h1>
+    <p class="subtitle">
+      Upload microscope images to automatically segment and count cells,
+      while also distinguishing between different cell types. The system
+      highlights cells in the image, generates size data, and allows you to save
+      annotated results for classroom learning or forensic analysis.
+    </p>
+    <section class="upload-zone">
+      <h2 class="upload-title">Upload Image</h2>
+      <p class="upload-hint">
+        Upload your own image, or choose one from our gallery.
+      </p>
+      <div class="btn-row">
+        <a class="btn" href="../gallery.html">Gallery</a>
+        <a class="btn" href="../next-step.html">Upload</a>
+      </div>
+      <input type="file" id="file-input" accept="image/*" hidden />
+    </section>
+  </main>
+</div>
+
+<script>
+  // Optional: trigger file picker if you later add an "Upload" button
+  // document.querySelector('#btn-upload')?.addEventListener('click', () => {
+  //   document.querySelector('#file-input').click();
+  // });
+</script>
+```

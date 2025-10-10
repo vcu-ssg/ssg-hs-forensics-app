@@ -1,0 +1,36 @@
+---
+title: "Saliva Cells"
+format:
+  html:
+    css: styles.css
+---
+
+:::: {.grid style="margin: 2rem 0;"}
+
+::: {.g-col-6}
+![Saliva cells under microscope](assets/saliva1.png)
+:::
+
+::: {.g-col-6}
+![Saliva cells under microscope](assets/saliva2.png)
+:::
+
+::::
+
+<div class="lesson-card">
+<p>
+Saliva cells play a vital role in forensic science because they contain DNA that can be used to identify individuals.
+</p>
+<p>
+When saliva is left behind on objects such as cups, cigarettes, or bite marks, forensic experts can collect epithelial cells from the sample, extract the DNA, and compare it to known profiles.
+</p>
+<p>
+This makes saliva evidence especially useful in linking suspects to crimes or confirming identities in investigations.
+</p>
+<a href="1-objectives.html">
+<button class="btn">Back</button>
+</a>
+<a href="3-skin.html">
+<button class="btn">Next</button>
+</a>
+</div>

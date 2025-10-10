@@ -1,0 +1,30 @@
+---
+title: "Blood Cells"
+format:
+  html:
+    css: styles.css
+---
+
+:::: {.grid style="margin: 2rem 0;"}
+
+::: {.g-col-6}
+![Blood cells under microscope](assets/blood1.png)
+:::
+
+::: {.g-col-6}
+![Blood cells under microscope](assets/blood2.png)
+:::
+
+::::
+
+<div class="lesson-card">
+  <p>Blood cells are a key source of DNA in forensic science, making them crucial for identifying individuals and linking suspects to crime scenes.</p> 
+
+  <p>Blood evidence can also provide information about blood type, patterns, and spatter, which helps investigators reconstruct events and determine how a crime occurred.</p>
+  <a href="3-skin.html">
+    <button class="btn">Back</button>
+  </a>
+  <a href="5-buccal.html">
+    <button class="btn">Next</button>
+  </a>
+</div>

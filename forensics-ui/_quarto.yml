@@ -7,13 +7,15 @@ website:
     left:
       - href: index.qmd
         text: Home
-      - about.qmd
+      - href: about.qmd
+        text: About
+      - href: lesson-1/index.qmd
+        text: "Lesson 1: Important Cells in Forensics"
 
 format:
   html:
     theme:
-      - cosmo
-      - brand
+      - flatly
     css: styles.css
     toc: true
 

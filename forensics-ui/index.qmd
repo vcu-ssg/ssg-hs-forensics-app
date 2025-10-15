@@ -6,4 +6,4 @@ format:
     css: styles.css
 ---
 
-[Lesson 1: Important Cells in Forensics](Lesson1/index.qmd)
+[Lesson 1: Important Cells in Forensics](lesson-1/index.qmd)

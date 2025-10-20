@@ -1,0 +1,23 @@
+---
+title: "Introduction to Cell Analysis"
+format:
+  html:
+    css: styles.css
+---
+
+<div class="lesson-card">
+  <p>In the context of biology, cell analysis refers to computational and statistical methods to attract data from images.</p>
+  <p>It involves image analysis techniques like:</p>
+  <ul>
+    <li>Cell Finding (Segmentation) - Identifies each individual type of cell in the image.</li>
+    <li>Measuring Features (Extraction) - Measures the cell’s size, shape, etc.</li>
+    <li>Counting/Summarizing (Statistics) - Measures cell count, area, and etc.</li>
+  </ul>
+  <p>In the last section of this lesson, you'll get an interactive introduction to these techniques.</p>
+  <a href="7-quiz.html">
+    <button class="btn">Back</button>
+  </a>
+  <a href="../upload/upload.html">
+    <button class="btn">Next</button>
+  </a>
+</div>

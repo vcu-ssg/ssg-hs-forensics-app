@@ -52,12 +52,12 @@ Test your knowledge of the important cell types used in forensic science. Select
   <button class="btn check-btn" onclick="checkAnswer(4)">Check Answer</button>
   <div id="result-4" class="result-message"></div>
 </div>
-  <a href="5-buccal.html">
-    <button class="btn">Back</button>
-  </a>
-  <a href="index.html">
-    <button class="btn">Next</button>
-  </a>
+<a href="5-buccal.html">
+  <button class="btn">Back</button>
+</a>
+<a href="8-analysis-introduction.html">
+  <button class="btn">Next</button>
+</a>
 
 <script>
 function checkAnswer(questionNum) {

@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Review Quiz – FORENSICS-UI</title>
+<title>Introduction to Cell Analysis – FORENSICS-UI</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -121,7 +121,7 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Review Quiz</h1>
+<h1 class="title">Introduction to Cell Analysis</h1>
 </div>
 
 
@@ -138,83 +138,29 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>Test your knowledge of the important cell types used in forensic science. Select the best answer for each question and click “Check Answer” to see if you got it right.</p>
 <div class="lesson-card">
-<h3 class="anchored">
-What type of cells in saliva are used in forensic investigations, and why are they useful?
-</h3>
-<div class="question-options">
-<p><label><input type="radio" name="q1" value="1"> Epithelial cells, because they contain DNA that can be used to identify individuals</label> <label><input type="radio" name="q1" value="2"> Red blood cells, because they carry oxygen</label> <label><input type="radio" name="q1" value="3"> White blood cells, because they fight infections</label> <label><input type="radio" name="q1" value="4"> Nerve cells, because they transmit signals</label></p>
+<p>
+In the context of biology, cell analysis refers to computational and statistical methods to attract data from images.
+</p>
+<p>
+It involves image analysis techniques like:
+</p>
+<ul>
+<li>
+Cell Finding (Segmentation) - Identifies each individual type of cell in the image.
+</li>
+<li>
+Measuring Features (Extraction) - Measures the cell’s size, shape, etc.
+</li>
+<li>
+Counting/Summarizing (Statistics) - Measures cell count, area, and etc.
+</li>
+</ul>
+<p>
+In the last section of this lesson, you’ll get an interactive introduction to these techniques.
+</p>
+<p><a href="7-quiz.html"> <button class="btn">Back</button> </a> <a href="../upload/upload.html"> <button class="btn">Next</button> </a></p>
 </div>
-<button class="btn check-btn" onclick="checkAnswer(1)">Check Answer</button>
-<div id="result-1" class="result-message">
-
-</div>
-</div>
-<div class="lesson-card">
-<h3 class="anchored">
-Which forensic evidence sources commonly contain epithelial cells that can be analyzed for DNA?
-</h3>
-<div class="question-options">
-<p><label><input type="radio" name="q2" value="1"> Cups, cigarettes, and bite marks</label> <label><input type="radio" name="q2" value="2"> Only blood samples</label> <label><input type="radio" name="q2" value="3"> Hair follicles exclusively</label></p>
-</div>
-<button class="btn check-btn" onclick="checkAnswer(2)">Check Answer</button>
-<div id="result-2" class="result-message">
-
-</div>
-</div>
-<div class="lesson-card">
-<h3 class="anchored">
-What is the primary purpose of studying different epithelial cell types in forensic science?
-</h3>
-<div class="question-options">
-<p><label><input type="radio" name="q3" value="1"> To understand and compare physical attributes of cells from different body sources</label> <label><input type="radio" name="q3" value="2"> To determine the age of evidence</label> <label><input type="radio" name="q3" value="3"> To identify the time of death</label> <label><input type="radio" name="q3" value="4"> To determine weapon types used</label></p>
-</div>
-<button class="btn check-btn" onclick="checkAnswer(3)">Check Answer</button>
-<div id="result-3" class="result-message">
-
-</div>
-</div>
-<div class="lesson-card">
-<h3 class="anchored">
-Why is saliva evidence especially useful in forensic investigations?
-</h3>
-<div class="question-options">
-<p><label><input type="radio" name="q4" value="1"> It never degrades over time</label> <label><input type="radio" name="q4" value="2"> It can link suspects to crimes or confirm identities</label> <label><input type="radio" name="q4" value="3"> It only comes from criminals</label></p>
-</div>
-<button class="btn check-btn" onclick="checkAnswer(4)">Check Answer</button>
-<div id="result-4" class="result-message">
-
-</div>
-</div>
-<p><a href="5-buccal.html"> <button class="btn">Back</button> </a> <a href="8-analysis-introduction.html"> <button class="btn">Next</button> </a></p>
-<script>
-function checkAnswer(questionNum) {
-  const selected = document.querySelector(`input[name="q${questionNum}"]:checked`);
-  const resultDiv = document.getElementById(`result-${questionNum}`);
-
-  if (!selected) {
-    resultDiv.innerHTML = '<p style="color: orange;">Please select an answer!</p>';
-    return;
-}
-
-// Correct answers: Q1=1, Q2=1, Q3=1, Q4=2
-const correctAnswers = {1: '1', 2: '1', 3: '1', 4: '2'};
-const correctAnswer = correctAnswers[questionNum];
-
-if (selected.value === correctAnswer) {
-  resultDiv.innerHTML = '<p style="color: green;">✓ Correct!</p>';
-} else {
-  const correctText = {
-    1: 'Epithelial cells, because they contain DNA that can be used to identify individuals',
-    2: 'Cups, cigarettes, and bite marks',
-    3: 'To understand and compare physical attributes of cells from different body sources',
-    4: 'It can link suspects to crimes or confirm identities'
-  };
-  resultDiv.innerHTML = `<p style="color: red;">✗ Incorrect. The correct answer is: ${correctText[questionNum]}.</p>`;
-  }
-}
-</script>
 
 
 

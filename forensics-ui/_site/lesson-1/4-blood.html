@@ -156,15 +156,68 @@ ul.task-list li input[type="checkbox"] {
 </div>
 </div>
 </div>
+
 <div class="lesson-card">
-<p>
-Blood cells are a key source of DNA in forensic science, making them crucial for identifying individuals and linking suspects to crime scenes.
-</p>
-<p>
-Blood evidence can also provide information about blood type, patterns, and spatter, which helps investigators reconstruct events and determine how a crime occurred.
-</p>
-<p><a href="3-skin.html"> <button class="btn">Back</button> </a> <a href="5-buccal.html"> <button class="btn">Next</button> </a></p>
+  <p>Blood cells are a key source of DNA in forensic science, making them crucial for identifying individuals and linking suspects to crime scenes.</p> 
+
+  <p>Blood evidence can also provide information about blood type, patterns, and spatter, which helps investigators reconstruct events and determine how a crime occurred.</p>
+  <div style="text-align: center; margin: 1.5rem 0;">
+    <button class="btn video-btn" onclick="openVideoLightbox('assets/bloodcells.mp4')">
+      Watch Blood Cells Video
+    </button>
+  </div>
+  <a href="3-skin.html">
+    <button class="btn">Back</button>
+  </a>
+  <a href="5-buccal.html">
+    <button class="btn">Next</button>
+  </a>
 </div>
+
+<div id="videoLightbox" class="lightbox" onclick="closeLightbox(event)">
+  <div class="lightbox-content">
+    <span class="close-btn" onclick="closeLightbox(event)">×</span>
+    <video id="lightboxVideo" controls="">
+    <source src="" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+  </div>
+</div>
+
+<script>
+
+function openVideoLightbox(videoSrc) {
+  const lightbox = document.getElementById('videoLightbox');
+  const video = document.getElementById('lightboxVideo');
+  video.src = videoSrc;
+  lightbox.style.display = 'flex';
+  video.play();
+}
+
+function closeLightbox(event) {
+  const lightbox = document.getElementById('videoLightbox');
+  const video = document.getElementById('lightboxVideo');
+  
+  if (event.target === lightbox || event.target.className === 'close-btn') {
+    lightbox.style.display = 'none';
+    video.pause();
+    video.currentTime = 0;
+  }
+}
+
+// Close lightbox with Escape key
+document.addEventListener('keydown', function(event) {
+  if (event.key === 'Escape') {
+    const lightbox = document.getElementById('videoLightbox');
+    const video = document.getElementById('lightboxVideo');
+    lightbox.style.display = 'none';
+    video.pause();
+    video.currentTime = 0;
+  }
+});
+</script>
+
+
 
 
 

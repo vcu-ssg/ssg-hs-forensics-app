@@ -17,10 +17,17 @@ format:
 
 ::::
 
+```{=html}
+
 <div class="lesson-card">
   <p>Blood cells are a key source of DNA in forensic science, making them crucial for identifying individuals and linking suspects to crime scenes.</p> 
 
   <p>Blood evidence can also provide information about blood type, patterns, and spatter, which helps investigators reconstruct events and determine how a crime occurred.</p>
+  <div style="text-align: center; margin: 1.5rem 0;">
+    <button class="btn video-btn" onclick="openVideoLightbox('assets/bloodcells.mp4')">
+      Watch Blood Cells Video
+    </button>
+  </div>
   <a href="3-skin.html">
     <button class="btn">Back</button>
   </a>
@@ -28,3 +35,7 @@ format:
     <button class="btn">Next</button>
   </a>
 </div>
+
+{{< include _video-lightbox.html >}}
+
+```

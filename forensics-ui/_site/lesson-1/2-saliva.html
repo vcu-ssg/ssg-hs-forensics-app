@@ -156,18 +156,74 @@ ul.task-list li input[type="checkbox"] {
 </div>
 </div>
 </div>
+
 <div class="lesson-card">
-<p>
-Saliva cells play a vital role in forensic science because they contain DNA that can be used to identify individuals.
-</p>
-<p>
-When saliva is left behind on objects such as cups, cigarettes, or bite marks, forensic experts can collect epithelial cells from the sample, extract the DNA, and compare it to known profiles.
-</p>
-<p>
-This makes saliva evidence especially useful in linking suspects to crimes or confirming identities in investigations.
-</p>
-<p><a href="1-objectives.html"> <button class="btn">Back</button> </a> <a href="3-skin.html"> <button class="btn">Next</button> </a></p>
+  <p>
+    Saliva cells play a vital role in forensic science because they contain DNA that can be used to identify individuals.
+  </p>
+  <p>
+    When saliva is left behind on objects such as cups, cigarettes, or bite marks, forensic experts can collect epithelial cells from the sample, extract the DNA, and compare it to known profiles.
+  </p>
+  <p>
+    This makes saliva evidence especially useful in linking suspects to crimes or confirming identities in investigations.
+  </p>
+  <div style="text-align: center; margin: 1.5rem 0;">
+    <button class="btn video-btn" onclick="openVideoLightbox('assets/salivacells.mp4')">
+      Watch Saliva Cells Video
+    </button>
+  </div>
+  <a href="1-objectives.html">
+    <button class="btn">Back</button>
+  </a>
+  <a href="3-skin.html">
+    <button class="btn">Next</button>
+  </a>
 </div>
+
+<div id="videoLightbox" class="lightbox" onclick="closeLightbox(event)">
+  <div class="lightbox-content">
+    <span class="close-btn" onclick="closeLightbox(event)">×</span>
+    <video id="lightboxVideo" controls="">
+    <source src="" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+  </div>
+</div>
+
+<script>
+
+function openVideoLightbox(videoSrc) {
+  const lightbox = document.getElementById('videoLightbox');
+  const video = document.getElementById('lightboxVideo');
+  video.src = videoSrc;
+  lightbox.style.display = 'flex';
+  video.play();
+}
+
+function closeLightbox(event) {
+  const lightbox = document.getElementById('videoLightbox');
+  const video = document.getElementById('lightboxVideo');
+  
+  if (event.target === lightbox || event.target.className === 'close-btn') {
+    lightbox.style.display = 'none';
+    video.pause();
+    video.currentTime = 0;
+  }
+}
+
+// Close lightbox with Escape key
+document.addEventListener('keydown', function(event) {
+  if (event.key === 'Escape') {
+    const lightbox = document.getElementById('videoLightbox');
+    const video = document.getElementById('lightboxVideo');
+    lightbox.style.display = 'none';
+    video.pause();
+    video.currentTime = 0;
+  }
+});
+</script>
+
+
 
 
 

@@ -1,5 +1,7 @@
 project:
   type: website
+  resources:
+    - "lesson-1/assets/*.mp4"
 
 website:
   title: "FORENSICS-UI"

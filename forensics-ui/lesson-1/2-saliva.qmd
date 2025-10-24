@@ -17,6 +17,8 @@ format:
 
 ::::
 
+```{=html}
+
 <div class="lesson-card">
   <p>
     Saliva cells play a vital role in forensic science because they contain DNA that can be used to identify individuals.
@@ -27,10 +29,19 @@ format:
   <p>
     This makes saliva evidence especially useful in linking suspects to crimes or confirming identities in investigations.
   </p>
+  <div style="text-align: center; margin: 1.5rem 0;">
+    <button class="btn video-btn" onclick="openVideoLightbox('assets/salivacells.mp4')">
+      Watch Saliva Cells Video
+    </button>
+  </div>
   <a href="1-objectives.html">
     <button class="btn">Back</button>
   </a>
   <a href="3-skin.html">
     <button class="btn">Next</button>
   </a>
-</div>  
+</div>
+
+{{< include _video-lightbox.html >}}
+
+```

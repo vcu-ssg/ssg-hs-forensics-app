@@ -7,33 +7,35 @@ format:
     toc: false
 ---
 
+```{=html}
 <div class="shell">
-<main class="card">
-<h1 class="title">SSG Forensics</h1>
-<p class="subtitle">
-Upload microscope images to automatically segment and count cells,
-while also distinguishing between different cell types. The system
-highlights cells in the image, generates size data, and allows you to save
-annotated results for classroom learning or forensic analysis.
-</p>
-<section class="upload-zone">
-<h2 class="upload-title">Upload Image</h2>
-<p class="upload-hint">
-Upload your own image, or choose one from our gallery.
-</p>
-<div class="btn-row">
-<a href="../gallery.html">
-<button class="btn">Gallery</button>
-</a>
-<a href="../next-step.html">
-<button class="btn">Next</button>
-</a>
-</div>
-<input type="file" id="file-input" accept="image/*" hidden />
-</section>
-</main>
+  <main class="card">
+    <h1 class="title">SSG Forensics</h1>
+    <p class="subtitle">
+      Upload microscope images to automatically segment and count cells,
+      while also distinguishing between different cell types. The system
+      highlights cells in the image, generates size data, and allows you to save
+      annotated results for classroom learning or forensic analysis.
+    </p>
+    <section class="upload-zone">
+      <h2 class="upload-title">Upload Image</h2>
+      <p class="upload-hint">
+        Upload your own image, or choose one from our gallery.
+      </p>
+      <div class="btn-row">
+        <a href="../cell-gallery/index.html">
+          <button class="btn">Gallery</button>
+        </a>
+        <a href="../next-step.html">
+          <button class="btn">Next</button>
+        </a>
+      </div>
+      <input type="file" id="file-input" accept="image/*" hidden />
+    </section>
+  </main>
 </div>
 
 <script>
 // Optional: trigger file picker
 </script>
+```

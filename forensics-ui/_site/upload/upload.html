@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.33">
+<meta name="generator" content="quarto-1.8.25">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -32,14 +32,15 @@ ul.task-list li input[type="checkbox"] {
 <meta name="quarto:offset" content="../">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-ea385d0e468b0dd5ea5bf0780b1290d9.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-6bdd2aebeb936dcddaa5f935a5de481c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-835c8631f6ae5c4909394ce24fda0172.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -80,6 +81,8 @@ ul.task-list li input[type="checkbox"] {
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    </a>
     <a class="navbar-brand" href="../index.html">
     <span class="navbar-title">FORENSICS-UI</span>
     </a>
@@ -101,6 +104,10 @@ ul.task-list li input[type="checkbox"] {
   <li class="nav-item">
     <a class="nav-link" href="../lesson-1/index.html"> 
 <span class="menu-text">Lesson 1: Important Cells in Forensics</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="../upload/upload.html" aria-current="page"> 
+<span class="menu-text">Upload Image</span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -143,12 +150,138 @@ ul.task-list li input[type="checkbox"] {
         </a>
       </div>
       <input type="file" id="file-input" accept="image/*" hidden="">
+      <div id="file-name"></div>
     </section>
   </main>
 </div>
 
 <script>
-// Optional: trigger file picker
+  // TODO: display received processed image properly (see same comment in relevant section below).
+  // TODO: change the visual in the CSS for when you drag a file into the upload box.
+  // TODO: change the visual for the display of the selected file's name (added right below the hidden button creation in the part before this script, looks like "<div id="file-name"></div>").
+
+  // Get file upload zone items
+  const uploadZone = document.querySelector('.upload-zone'); // file upload box
+  const fileInput = document.querySelector('#file-input'); // hidden file upload button
+  const fileNameDisplay = document.querySelector('#file-name'); // display name of uploaded file
+
+
+
+  // Connect upload zone/box to the hidden upload button
+
+  // handle clicking (opens file explorer)
+  uploadZone.addEventListener('click', (event) => {
+    if (event.target == uploadZone) {
+      fileInput.click();
+    }
+  });
+
+  // handle file selection
+  fileInput.addEventListener('change', () => {
+    // only try to upload if a file was provided
+    if (fileInput.files.length > 0) {
+      // only handle the first file, in case multiple files are given at once
+      uploadFile(fileInput.files[0]);
+    }
+  });
+
+
+  // handle drag-and-drop
+
+  // prevent default browser behavior for drag events
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    uploadZone.addEventListener(eventName, (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+    });
+  });
+
+  // add visual cue when file is dragged over
+  uploadZone.addEventListener('dragenter', () => {
+    uploadZone.classList.add('drag-over');
+  });
+  uploadZone.addEventListener('dragover', () => {
+    uploadZone.classList.add('drag-over');
+  });
+
+  // remove visual cue when file leaves
+  uploadZone.addEventListener('dragleave', () => {
+    uploadZone.classList.remove('drag-over');
+  });
+
+  // handle the file drop
+  uploadZone.addEventListener('drop', (event) => {
+    uploadZone.classList.remove('drag-over');
+
+    // get the dropped files
+    const files = event.dataTransfer.files;
+    // only try to do anything if a file was actually provided
+    if (files.length > 0) {
+      // put the dropped file into our hidden input
+      fileInput.files = files;
+      // only handle the first file, in case multiple files are given at once
+      uploadFile(fileInput.files[0]);
+    }
+  });
+
+
+  
+  // Handle the provided file; send to Server
+  function uploadFile(file) {
+
+    // package image file to be sent to server
+    const formData = new FormData();
+    formData.append('image', file);
+
+    // display file name (backticks signal to JavaScript it's a template literal)
+    fileNameDisplay.textContent = `Uploading: ${file.name}...`;
+
+    // clear the text in the Upload Zone
+    uploadZone.innerHTML = '';
+
+    // send the packaged image to the server
+    fetch('http://localhost/api/img', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+      // throw an error if server responded with an error code
+      if (!response.ok) {
+            throw new Error(`Server Error: ${response.status} ${response.statusText}`);
+        }
+        return response.blob(); 
+    })
+    // get response from server
+    .then(imageBlob => {
+        // 'imageBlob' is now a file-like object
+        console.log('Successfully received image blob:', imageBlob);
+
+        // TODO: display received processed image properly (current visual code is right below)
+
+        // update status
+        fileNameDisplay.textContent = 'Upload complete!';
+
+        const imageURL = URL.createObjectURL(imageBlob);
+        const imgPreview = document.createElement('img');
+
+        // configure visual of image
+        imgPreview.src = imageURL;
+        imgPreview.style.width = '100%';
+        imgPreview.style.height = '100%';
+        imgPreview.style.objectFit = 'contain';
+
+        // display returned processed image
+        uploadZone.appendChild(imgPreview);
+    })
+    // catch any errors experienced when sending to server
+    .catch(error => {
+        console.error('Error uploading image:', error);
+
+        // display the error message to the user
+        fileNameDisplay.textContent = `Error: ${error.message}`;
+    });
+  }
+
 </script>
 
 
@@ -205,13 +338,14 @@ ul.task-list li input[type="checkbox"] {
       e.clearSelection();
     }
     const getTextToCopy = function(trigger) {
-        const codeEl = trigger.previousElementSibling.cloneNode(true);
-        for (const childEl of codeEl.children) {
-          if (isCodeAnnotation(childEl)) {
-            childEl.remove();
-          }
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
         }
-        return codeEl.innerText;
+      }
+      return codeEl.innerText;
     }
     const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
       text: getTextToCopy

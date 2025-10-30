@@ -33,16 +33,31 @@
   border-radius: 12px;
   padding: 24px;
   background: #fafafa;
+  cursor: pointer;
+}
+/* Change to whatever looks good for visual cue when dragging a file into the box */
+.upload-zone.drag-over {
+  border-color: #007bff;
+  background-color: #f0f8ff;
+}
+.upload-zone img {
+  cursor: default;
+}
+
+#file-name {
+  cursor: default;
 }
 
 .upload-title {
   font-weight: bold;
   margin-bottom: 0.5rem;
+  cursor: default;
 }
 
 .upload-hint {
   color: #666;
   margin-bottom: 1.25rem;
+  cursor: default;
 }
 
 /* Buttons */

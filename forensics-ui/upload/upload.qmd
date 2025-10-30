@@ -31,11 +31,137 @@ format:
         </a>
       </div>
       <input type="file" id="file-input" accept="image/*" hidden />
+      <div id="file-name"></div>
     </section>
   </main>
 </div>
 
 <script>
-// Optional: trigger file picker
+  // TODO: display received processed image properly (see same comment in relevant section below).
+  // TODO: change the visual in the CSS for when you drag a file into the upload box.
+  // TODO: change the visual for the display of the selected file's name (added right below the hidden button creation in the part before this script, looks like "<div id="file-name"></div>").
+
+  // Get file upload zone items
+  const uploadZone = document.querySelector('.upload-zone'); // file upload box
+  const fileInput = document.querySelector('#file-input'); // hidden file upload button
+  const fileNameDisplay = document.querySelector('#file-name'); // display name of uploaded file
+
+
+
+  // Connect upload zone/box to the hidden upload button
+
+  // handle clicking (opens file explorer)
+  uploadZone.addEventListener('click', (event) => {
+    if (event.target == uploadZone) {
+      fileInput.click();
+    }
+  });
+
+  // handle file selection
+  fileInput.addEventListener('change', () => {
+    // only try to upload if a file was provided
+    if (fileInput.files.length > 0) {
+      // only handle the first file, in case multiple files are given at once
+      uploadFile(fileInput.files[0]);
+    }
+  });
+
+
+  // handle drag-and-drop
+
+  // prevent default browser behavior for drag events
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    uploadZone.addEventListener(eventName, (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+    });
+  });
+
+  // add visual cue when file is dragged over
+  uploadZone.addEventListener('dragenter', () => {
+    uploadZone.classList.add('drag-over');
+  });
+  uploadZone.addEventListener('dragover', () => {
+    uploadZone.classList.add('drag-over');
+  });
+
+  // remove visual cue when file leaves
+  uploadZone.addEventListener('dragleave', () => {
+    uploadZone.classList.remove('drag-over');
+  });
+
+  // handle the file drop
+  uploadZone.addEventListener('drop', (event) => {
+    uploadZone.classList.remove('drag-over');
+
+    // get the dropped files
+    const files = event.dataTransfer.files;
+    // only try to do anything if a file was actually provided
+    if (files.length > 0) {
+      // put the dropped file into our hidden input
+      fileInput.files = files;
+      // only handle the first file, in case multiple files are given at once
+      uploadFile(fileInput.files[0]);
+    }
+  });
+
+
+  
+  // Handle the provided file; send to Server
+  function uploadFile(file) {
+
+    // package image file to be sent to server
+    const formData = new FormData();
+    formData.append('image', file);
+
+    // display file name (backticks signal to JavaScript it's a template literal)
+    fileNameDisplay.textContent = `Uploading: ${file.name}...`;
+
+    // clear the text in the Upload Zone
+    uploadZone.innerHTML = '';
+
+    // send the packaged image to the server
+    fetch('http://localhost/api/img', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+      // throw an error if server responded with an error code
+      if (!response.ok) {
+            throw new Error(`Server Error: ${response.status} ${response.statusText}`);
+        }
+        return response.blob(); 
+    })
+    // get response from server
+    .then(imageBlob => {
+        // 'imageBlob' is now a file-like object
+        console.log('Successfully received image blob:', imageBlob);
+
+        // TODO: display received processed image properly (current visual code is right below)
+
+        // update status
+        fileNameDisplay.textContent = 'Upload complete!';
+
+        const imageURL = URL.createObjectURL(imageBlob);
+        const imgPreview = document.createElement('img');
+
+        // configure visual of image
+        imgPreview.src = imageURL;
+        imgPreview.style.width = '100%';
+        imgPreview.style.height = '100%';
+        imgPreview.style.objectFit = 'contain';
+
+        // display returned processed image
+        uploadZone.appendChild(imgPreview);
+    })
+    // catch any errors experienced when sending to server
+    .catch(error => {
+        console.error('Error uploading image:', error);
+
+        // display the error message to the user
+        fileNameDisplay.textContent = `Error: ${error.message}`;
+    });
+  }
+
 </script>
 ```

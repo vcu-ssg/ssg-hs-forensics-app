@@ -13,6 +13,8 @@ website:
         text: About
       - href: lesson-1/index.qmd
         text: "Lesson 1: Important Cells in Forensics"
+      - href: upload/upload.qmd
+        text: "Upload Image"
 
 format:
   html:

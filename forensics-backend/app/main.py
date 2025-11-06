@@ -5,7 +5,7 @@ import os
 
 app = FastAPI()
 
-@app.get("/hello")
+@app.get("/hello/*")
 def root():
     return {"message": "Hello from FastAPI behind NGINX! on /api/hello"}
 

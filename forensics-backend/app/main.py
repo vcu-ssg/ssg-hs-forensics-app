@@ -1,11 +1,11 @@
 from fastapi import FastAPI, File, UploadFile
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse
 import shutil
 import os
 
 app = FastAPI()
 
-@app.get("/hello/*")
+@app.get("/hello")
 def root():
     return {"message": "Hello from FastAPI behind NGINX! on /api/hello"}
 
@@ -13,38 +13,16 @@ def root():
 def root():
     return {"message": "Goodby from FastAPI behind NGINX! on /api/goodbye"}
 
-# TODO: Feature to add in the future.
-# checks if image has been processed in the past, and returns the stored processed results if it has been
-#@app.get("/get-img/{img_name}")
-#async def get_image(img_name: str):
-    # get image file name without extension (it is used as the directory name)
-    #directory_name = img_name.split(sep='.')[0]
-    #if os.path.isdir(f"/usr/share/nginx/user-images/{directory_name}"):
-
-
 # TODO: Hook up the SAM model to this function so it instead passes the received image to the function.
-# processes a new image
-UPLOAD_DIRECTORY = "/cell-gallery/assets/user-images"
-
-@app.post("/process-img")
+@app.post("/img")
 async def upload_image(image: UploadFile = File(...)):
     try:
         # Save the uploaded image to a local file
-        contents = await image.read()
-        with open(f"{UPLOAD_DIRECTORY}/{image.filename}", "wb") as f:
-            f.write(contents)
-        
-        # run sam model
-        #contents = 
-
-        with open(f"{UPLOAD_DIRECTORY}/processed_{image.filename}", "wb") as f:
-            f.write(contents)
-
-        # return url to processed file to client
-        return JSONResponse(content={"image_url": f"{UPLOAD_DIRECTORY}/processed_{image.filename}"})
+        temp_filename = f"uploaded_{image.filename}"
+        with open(temp_filename, "wb") as buffer:
+            shutil.copyfileobj(image.file, buffer)
+        #return {"message": f"Image '{image.filename}' uploaded successfully!"}
+        return FileResponse(path=temp_filename, media_type="image/png", filename="edited_image.png")
     except Exception as e:
-        return {"error": f"Failed to process image: {e}"}
-    finally:
-        # make sure to close the image object
-        image.close()
+        return {"error": f"Failed to upload image: {e}"}
 

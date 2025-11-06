@@ -23,7 +23,7 @@ format:
         Upload your own image, or choose one from our gallery.
       </p>
       <div class="btn-row">
-        <a href="../cell-gallery/index.html">
+        <a href="../cell-gallery/gallery.html">
           <button class="btn">Gallery</button>
         </a>
         <a href="../next-step.html">

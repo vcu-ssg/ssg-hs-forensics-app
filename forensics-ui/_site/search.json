@@ -60,7 +60,7 @@
     "href": "upload/upload.html",
     "title": "SSG Forensics",
     "section": "",
-    "text": "Upload microscope images to automatically segment and count cells,\n      while also distinguishing between different cell types. The system\n      highlights cells in the image, generates size data, and allows you to save\n      annotated results for classroom learning or forensic analysis.\n    \n    \n      Upload Image\n      \n        Upload your own image, or choose one from our gallery.\n      \n      \n        \n          Gallery\n        \n        \n          Next"
+    "text": "Upload microscope images to automatically segment and count cells,\n      while also distinguishing between different cell types. The system\n      highlights cells in the image, generates size data, and allows you to save\n      annotated results for classroom learning or forensic analysis.\n    \n    \n      Upload Image\n      \n        Upload your own image, or choose one from our gallery.\n      \n      \n        \n          Gallery\n        \n        Upload\n        \n          Next"
   },
   {
     "objectID": "index.html",

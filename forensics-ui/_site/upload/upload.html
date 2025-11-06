@@ -255,7 +255,7 @@ ul.task-list li input[type="checkbox"] {
       cancelBtn.type = 'button';
       cancelBtn.title = 'Remove image';
       cancelBtn.className = 'btn btn-cancel';
-      cancelBtn.textContent = '×';
+      cancelBtn.textContent = 'Cancel';
 
       // when clicked, remove preview and allow another selection
       cancelBtn.addEventListener('click', () => {
@@ -282,7 +282,9 @@ ul.task-list li input[type="checkbox"] {
         processFile(file)
           .then(() => {
             // clear the external controls after successful processing
-            processControls.innerHTML = '';
+            processBtn.textContent = '';
+            cancelBtn.textContent = 'Upload Another Image';
+            cancelBtn.title = 'Go back';
             // revoke any preview URL we created
             if (currentObjectURL) {
               try { URL.revokeObjectURL(currentObjectURL); } catch(e){}

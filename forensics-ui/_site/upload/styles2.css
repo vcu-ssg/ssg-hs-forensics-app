@@ -89,14 +89,12 @@
 }
 
 .btn-cancel {
-  width: 36px;
   height: 36px;
-  border-radius: 50%;
+  line-height: 36px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
-  padding: 0;
+  padding: 0 12px;
 }
 
 .btn-process {

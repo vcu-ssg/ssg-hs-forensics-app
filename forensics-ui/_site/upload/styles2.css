@@ -106,7 +106,9 @@
 }
 
 .img-preview {
-  width: 100%;
-  height: 100%;
+  display: block;
+  max-width: 100%; /* prevents it from ever being wider than its container */
+  height: auto; /* lets the height adjust automatically to the aspect ratio */
   object-fit: contain;
+  margin: 0 auto; /* center any images that are smaller than the container */
 }

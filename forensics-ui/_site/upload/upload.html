@@ -150,9 +150,8 @@ ul.task-list li input[type="checkbox"] {
         </a>
       </div>
       <input type="file" id="file-input" accept="image/*" hidden="">
-        <div id="file-name"></div>
-      </section>
-  <div id="process-controls" class="process-controls"></div>
+      <div id="file-name"></div>
+    </section>
   </main>
 </div>
 
@@ -165,9 +164,6 @@ ul.task-list li input[type="checkbox"] {
   const uploadZone = document.querySelector('.upload-zone'); // file upload box
   const fileInput = document.querySelector('#file-input'); // hidden file upload button
   const fileNameDisplay = document.querySelector('#file-name'); // display name of uploaded file
-  const processControls = document.querySelector('#process-controls');
-  // keep track of the most recent object URL so we can revoke it when removing
-  let currentObjectURL = null;
 
 
 
@@ -230,90 +226,21 @@ ul.task-list li input[type="checkbox"] {
 
 
   
-  // uploadFile: UI wrapper shown when a user selects/drops a file.
-  // Shows a preview of the provided file and a "Process image" button.
+  // Handle the provided file; send to Server
   function uploadFile(file) {
-    fileNameDisplay.textContent = `Ready: ${file.name}`;
 
-    // clear the upload zone and show a preview of the selected file
-    uploadZone.innerHTML = '';
-
-    const imageURL = URL.createObjectURL(file);
-    currentObjectURL = imageURL;
-    const imgPreview = document.createElement('img');
-    imgPreview.src = imageURL;
-    imgPreview.className = 'img-preview';
-
-    uploadZone.appendChild(imgPreview);
-
-    // Shows process controls if an image is uploaded
-    if (processControls) {
-      processControls.innerHTML = '';
-
-      // create cancel button
-      const cancelBtn = document.createElement('button');
-      cancelBtn.type = 'button';
-      cancelBtn.title = 'Remove image';
-      cancelBtn.className = 'btn btn-cancel';
-      cancelBtn.textContent = '×';
-
-      // when clicked, remove preview and allow another selection
-      cancelBtn.addEventListener('click', () => {
-        // revoke preview URL if present
-        if (currentObjectURL) {
-          try { URL.revokeObjectURL(currentObjectURL); } catch(e){}
-          currentObjectURL = null;
-        }
-
-        // reload the page to restore original upload UI and handlers
-        // (simpler and robust in this static page context)
-        location.reload();
-      });
-
-      const processBtn = document.createElement('button');
-      processBtn.className = 'btn btn-process';
-      processBtn.textContent = 'Process image';
-
-      // when clicked, call processFile which sends to server and updates the preview
-      processBtn.addEventListener('click', () => {
-        processBtn.disabled = true;
-        processBtn.textContent = 'Processing...';
-
-        processFile(file)
-          .then(() => {
-            // clear the external controls after successful processing
-            processControls.innerHTML = '';
-            // revoke any preview URL we created
-            if (currentObjectURL) {
-              try { URL.revokeObjectURL(currentObjectURL); } catch(e){}
-              currentObjectURL = null;
-            }
-          })
-          .catch((err) => {
-            console.error('Processing failed:', err);
-            fileNameDisplay.textContent = `Error: ${err.message || err}`;
-            processBtn.disabled = false;
-            processBtn.textContent = 'Process image';
-          });
-      });
-
-      processControls.appendChild(cancelBtn);
-      processControls.appendChild(processBtn);
-    }
-  }
-
-
-  // processFile: sends the image to the server and replaces the preview with the
-  // processed image returned by the API.
-  function processFile(file) {
     // package image file to be sent to server
     const formData = new FormData();
     formData.append('image', file);
 
-    fileNameDisplay.textContent = `Uploading: ${file.name}`;
+    // display file name (backticks signal to JavaScript it's a template literal)
+    fileNameDisplay.textContent = `Uploading: ${file.name}...`;
+
+    // clear the text in the Upload Zone
+    uploadZone.innerHTML = '';
 
     // send the packaged image to the server
-    return fetch('http://localhost/api/process-img', {
+    fetch('http://localhost/api/img', {
         method: 'POST',
         body: formData
     })
@@ -322,33 +249,36 @@ ul.task-list li input[type="checkbox"] {
       if (!response.ok) {
             throw new Error(`Server Error: ${response.status} ${response.statusText}`);
         }
-        return response.json(); 
+        return response.blob(); 
     })
     // get response from server
-    .then(data => {
-        // data is now a file-like object
-        console.log('Successfully received image file url:', data);
+    .then(imageBlob => {
+        // 'imageBlob' is now a file-like object
+        console.log('Successfully received image blob:', imageBlob);
+
+        // TODO: display received processed image properly (current visual code is right below)
 
         // update status
-        fileNameDisplay.textContent = 'Processing complete!';
+        fileNameDisplay.textContent = 'Upload complete!';
 
-        const imageURL = data['image_url'];
+        const imageURL = URL.createObjectURL(imageBlob);
         const imgPreview = document.createElement('img');
 
-      // configure visual of image
-      imgPreview.src = imageURL;
-      imgPreview.className = 'img-preview';
+        // configure visual of image
+        imgPreview.src = imageURL;
+        imgPreview.style.width = '100%';
+        imgPreview.style.height = '100%';
+        imgPreview.style.objectFit = 'contain';
 
-      // replace uploadZone content with returned processed image
-      uploadZone.innerHTML = '';
-      uploadZone.appendChild(imgPreview);
+        // display returned processed image
+        uploadZone.appendChild(imgPreview);
     })
+    // catch any errors experienced when sending to server
     .catch(error => {
-        console.error('Error processing image:', error);
+        console.error('Error uploading image:', error);
 
         // display the error message to the user
         fileNameDisplay.textContent = `Error: ${error.message}`;
-        throw error;
     });
   }
 

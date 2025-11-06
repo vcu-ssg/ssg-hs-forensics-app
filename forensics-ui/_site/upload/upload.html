@@ -313,7 +313,7 @@ ul.task-list li input[type="checkbox"] {
     fileNameDisplay.textContent = `Uploading: ${file.name}`;
 
     // send the packaged image to the server
-    return fetch('http://localhost/api/img', {
+    return fetch('http://localhost/api/process-img', {
         method: 'POST',
         body: formData
     })
@@ -322,17 +322,17 @@ ul.task-list li input[type="checkbox"] {
       if (!response.ok) {
             throw new Error(`Server Error: ${response.status} ${response.statusText}`);
         }
-        return response.blob(); 
+        return response.json(); 
     })
     // get response from server
-    .then(imageBlob => {
-        // 'imageBlob' is now a file-like object
-        console.log('Successfully received image blob:', imageBlob);
+    .then(data => {
+        // data is now a file-like object
+        console.log('Successfully received image file url:', data);
 
         // update status
         fileNameDisplay.textContent = 'Processing complete!';
 
-        const imageURL = URL.createObjectURL(imageBlob);
+        const imageURL = data['image_url'];
         const imgPreview = document.createElement('img');
 
       // configure visual of image

@@ -8,6 +8,8 @@ services:
     expose:
       - "8000"
     restart: always
+    volumes:
+      - ../forensics-ui/_site/cell-gallery/assets/user-images:/cell-gallery/assets/user-images
 
 
   nginx:
@@ -16,6 +18,7 @@ services:
     ports:
       - "80:80"
     volumes:
+      # bind mounts
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
       - ../forensics-ui/_site:/usr/share/nginx/html:ro
     depends_on:

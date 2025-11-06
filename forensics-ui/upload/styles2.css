@@ -79,36 +79,3 @@
 
 .btn:hover { background: #d1d5db; }
 .btn:active { transform: translateY(1px); }
-
-.process-controls {
-  margin-top: 8px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  justify-content: center;
-}
-
-.btn-cancel {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  padding: 0;
-}
-
-.btn-process {
-  height: 36px;
-  line-height: 36px;
-  padding: 0 12px;
-}
-
-.img-preview {
-  display: block;
-  max-width: 100%; /* prevents it from ever being wider than its container */
-  height: auto; /* lets the height adjust automatically to the aspect ratio */
-  object-fit: contain;
-  margin: 0 auto; /* center any images that are smaller than the container */
-}

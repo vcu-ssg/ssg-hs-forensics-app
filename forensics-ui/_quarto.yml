@@ -2,8 +2,6 @@ project:
   type: website
   resources:
     - "lesson-1/assets/*.mp4"
-  # create empty directory for Docker to store user images in
-  post-render: mkdir -p _site/cell-gallery/assets/user-images
 
 website:
   title: "FORENSICS-UI"

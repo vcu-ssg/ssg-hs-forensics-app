@@ -1,6 +1,8 @@
 project:
   type: website
   output-dir: ../docs
+  # create empty directory for Docker to store user images in
+  post-render: mkdir -p _site/cell-gallery/assets/user-images
 
 website:
   title: "SSG - HS Forensics"
@@ -12,6 +14,8 @@ website:
         text: Example 1
       - href: https://github.com/vcu-ssg/ssg-hs-forensics-app
         text: Repository
+      - href: cell-gallery/gallery.qmd
+        text: "Gallery"
 
 format:
   html:

@@ -23,32 +23,31 @@ format:
         Upload your own image, or choose one from our gallery.
       </p>
       <div class="btn-row">
-        <a href="../cell-gallery/index.html">
+        <a href="../cell-gallery/gallery.html">
           <button class="btn">Gallery</button>
         </a>
+        <button class="btn" id="upload-btn" type="button">Upload</button>
         <a href="../next-step.html">
           <button class="btn">Next</button>
         </a>
       </div>
       <input type="file" id="file-input" accept="image/*" hidden />
-        <div id="file-name"></div>
-      </section>
-  <div id="process-controls" class="process-controls"></div>
+      <div id="file-name"></div>
+    </section>
   </main>
 </div>
 
 <script>
-  // TODO: display received processed image properly (see same comment in relevant section below).
-  // TODO: change the visual in the CSS for when you drag a file into the upload box.
-  // TODO: change the visual for the display of the selected file's name (added right below the hidden button creation in the part before this script, looks like "<div id="file-name"></div>").
 
   // Get file upload zone items
   const uploadZone = document.querySelector('.upload-zone'); // file upload box
   const fileInput = document.querySelector('#file-input'); // hidden file upload button
+  const uploadBtn = document.querySelector('#upload-btn');
   const fileNameDisplay = document.querySelector('#file-name'); // display name of uploaded file
   const processControls = document.querySelector('#process-controls');
   // keep track of the most recent object URL so we can revoke it when removing
   let currentObjectURL = null;
+  let isProcessed = false;
 
 
 
@@ -56,9 +55,20 @@ format:
 
   // handle clicking (opens file explorer)
   uploadZone.addEventListener('click', (event) => {
-    if (event.target == uploadZone) {
-      fileInput.click();
+    // if displayed image is the processed image, don't allow a new image to be added, unless a back button pressed
+    if (isProcessed) return;
+
+    // if user clicked a button/link inside the zone, let it do its job and don't open file explorer
+    // event.target.closest('a') checks for on or inside a link
+    if (event.target.closest('button') || event.target.closest('a')) {
+      return;
     }
+    // if something else was clicked in the upload zone, then open the file explorer
+    fileInput.click();
+  });
+
+  uploadBtn.addEventListener('click', () => {
+    fileInput.click();
   });
 
   // handle file selection
@@ -68,6 +78,13 @@ format:
       // only handle the first file, in case multiple files are given at once
       uploadFile(fileInput.files[0]);
     }
+
+    // make sure provided file was an image
+    if (!file.type.startsWith('image/')) {
+        fileNameDisplay.textContent = 'Error: Selected file is not an image.';
+        fileInput.value = ''; // clear the invalid file from the input
+        return;
+      }
   });
 
 
@@ -76,6 +93,9 @@ format:
   // prevent default browser behavior for drag events
   ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
     uploadZone.addEventListener(eventName, (event) => {
+      // if displayed image is the processed image, don't allow a new image to be added, unless a back button pressed
+      if (isProcessed) return;
+
       event.preventDefault();
       event.stopPropagation();
     });
@@ -83,14 +103,20 @@ format:
 
   // add visual cue when file is dragged over
   uploadZone.addEventListener('dragenter', () => {
+    if (isProcessed) return;
+
     uploadZone.classList.add('drag-over');
   });
   uploadZone.addEventListener('dragover', () => {
+    if (isProcessed) return;
+
     uploadZone.classList.add('drag-over');
   });
 
   // remove visual cue when file leaves
   uploadZone.addEventListener('dragleave', () => {
+    if (isProcessed) return;
+
     uploadZone.classList.remove('drag-over');
   });
 
@@ -100,8 +126,18 @@ format:
 
     // get the dropped files
     const files = event.dataTransfer.files;
+
     // only try to do anything if a file was actually provided
     if (files.length > 0) {
+      const file = files[0]; // get first file
+
+      // make sure the file is an image
+      if (!file.type.startsWith('image/')) {
+        fileNameDisplay.textContent = 'Error: Selected file is not an image.';
+        fileInput.value = ''; // clear the invalid file from the input
+        return;
+      }
+
       // put the dropped file into our hidden input
       fileInput.files = files;
       // only handle the first file, in case multiple files are given at once
@@ -111,8 +147,7 @@ format:
 
 
   
-  // uploadFile: UI wrapper shown when a user selects/drops a file.
-  // Shows a preview of the provided file and a "Process image" button.
+  // Handle the provided file; send to Server
   function uploadFile(file) {
     fileNameDisplay.textContent = `Ready: ${file.name}`;
 
@@ -140,6 +175,9 @@ format:
 
       // when clicked, remove preview and allow another selection
       cancelBtn.addEventListener('click', () => {
+        // allow images to be uploaded if they weren't already allowed
+        isProcessed = false;
+
         // revoke preview URL if present
         if (currentObjectURL) {
           try { URL.revokeObjectURL(currentObjectURL); } catch(e){}
@@ -162,6 +200,10 @@ format:
 
         processFile(file)
           .then(() => {
+            // don't allow a new image it be uploaded (unless the back button is used), and return cursor to normal (remove the clickable look)
+            isProcessed = true;
+            uploadZone.classList.add('processed');
+
             // clear the external controls after successful processing
             processBtn.textContent = '';
             cancelBtn.textContent = 'Upload Another Image';
@@ -193,10 +235,14 @@ format:
     const formData = new FormData();
     formData.append('image', file);
 
-    fileNameDisplay.textContent = `Uploading: ${file.name}`;
+    // display file name (backticks signal to JavaScript it's a template literal)
+    fileNameDisplay.textContent = `Uploading: ${file.name}...`;
+
+    // clear the text in the Upload Zone
+    uploadZone.innerHTML = '';
 
     // send the packaged image to the server
-    return fetch('http://localhost/api/process-img', {
+    fetch('http://localhost/api/img', {
         method: 'POST',
         body: formData
     })
@@ -205,33 +251,36 @@ format:
       if (!response.ok) {
             throw new Error(`Server Error: ${response.status} ${response.statusText}`);
         }
-        return response.json(); 
+        return response.blob(); 
     })
     // get response from server
-    .then(data => {
-        // data is now a file-like object
-        console.log('Successfully received image file url:', data);
+    .then(imageBlob => {
+        // 'imageBlob' is now a file-like object
+        console.log('Successfully received image blob:', imageBlob);
+
+        // TODO: display received processed image properly (current visual code is right below)
 
         // update status
-        fileNameDisplay.textContent = 'Processing complete!';
+        fileNameDisplay.textContent = 'Upload complete!';
 
-        const imageURL = data['image_url'];
+        const imageURL = URL.createObjectURL(imageBlob);
         const imgPreview = document.createElement('img');
 
-      // configure visual of image
-      imgPreview.src = imageURL;
-      imgPreview.className = 'img-preview';
+        // configure visual of image
+        imgPreview.src = imageURL;
+        imgPreview.style.width = '100%';
+        imgPreview.style.height = '100%';
+        imgPreview.style.objectFit = 'contain';
 
-      // replace uploadZone content with returned processed image
-      uploadZone.innerHTML = '';
-      uploadZone.appendChild(imgPreview);
+        // display returned processed image
+        uploadZone.appendChild(imgPreview);
     })
+    // catch any errors experienced when sending to server
     .catch(error => {
-        console.error('Error processing image:', error);
+        console.error('Error uploading image:', error);
 
         // display the error message to the user
         fileNameDisplay.textContent = `Error: ${error.message}`;
-        throw error;
     });
   }
 

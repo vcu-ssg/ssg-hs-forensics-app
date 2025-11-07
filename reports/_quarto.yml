@@ -1,8 +1,6 @@
 project:
   type: website
   output-dir: ../docs
-  # create empty directory for Docker to store user images in
-  post-render: mkdir -p _site/cell-gallery/assets/user-images
 
 website:
   title: "SSG - HS Forensics"

@@ -80,6 +80,8 @@ format:
       uploadFile(fileInput.files[0]);
     }
 
+    const file = fileInput.files[0];
+
     // make sure provided file was an image
     if (!file.type.startsWith('image/')) {
         fileNameDisplay.textContent = 'Error: Selected file is not an image.';

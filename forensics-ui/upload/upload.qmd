@@ -32,8 +32,9 @@ format:
         </a>
       </div>
       <input type="file" id="file-input" accept="image/*" hidden />
-      <div id="file-name"></div>
-    </section>
+        <div id="file-name"></div>
+      </section>
+  <div id="process-controls" class="process-controls"></div>
   </main>
 </div>
 
@@ -147,7 +148,8 @@ format:
 
 
   
-  // Handle the provided file; send to Server
+  // uploadFile: UI wrapper shown when a user selects/drops a file.
+  // Shows a preview of the provided file and a "Process image" button.
   function uploadFile(file) {
     fileNameDisplay.textContent = `Ready: ${file.name}`;
 
@@ -235,14 +237,10 @@ format:
     const formData = new FormData();
     formData.append('image', file);
 
-    // display file name (backticks signal to JavaScript it's a template literal)
-    fileNameDisplay.textContent = `Uploading: ${file.name}...`;
-
-    // clear the text in the Upload Zone
-    uploadZone.innerHTML = '';
+    fileNameDisplay.textContent = `Uploading: ${file.name}`;
 
     // send the packaged image to the server
-    fetch('http://localhost/api/img', {
+    return fetch('http://localhost/api/process-img', {
         method: 'POST',
         body: formData
     })
@@ -251,36 +249,33 @@ format:
       if (!response.ok) {
             throw new Error(`Server Error: ${response.status} ${response.statusText}`);
         }
-        return response.blob(); 
+        return response.json(); 
     })
     // get response from server
-    .then(imageBlob => {
-        // 'imageBlob' is now a file-like object
-        console.log('Successfully received image blob:', imageBlob);
-
-        // TODO: display received processed image properly (current visual code is right below)
+    .then(data => {
+        // data is now a file-like object
+        console.log('Successfully received image file url:', data);
 
         // update status
-        fileNameDisplay.textContent = 'Upload complete!';
+        fileNameDisplay.textContent = 'Processing complete!';
 
-        const imageURL = URL.createObjectURL(imageBlob);
+        const imageURL = data['image_url'];
         const imgPreview = document.createElement('img');
 
-        // configure visual of image
-        imgPreview.src = imageURL;
-        imgPreview.style.width = '100%';
-        imgPreview.style.height = '100%';
-        imgPreview.style.objectFit = 'contain';
+      // configure visual of image
+      imgPreview.src = imageURL;
+      imgPreview.className = 'img-preview';
 
-        // display returned processed image
-        uploadZone.appendChild(imgPreview);
+      // replace uploadZone content with returned processed image
+      uploadZone.innerHTML = '';
+      uploadZone.appendChild(imgPreview);
     })
-    // catch any errors experienced when sending to server
     .catch(error => {
-        console.error('Error uploading image:', error);
+        console.error('Error processing image:', error);
 
         // display the error message to the user
         fileNameDisplay.textContent = `Error: ${error.message}`;
+        throw error;
     });
   }
 

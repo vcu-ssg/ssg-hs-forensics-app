@@ -9,7 +9,7 @@ services:
       - "8000"
     restart: always
     volumes:
-      - ../forensics-ui/_site/cell-gallery/assets/user-images:/cell-gallery/assets/user-images
+      - ../images/user-images:/images/user-images
 
 
   nginx:
@@ -21,6 +21,7 @@ services:
       # bind mounts
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
       - ../forensics-ui/_site:/usr/share/nginx/html:ro
+      - ../images/user-images:/usr/share/nginx/images:ro
     depends_on:
       - fastapi
     restart: always

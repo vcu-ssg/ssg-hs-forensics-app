@@ -4,7 +4,7 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-RUN wget https://dl.fbaipublicfiles.com/segment_anything/sam_vit_b_01ec64.pth
+#RUN wget https://dl.fbaipublicfiles.com/segment_anything/sam_vit_b_01ec64.pth
 
 COPY . .
 

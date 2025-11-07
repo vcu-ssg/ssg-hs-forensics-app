@@ -2,7 +2,7 @@ from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import JSONResponse
 import shutil
 import os
-from run_sam2 import generate_segmentation
+#from run_sam2 import generate_segmentation
 
 app = FastAPI()
 

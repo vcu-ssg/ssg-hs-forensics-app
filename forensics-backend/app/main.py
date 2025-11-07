@@ -25,24 +25,25 @@ def root():
 
 # TODO: Hook up the SAM model to this function so it instead passes the received image to the function.
 # processes a new image
-UPLOAD_DIRECTORY = "/cell-gallery/assets/user-images"
+UPLOAD_DIRECTORY_FASTAPI = "/images/uploaded-images"
+PREVIEW_DIRECTORY_NGINX = "/images/uploaded-images"
 
 @app.post("/process-img")
 async def upload_image(image: UploadFile = File(...)):
     try:
         # Save the uploaded image to a local file
         contents = await image.read()
-        with open(f"{UPLOAD_DIRECTORY}/{image.filename}", "wb") as f:
+        with open(f"{UPLOAD_DIRECTORY_FASTAPI}/{image.filename}", "wb") as f:
             f.write(contents)
         
         # run sam model
         #contents = 
 
-        with open(f"{UPLOAD_DIRECTORY}/processed_{image.filename}", "wb") as f:
+        with open(f"{UPLOAD_DIRECTORY_FASTAPI}/processed_{image.filename}", "wb") as f:
             f.write(contents)
 
         # return url to processed file to client
-        return JSONResponse(content={"image_url": f"{UPLOAD_DIRECTORY}/processed_{image.filename}"})
+        return JSONResponse(content={"image_url": f"{PREVIEW_DIRECTORY_NGINX}/processed_{image.filename}"})
     except Exception as e:
         return {"error": f"Failed to process image: {e}"}
     finally:

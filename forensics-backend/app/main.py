@@ -26,20 +26,23 @@ def root():
 # TODO: Hook up the SAM model to this function so it instead passes the received image to the function.
 # processes a new image
 UPLOAD_DIRECTORY_FASTAPI = "/images/uploaded-images"
-PREVIEW_DIRECTORY_NGINX = "/images/uploaded-images"
+PROCESSED_DIRECTORY_FASTAPI = "/images/processed-images"
+PREVIEW_DIRECTORY_NGINX = "/images/processed-images"
 
 @app.post("/process-img")
 async def upload_image(image: UploadFile = File(...)):
     try:
         # Save the uploaded image to a local file
         contents = await image.read()
-        with open(f"{UPLOAD_DIRECTORY_FASTAPI}/{image.filename}", "wb") as f:
+        # save original upload
+        upload_path = os.path.join(UPLOAD_DIRECTORY_FASTAPI, image.filename)
+        with open(upload_path, "wb") as f:
             f.write(contents)
-        
-        # run sam model
-        #contents = 
 
-        with open(f"{UPLOAD_DIRECTORY_FASTAPI}/processed_{image.filename}", "wb") as f:
+        # TODO: call segmentation/model processing here and write real processed output
+        # For now, write the processed file as a copy into the processed directory
+        processed_path = os.path.join(PROCESSED_DIRECTORY_FASTAPI, f"processed_{image.filename}")
+        with open(processed_path, "wb") as f:
             f.write(contents)
 
         # return url to processed file to client

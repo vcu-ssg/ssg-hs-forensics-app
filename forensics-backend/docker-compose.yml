@@ -10,6 +10,7 @@ services:
     restart: always
     volumes:
       - ../images/uploaded-images:/images/uploaded-images
+      - ../images/processed-images:/images/processed-images
 
 
   nginx:

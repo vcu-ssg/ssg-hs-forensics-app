@@ -9,6 +9,7 @@ services:
       - "8000"
     restart: always
     volumes:
+      - ../images/sample-gallery-images:/images/sample-gallery-images
       - ../images/uploaded-images:/images/uploaded-images
       - ../images/processed-images:/images/processed-images
 

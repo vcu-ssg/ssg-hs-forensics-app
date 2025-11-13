@@ -2,6 +2,7 @@ from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import JSONResponse
 import shutil
 import os
+from pathlib import Path
 #from run_sam2 import generate_segmentation
 
 app = FastAPI()
@@ -53,3 +54,70 @@ async def upload_image(image: UploadFile = File(...)):
         # make sure to close the image object
         image.close()
 
+
+# Image gallery endpoints
+SAMPLE_IMAGES_BASE = "/images/sample-gallery-images"
+UPLOADED_IMAGES_BASE = "/images/uploaded-images"
+PROCESSED_IMAGES_BASE = "/images/processed-images"
+
+def get_images_from_directory(directory_path: str) -> list:
+    """Recursively get all image files from a directory."""
+    image_extensions = {'.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff', '.webp'}
+    images = []
+    
+    if not os.path.exists(directory_path):
+        return images
+    
+    for root, dirs, files in os.walk(directory_path):
+        for file in files:
+            if any(file.lower().endswith(ext) for ext in image_extensions):
+                # Get relative path from the base directory
+                rel_path = os.path.relpath(os.path.join(root, file), directory_path)
+                images.append(rel_path)
+    
+    return sorted(images)
+
+@app.get("/gallery/sample-images")
+async def get_sample_images():
+    """Get all sample images organized by cell type."""
+    try:
+        result = {
+            "buccal_cells": [],
+            "epidermal_cells": [],
+            "saliva_cells": []
+        }
+        
+        for cell_type in result.keys():
+            cell_dir = os.path.join(SAMPLE_IMAGES_BASE, cell_type)
+            if os.path.exists(cell_dir):
+                images = get_images_from_directory(cell_dir)
+                # Create full URLs for frontend
+                result[cell_type] = [f"/images/sample-gallery-images/{cell_type}/{img}" for img in images]
+        
+        return JSONResponse(content=result)
+    except Exception as e:
+        return JSONResponse(content={"error": str(e)}, status_code=500)
+
+@app.get("/gallery/uploaded-images")
+async def get_uploaded_images():
+    """Get all uploaded images."""
+    try:
+        images = get_images_from_directory(UPLOADED_IMAGES_BASE)
+        # Create full URLs for frontend
+        image_urls = [f"/images/uploaded-images/{img}" for img in images]
+        return JSONResponse(content={"images": image_urls})
+    except Exception as e:
+        return JSONResponse(content={"error": str(e)}, status_code=500)
+
+@app.get("/gallery/processed-images")
+async def get_processed_images():
+    """Get all processed images."""
+    try:
+        images = get_images_from_directory(PROCESSED_IMAGES_BASE)
+        # Filter out .gitkeep files
+        images = [img for img in images if not img.endswith('.gitkeep')]
+        # Create full URLs for frontend
+        image_urls = [f"/images/processed-images/{img}" for img in images]
+        return JSONResponse(content={"images": image_urls})
+    except Exception as e:
+        return JSONResponse(content={"error": str(e)}, status_code=500)

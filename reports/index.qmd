@@ -4,6 +4,10 @@ title: Welcome
 
 First draft of a working website documenting our work on this project.
 
+## Documentation
+
+- [Image Gallery and Upload Guide](image-gallery-guide.qmd) - Learn how to upload images and use the gallery features
+- [Developer Documentation](development.qmd) - Technical documentation for developers working on the project
 
 ## Intro presentation
 

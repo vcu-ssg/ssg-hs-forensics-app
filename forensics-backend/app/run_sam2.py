@@ -40,13 +40,14 @@ def load_model(sam_checkpoint: str = "sam_vit_b_01ec64.pth", device: torch.devic
     try: 
         model_type = "vit_b"
 
-        # Register and load the SAM2 model
+        # Register and load the SAM model
         sam = sam_model_registry[model_type](checkpoint=sam_checkpoint)
         sam.to(device)  # use cpu (hopefully)
         print("YUP all loaded")
         return sam        
     except Exception as e:
-        print("NOPE not loaded")
+        print(f"NOPE not loaded: {e}")
+        return None
 
 
 # this code is not currently being used but could be incorporated
@@ -73,8 +74,20 @@ def analyze_image(masks):
             # add non-bubble masks to the array
             total_areas.append(mask["area"])
 
-    #remove the background element
-    del total_areas[0]
+    #remove the background element if it exists
+    if len(total_areas) > 0:
+        del total_areas[0]
+
+    # Handle case where no areas remain after filtering
+    if len(total_areas) == 0:
+        return {
+            "total_cells": 0,
+            "mean_area": 0.0,
+            "cell_type_prediction": "unknown",
+            "buccal_count": 0,
+            "touch_count": 0,
+            "saliva_count": 0,
+        }
 
     #convert to a numpy array
     total_areas = np.array(total_areas)
@@ -97,25 +110,25 @@ def analyze_image(masks):
         prediction = "saliva cells"
 
     # how many of each type
-    buccalCount = 0
-    touchCount = 0
-    salivaCount = 0
+    buccal_count = 0
+    touch_count = 0
+    saliva_count = 0
 
     for area in total_areas:
         if area >= 10000:
-            buccalCount +=1
-        elif area <2500:
-            touchCount +=1
-        elif area >=2500 and area < 10000:
-            salivaCount +=1
+            buccal_count += 1
+        elif area < 2500:
+            touch_count += 1
+        elif area >= 2500 and area < 10000:
+            saliva_count += 1
 
     return {
         "total_cells": total_cells,
         "mean_area": mean_area,
         "cell_type_prediction": prediction,
-        "buccal_count": buccalCount,
-        "touch_count": touchCount,
-        "saliva_count": salivaCount,
+        "buccal_count": buccal_count,
+        "touch_count": touch_count,
+        "saliva_count": saliva_count,
     }
 
 # this processes the image
@@ -123,21 +136,24 @@ def process_image(image_path: str, sam, device: torch.device):
     image_path = Path(image_path)
     if not image_path.is_file():
         print(f"{image_path} does not exist")
-        sys.exit(1)
+        raise FileNotFoundError(f"{image_path} does not exist")
 
     # initial processing of image 
-    image = cv2.imread(image_path)
+    image = cv2.imread(str(image_path))
+    if image is None:
+        raise ValueError(f"Failed to load image from {image_path}")
+    
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)  # Convert to RGB
 
     # mask generation
     mask_generator_ = SamAutomaticMaskGenerator(
-    model=sam,
-    points_per_side=32,
-    pred_iou_thresh=0.9,
-    stability_score_thresh=0.96,
-    crop_n_layers=1,
-    crop_n_points_downscale_factor=2,
-    min_mask_region_area=100,    # Requires open-cv to run post-processing
+        model=sam,
+        points_per_side=32,
+        pred_iou_thresh=0.9,
+        stability_score_thresh=0.96,
+        crop_n_layers=1,
+        crop_n_points_downscale_factor=2,
+        min_mask_region_area=100,    # Requires open-cv to run post-processing
     )
 
     start = time.perf_counter()
@@ -163,33 +179,32 @@ def process_image(image_path: str, sam, device: torch.device):
     # Save the image to a BytesIO stream
     buffer = BytesIO()
     plt.axis('off')  # Hide axes
-    plt.savefig(buffer, format="png")  # Save to buffer as PNG
+    plt.savefig(buffer, format="png", bbox_inches='tight', pad_inches=0)  # Save to buffer as PNG
     buffer.seek(0)  # Move to beginning so it can be read
     plt.close(fig)  # Close figure to free memory
-
 
     # image to be returned
     cell_stats = analyze_image(masks)
     return buffer, cell_stats
     
 
-# Initialize the SAM2 model and process an image
+# Initialize the SAM model and process an image
 def generate_segmentation(image_path: str, model_checkpoint: str = "sam_vit_b_01ec64.pth", device: torch.device = torch.device("cpu")):
 
-    # Load the SAM2 model
+    # Load the SAM model
     model = load_model(model_checkpoint, device)
 
     if model is None:
         print("Model loading failed. Returning None.")
-        return None
+        raise RuntimeError("Failed to load SAM model")
 
     # Process the image and generate the result
     result_image, cell_stats = process_image(image_path, model, device)
-    print(cell_stats["total_cells"])
-    print(cell_stats["mean_area"])
-    print(cell_stats["buccalCount"])
-    print(cell_stats["touchCount"])
-    print(cell_stats["salivaCount"])
+    print(f"Total cells: {cell_stats['total_cells']}")
+    print(f"Mean area: {cell_stats['mean_area']}")
+    print(f"Buccal count: {cell_stats['buccal_count']}")
+    print(f"Touch count: {cell_stats['touch_count']}")
+    print(f"Saliva count: {cell_stats['saliva_count']}")
 
     return result_image, cell_stats
 
@@ -197,5 +212,4 @@ def generate_segmentation(image_path: str, model_checkpoint: str = "sam_vit_b_01
 if __name__ == "__main__":
     print("PyTorch version:", torch.__version__)
     print("Torchvision version:", torchvision.__version__)
-
     print("CUDA is available:", torch.cuda.is_available())

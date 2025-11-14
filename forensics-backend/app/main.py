@@ -1,13 +1,14 @@
 from fastapi import FastAPI, File, UploadFile
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 import shutil
 import os
 from pathlib import Path
-#from run_sam2 import generate_segmentation
+from run_sam2 import generate_segmentation
+import torch
 
 app = FastAPI()
 
-@app.get("/hello/*")
+@app.get("/hello")
 def root():
     return {"message": "Hello from FastAPI behind NGINX! on /api/hello"}
 
@@ -24,11 +25,13 @@ def root():
     #if os.path.isdir(f"/usr/share/nginx/user-images/{directory_name}"):
 
 
-# TODO: Hook up the SAM model to this function so it instead passes the received image to the function.
 # processes a new image
 UPLOAD_DIRECTORY_FASTAPI = "/images/uploaded-images"
 PROCESSED_DIRECTORY_FASTAPI = "/images/processed-images"
 PREVIEW_DIRECTORY_NGINX = "/images/processed-images"
+
+# Initialize device
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 @app.post("/process-img")
 async def upload_image(image: UploadFile = File(...)):
@@ -40,19 +43,41 @@ async def upload_image(image: UploadFile = File(...)):
         with open(upload_path, "wb") as f:
             f.write(contents)
 
-        # TODO: call segmentation/model processing here and write real processed output
-        # For now, write the processed file as a copy into the processed directory
-        processed_path = os.path.join(PROCESSED_DIRECTORY_FASTAPI, f"processed_{image.filename}")
-        with open(processed_path, "wb") as f:
-            f.write(contents)
+        # Call segmentation/model processing
+        result_image_buffer, cell_stats = generate_segmentation(
+            image_path=upload_path,
+            device=device
+        )
 
-        # return url to processed file to client
-        return JSONResponse(content={"image_url": f"{PREVIEW_DIRECTORY_NGINX}/processed_{image.filename}"})
+        # Save the processed image from the buffer
+        processed_filename = f"processed_{image.filename}"
+        # Ensure the filename has .png extension since that's what we save as
+        if not processed_filename.lower().endswith('.png'):
+            processed_filename = os.path.splitext(processed_filename)[0] + '.png'
+        
+        processed_path = os.path.join(PROCESSED_DIRECTORY_FASTAPI, processed_filename)
+        
+        # Write the buffer contents to file
+        with open(processed_path, "wb") as f:
+            f.write(result_image_buffer.getvalue())
+
+        # Return URL to processed file and cell statistics to client
+        return JSONResponse(content={
+            "image_url": f"{PREVIEW_DIRECTORY_NGINX}/{processed_filename}",
+            "cell_stats": {
+                "total_cells": cell_stats["total_cells"],
+                "mean_area": float(cell_stats["mean_area"]),
+                "cell_type_prediction": cell_stats["cell_type_prediction"],
+                "buccal_count": cell_stats["buccal_count"],
+                "touch_count": cell_stats["touch_count"],
+                "saliva_count": cell_stats["saliva_count"]
+            }
+        })
     except Exception as e:
-        return {"error": f"Failed to process image: {e}"}
+        return JSONResponse(content={"error": f"Failed to process image: {str(e)}"}, status_code=500)
     finally:
         # make sure to close the image object
-        image.close()
+        await image.close()
 
 
 # Image gallery endpoints

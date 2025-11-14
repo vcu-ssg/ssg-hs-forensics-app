@@ -6,8 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="SSG Forensics Team">
+<meta name="dcterms.date" content="2025-11-13">
 
-<title>Welcome – SSG - HS Forensics</title>
+<title>Image Gallery and Upload Guide – SSG - HS Forensics</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -93,7 +95,7 @@ ul.task-list li input[type="checkbox"] {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="./index.html" aria-current="page"> 
+    <a class="nav-link" href="./index.html"> 
 <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
@@ -124,8 +126,25 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#documentation" id="toc-documentation" class="nav-link active" data-scroll-target="#documentation">Documentation</a></li>
-  <li><a href="#intro-presentation" id="toc-intro-presentation" class="nav-link" data-scroll-target="#intro-presentation">Intro presentation</a></li>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">Overview</a></li>
+  <li><a href="#image-gallery" id="toc-image-gallery" class="nav-link" data-scroll-target="#image-gallery">Image Gallery</a>
+  <ul class="collapse">
+  <li><a href="#sample-images" id="toc-sample-images" class="nav-link" data-scroll-target="#sample-images">Sample Images</a></li>
+  <li><a href="#uploaded-images" id="toc-uploaded-images" class="nav-link" data-scroll-target="#uploaded-images">Uploaded Images</a></li>
+  <li><a href="#processed-images" id="toc-processed-images" class="nav-link" data-scroll-target="#processed-images">Processed Images</a></li>
+  </ul></li>
+  <li><a href="#technical-implementation" id="toc-technical-implementation" class="nav-link" data-scroll-target="#technical-implementation">Technical Implementation</a>
+  <ul class="collapse">
+  <li><a href="#architecture" id="toc-architecture" class="nav-link" data-scroll-target="#architecture">Architecture</a></li>
+  <li><a href="#api-endpoints" id="toc-api-endpoints" class="nav-link" data-scroll-target="#api-endpoints">API Endpoints</a></li>
+  <li><a href="#image-storage" id="toc-image-storage" class="nav-link" data-scroll-target="#image-storage">Image Storage</a></li>
+  <li><a href="#processing-workflow" id="toc-processing-workflow" class="nav-link" data-scroll-target="#processing-workflow">Processing Workflow</a></li>
+  </ul></li>
+  <li><a href="#best-practices" id="toc-best-practices" class="nav-link" data-scroll-target="#best-practices">Best Practices</a>
+  <ul class="collapse">
+  <li><a href="#for-students" id="toc-for-students" class="nav-link" data-scroll-target="#for-students">For Students</a></li>
+  <li><a href="#for-educators" id="toc-for-educators" class="nav-link" data-scroll-target="#for-educators">For Educators</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -134,14 +153,26 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Welcome</h1>
+<h1 class="title">Image Gallery and Upload Guide</h1>
 </div>
 
 
 
 <div class="quarto-title-meta">
 
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>SSG Forensics Team </p>
+          </div>
+  </div>
     
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">November 13, 2025</p>
+    </div>
+  </div>
   
     
   </div>
@@ -151,20 +182,159 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>First draft of a working website documenting our work on this project.</p>
-<section id="documentation" class="level2">
-<h2 class="anchored" data-anchor-id="documentation">Documentation</h2>
+<section id="overview" class="level2">
+<h2 class="anchored" data-anchor-id="overview">Overview</h2>
+<p>This guide explains how to use the forensic cell image gallery and upload functionality in the SSG High School Forensics Application. The system allows users to view sample images, upload their own cell images, and process them using AI-powered analysis tools.</p>
+</section>
+<section id="image-gallery" class="level2">
+<h2 class="anchored" data-anchor-id="image-gallery">Image Gallery</h2>
+<p>The image gallery is organized into three main sections, each serving a specific purpose in the forensic analysis workflow.</p>
+<section id="sample-images" class="level3">
+<h3 class="anchored" data-anchor-id="sample-images">Sample Images</h3>
+<p>The Sample Images section contains pre-loaded reference images of different cell types:</p>
 <ul>
-<li><a href="./image-gallery-guide.html">Image Gallery and Upload Guide</a> - Learn how to upload images and use the gallery features</li>
-<li><a href="./development.html">Developer Documentation</a> - Technical documentation for developers working on the project</li>
+<li><strong>Buccal Cells</strong>: Epithelial cells collected from the inside of the cheek, commonly used in forensic DNA analysis</li>
+<li><strong>Epidermal Cells</strong>: Skin cells that can be found in fingerprints and touch DNA samples</li>
+<li><strong>Saliva Cells</strong>: A mixture of epithelial cells found in biological evidence</li>
+</ul>
+<p>These images are provided for educational purposes and can be used to:</p>
+<ul>
+<li>Learn to identify different cell types</li>
+<li>Practice with the image processing tools</li>
+<li>Compare against uploaded images</li>
+</ul>
+<section id="using-sample-images" class="level4">
+<h4 class="anchored" data-anchor-id="using-sample-images">Using Sample Images</h4>
+<ol type="1">
+<li>Navigate to the gallery page</li>
+<li>Browse images organized by cell type</li>
+<li>Hover over any image to reveal action buttons:
+<ul>
+<li><strong>View</strong>: Opens the full-size image in a new tab</li>
+<li><strong>Process</strong>: Sends the image to the AI analysis pipeline</li>
+</ul></li>
+</ol>
+</section>
+</section>
+<section id="uploaded-images" class="level3">
+<h3 class="anchored" data-anchor-id="uploaded-images">Uploaded Images</h3>
+<p>This section displays all images that have been uploaded by users through the upload tool.</p>
+<section id="how-to-upload-images" class="level4">
+<h4 class="anchored" data-anchor-id="how-to-upload-images">How to Upload Images</h4>
+<ol type="1">
+<li>Navigate to the Upload page</li>
+<li>Click the upload area or drag and drop an image file</li>
+<li>Supported formats: JPG, JPEG, PNG</li>
+<li>Once uploaded, the image will appear in the Uploaded Images section of the gallery</li>
+</ol>
+</section>
+<section id="processing-uploaded-images" class="level4">
+<h4 class="anchored" data-anchor-id="processing-uploaded-images">Processing Uploaded Images</h4>
+<p>After uploading an image:</p>
+<ol type="1">
+<li>Go to the gallery page</li>
+<li>Find your image in the Uploaded Images section</li>
+<li>Hover over the image to reveal action buttons</li>
+<li>Click <strong>Process</strong> to analyze the image</li>
+<li>Wait for the processing to complete (indicated by status messages)</li>
+<li>View the processed result in the Processed Images section</li>
+</ol>
+</section>
+</section>
+<section id="processed-images" class="level3">
+<h3 class="anchored" data-anchor-id="processed-images">Processed Images</h3>
+<p>This section contains all images that have been analyzed by the AI segmentation and identification tools.</p>
+<p>Processed images include:</p>
+<ul>
+<li>Segmented cell boundaries</li>
+<li>Cell type identification</li>
+<li>Analysis metadata</li>
+</ul>
+<section id="viewing-processed-results" class="level4">
+<h4 class="anchored" data-anchor-id="viewing-processed-results">Viewing Processed Results</h4>
+<ul>
+<li>Click on any processed image to view it full-size</li>
+<li>Processed images are named with a <code>processed_</code> prefix</li>
+<li>Results are stored persistently and can be reviewed at any time</li>
 </ul>
 </section>
-<section id="intro-presentation" class="level2">
-<h2 class="anchored" data-anchor-id="intro-presentation">Intro presentation</h2>
-<p>Below is the intro presentation shared by Alina. Here a <a href="https://docs.google.com/presentation/d/1Dvj30uIWChAgkIMVAGFMYwBHVhdFYcJw6l3nDvWGdbM/edit?slide=id.p#slide=id.p">direct link to the google slides</a> source.</p>
-<iframe src="https://docs.google.com/presentation/d/1Dvj30uIWChAgkIMVAGFMYwBHVhdFYcJw6l3nDvWGdbM/preview?slide=id.p" frameborder="0" width="960" height="569" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
+</section>
+</section>
+<section id="technical-implementation" class="level2">
+<h2 class="anchored" data-anchor-id="technical-implementation">Technical Implementation</h2>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This section contains technical details about the system architecture and implementation. Feel free to skip this if you’re primarily interested in using the application.</p>
+</div>
+</div>
+<section id="architecture" class="level3">
+<h3 class="anchored" data-anchor-id="architecture">Architecture</h3>
+<p>The gallery system uses a dynamic, API-driven architecture:</p>
+<pre><code>Frontend (Quarto/HTML/JS) → NGINX → FastAPI Backend → File System</code></pre>
+</section>
+<section id="api-endpoints" class="level3">
+<h3 class="anchored" data-anchor-id="api-endpoints">API Endpoints</h3>
+<p>The backend provides three main endpoints for the gallery:</p>
+<ul>
+<li><code>GET /api/gallery/sample-images</code>: Returns organized list of sample images by cell type</li>
+<li><code>GET /api/gallery/uploaded-images</code>: Returns list of user-uploaded images</li>
+<li><code>GET /api/gallery/processed-images</code>: Returns list of processed images</li>
+</ul>
+</section>
+<section id="image-storage" class="level3">
+<h3 class="anchored" data-anchor-id="image-storage">Image Storage</h3>
+<p>Images are organized in the following directory structure:</p>
+<pre><code>images/
+├── sample-gallery-images/
+│   ├── buccal_cells/
+│   ├── epidermal_cells/
+│   └── saliva_cells/
+├── uploaded-images/
+└── processed-images/</code></pre>
+</section>
+<section id="processing-workflow" class="level3">
+<h3 class="anchored" data-anchor-id="processing-workflow">Processing Workflow</h3>
+<ol type="1">
+<li>User selects an image to process</li>
+<li>Frontend fetches the image as a blob</li>
+<li>Image is sent to <code>/api/process-img</code> endpoint via POST request</li>
+<li>Backend processes the image using the SAM2 model (or current processing logic)</li>
+<li>Processed image is saved to <code>processed-images/</code> directory</li>
+<li>Frontend refreshes the Processed Images gallery</li>
+<li>User is notified of successful processing</li>
+</ol>
+</section>
+</section>
+<section id="best-practices" class="level2">
+<h2 class="anchored" data-anchor-id="best-practices">Best Practices</h2>
+<section id="for-students" class="level3">
+<h3 class="anchored" data-anchor-id="for-students">For Students</h3>
+<ul>
+<li>Start by exploring sample images to learn different cell types</li>
+<li>Upload clear, well-focused microscope images for best results</li>
+<li>Process images one at a time to avoid overwhelming the system</li>
+<li>Compare processed results against sample images to verify accuracy</li>
+</ul>
+</section>
+<section id="for-educators" class="level3">
+<h3 class="anchored" data-anchor-id="for-educators">For Educators</h3>
+<ul>
+<li>Use sample images for demonstrations and teaching</li>
+<li>Guide students to upload their own collected samples</li>
+<li>Review processed images with students to discuss cell identification</li>
+<li>Leverage the gallery for comparative analysis exercises</li>
+</ul>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->

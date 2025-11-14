@@ -10,7 +10,7 @@ NOTE 2: What else needs to be added to this page of documentation? I don't want 
 
 ## Who This Page Is For
 
-This section of the documentation is intended for developers or those who are hoping to look under the hood of this project. If you know little about coding or are trying to figure out how to add your own lessons to the application, then this section of documentation is NOT for you. If you are looking for documentation about how to make your own lesson, please see `ADD DOCUMENTATION NAME`.
+This section of the documentation is intended for developers or those who are hoping to look under the hood of this project. If you know little about coding or are trying to figure out how to add your own lessons to the application, then this section of documentation is NOT for you. If you are looking for documentation about how to make your own lesson, please see the [Creating New Lessons](lesson-creation-guide.qmd) guide.
 
 
 

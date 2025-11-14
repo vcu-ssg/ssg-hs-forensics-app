@@ -1,0 +1,18 @@
+---
+title: "Certificate of Completion"
+format:
+  html:
+    css: styles.css
+---
+
+<div class="lesson-card">
+  <h2>Cell Expert</h2>
+
+  <!-- Diploma image -->
+  <img src="assets/diploma.png" alt="Certificate of Completion" style="max-width:100%;height:auto;">
+
+  <div style="margin-top:1rem;">
+    <a href="../index.html"><button class="btn">Home</button></a>
+    <a href="assets/diploma.png" download><button class="btn">Download</button></a>
+  </div>
+</div>

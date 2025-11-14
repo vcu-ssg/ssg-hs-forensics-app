@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Introduction to Cell Analysis – FORENSICS-UI</title>
+<title>Identify all Buccal Cells – FORENSICS-UI</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -105,6 +105,10 @@ ul.task-list li input[type="checkbox"] {
     <a class="nav-link" href="../lesson-1/index.html"> 
 <span class="menu-text">Lesson 1: Important Cells in Forensics</span></a>
   </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../lesson-3/index.html"> 
+<span class="menu-text">Lesson 3: Buccal or Blood Game</span></a>
+  </li>  
 </ul>
           </div> <!-- /navcollapse -->
             <div class="quarto-navbar-tools">
@@ -113,23 +117,23 @@ ul.task-list li input[type="checkbox"] {
     </nav>
 </header>
 <!-- content -->
-<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
         
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content">
+<main class="content column-page" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Introduction to Cell Analysis</h1>
+<h1 class="title">Identify all Buccal Cells</h1>
 </div>
 
 
 
-<div class="quarto-title-meta">
+<div class="quarto-title-meta column-page">
 
     
   
@@ -141,29 +145,83 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<div class="lesson-card">
-<p>
-In the context of biology, cell analysis refers to computational and statistical methods to attract data from images.
-</p>
-<p>
-It involves image analysis techniques like:
-</p>
-<ul>
-<li>
-Cell Finding (Segmentation) - Identifies each individual type of cell in the image.
-</li>
-<li>
-Measuring Features (Extraction) - Measures the cell’s size, shape, etc.
-</li>
-<li>
-Counting/Summarizing (Statistics) - Measures cell count, area, and etc.
-</li>
-</ul>
-<p>
-In the last section of this lesson, you’ll get an interactive introduction to these techniques.
-</p>
-<p><a href="7-quiz.html"> <button class="btn">Back</button> </a> <a href="../upload/upload.html"> <button class="btn">Next</button> </a></p>
+<div class="shell" style="display:grid;place-items:center;min-height:100vh;background:#f3f4f6;">
+<main class="card" style="background:white;padding:2rem 3rem;border-radius:1rem;box-shadow:0 10px 20px rgba(0,0,0,.05);text-align:center;width:min(800px,90%);">
+<h2 style="font-weight:700;margin-bottom:1.5rem;" class="anchored">
+Identify all Buccal Cells
+</h2>
+<!-- Image Grid -->
+<form id="buccal-form">
+<div class="grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:2rem;">
+<p><!-- 6 clickable images --> <label class="img-choice"> <input type="checkbox" name="cell" value="assets/buccal1.png" hidden=""> <img src="assets/bucCell1.png" alt="cell 1"> </label></p>
+<p><label class="img-choice"> <input type="checkbox" name="cell" value="assets/buccal2.png" hidden=""> <img src="assets/bucCell2.png" alt="cell 2"> </label></p>
+<p><label class="img-choice"> <input type="checkbox" name="cell" value="assets/buccal3.png" hidden=""> <img src="assets/bucCell3.png" alt="cell 3"> </label></p>
+<p><label class="img-choice"> <input type="checkbox" name="cell" value="assets/buccal4.png" hidden=""> <img src="assets/bucCell4.png" alt="cell 4"> </label></p>
+<p><label class="img-choice"> <input type="checkbox" name="cell" value="assets/buccal5.png" hidden=""> <img src="assets/bucCell5.png" alt="cell 5"> </label></p>
+<label class="img-choice"> <input type="checkbox" name="cell" value="assets/buccal6.png" hidden=""> <img src="assets/bucCell6.png" alt="cell 6"> </label>
 </div>
+<!-- Submit button -->
+<button type="submit" class="btn" style="background:#d1d5db;color:#000;padding:.6rem 2rem;border-radius:2rem;border:none;cursor:pointer;font-weight:600;">
+Submit
+</button>
+</form>
+</main>
+</div>
+<script>
+// --- minimal scoring helper (shared across pages) ---
+function addLesson3Score(score, total) {
+  const s = Number(localStorage.getItem('lesson3Score') || 0);
+  const t = Number(localStorage.getItem('lesson3Total') || 0);
+  localStorage.setItem('lesson3Score', s + score);
+  localStorage.setItem('lesson3Total', t + total);
+}
+
+// OPTIONAL: start fresh if user comes here directly
+if (!sessionStorage.getItem('lesson3Started')) {
+  localStorage.removeItem('lesson3Score');
+  localStorage.removeItem('lesson3Total');
+  sessionStorage.setItem('lesson3Started', '1');
+}
+
+// Handle selection styling
+const choices = document.querySelectorAll('.img-choice');
+choices.forEach(choice => {
+  choice.addEventListener('click', () => {
+    const input = choice.querySelector('input');
+    input.checked = !input.checked;
+    choice.classList.toggle('selected', input.checked);
+  });
+});
+
+// Handle form submission
+const form = document.getElementById('buccal-form');
+form.addEventListener('submit', e => {
+  e.preventDefault();
+  const selected = [...form.querySelectorAll('input:checked')].map(i => i.value);
+  if (selected.length === 0) {
+    alert('Please select at least one buccal cell image.');
+    return;
+  }
+  // RANDOM demo "correct" set (uses your exact input values)
+  const correct = new Set([
+    "assets/buccal2.png",
+    "assets/buccal4.png",
+    "assets/buccal6.png",
+  ]);
+  const scoreThisPage = selected.filter(v => correct.has(v)).length;
+  const totalThisPage = correct.size;
+
+  addLesson3Score(scoreThisPage, totalThisPage);
+
+  // go to Saliva page (your flow)
+  window.location.href = 'saliva.html';
+});
+</script>
+<style>
+  .img-choice img { width: 100%; height: auto; border-radius: 0.5rem; border: 3px solid transparent; cursor: pointer; transition: border-color .2s, transform .1s; }
+  .img-choice img:hover { transform: scale(1.02); }
+  .img-choice.selected img { border-color: #2563eb; box-shadow: 0 0 0 4px rgba(37,99,235,.2); }
+</style>
 
 
 

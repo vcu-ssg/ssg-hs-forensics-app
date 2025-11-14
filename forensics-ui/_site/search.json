@@ -2,9 +2,9 @@
   {
     "objectID": "upload/upload.html",
     "href": "upload/upload.html",
-    "title": "\nSSG Forensics\n",
+    "title": "Upload",
     "section": "",
-    "text": "Upload microscope images to automatically segment and count cells, while also distinguishing between different cell types. The system highlights cells in the image, generates size data, and allows you to save annotated results for classroom learning or forensic analysis.\n\n\n\nUpload Image\n\n\nUpload your own image, or choose one from our gallery.\n\n\n Gallery   Next"
+    "text": "SSG Forensics\n\n\nUpload microscope images to automatically segment and count cells, while also distinguishing between different cell types. The system highlights cells in the image, generates size data, and allows you to save annotated results for classroom learning or forensic analysis.\n\n\n\nUpload Image\n\n\nUpload your own image, or choose one from our gallery.\n\n\n Gallery   Next"
   },
   {
     "objectID": "about.html",
@@ -82,5 +82,68 @@
     "title": "SSG Forensics – Prototype",
     "section": "",
     "text": "SSG Forensics\n\n\nUpload Buccal vs Blood\n\n\n\n\nUpload\n\n\n \n\n\n\n\nBuccal or blood"
+  },
+  {
+    "objectID": "lesson-3/index.html",
+    "href": "lesson-3/index.html",
+    "title": "Certificate of Completion",
+    "section": "",
+    "text": "Cell Expert\n\n \n\n&lt;a href=\"../index.html\"&gt;&lt;button class=\"btn\"&gt;Home&lt;/button&gt;&lt;/a&gt;\n&lt;a href=\"assets/diploma.png\" download&gt;&lt;button class=\"btn\"&gt;Download&lt;/button&gt;&lt;/a&gt;"
+  },
+  {
+    "objectID": "lesson-3/1-bloodORbuccal.html",
+    "href": "lesson-3/1-bloodORbuccal.html",
+    "title": "Blood or Buccal",
+    "section": "",
+    "text": "Saliva cells under microscope\n\n\n\n\n\n\n\nSaliva cells under microscope\n\n\n\n\n\n\nSaliva cells play a vital role in forensic science because they contain DNA that can be used to identify individuals.\n\n\nWhen saliva is left behind on objects such as cups, cigarettes, or bite marks, forensic experts can collect epithelial cells from the sample, extract the DNA, and compare it to known profiles.\n\n\nThis makes saliva evidence especially useful in linking suspects to crimes or confirming identities in investigations.\n\n Back   Next"
+  },
+  {
+    "objectID": "lesson-3/buccal.html",
+    "href": "lesson-3/buccal.html",
+    "title": "Identify all Buccal Cells",
+    "section": "",
+    "text": "Identify all Buccal Cells\n\n\n\n\n    \n   \n   \n   \n   \n   \n\n\n\nSubmit"
+  },
+  {
+    "objectID": "lesson-3/bloodOrbuccal.html",
+    "href": "lesson-3/bloodOrbuccal.html",
+    "title": "Blood or Buccal",
+    "section": "",
+    "text": "Blood or Buccal\n\n\n::: {.quarto-figure quarto-figure-center} \n\n\n\n::: {.quarto-figure quarto-figure-center} \n\n::: ::::\n\n\nSaliva cells play a vital role in forensic science because they contain DNA that can be used to identify individuals.\n\n\nWhen saliva is left behind on objects such as cups, cigarettes, or bite marks, forensic experts can collect epithelial cells from the sample, extract the DNA, and compare it to known profiles.\n\n\nThis makes saliva evidence especially useful in linking suspects to crimes or confirming identities in investigations.\n\n\nBack Next"
+  },
+  {
+    "objectID": "lesson-3/saliva.html",
+    "href": "lesson-3/saliva.html",
+    "title": "Identify all Saliva Cells",
+    "section": "",
+    "text": "Identify all Saliva Cells\n\n\n\n\n    \n   \n   \n   \n   \n   \n\n\n\nSubmit"
+  },
+  {
+    "objectID": "lesson-3/certificate.html",
+    "href": "lesson-3/certificate.html",
+    "title": "Certificate of Completion",
+    "section": "",
+    "text": "Cell Expert\n\n \n\n&lt;a href=\"../index.html\"&gt;&lt;button class=\"btn\"&gt;Home&lt;/button&gt;&lt;/a&gt;\n&lt;a href=\"assets/diploma.png\" download&gt;&lt;button class=\"btn\"&gt;Download&lt;/button&gt;&lt;/a&gt;"
+  },
+  {
+    "objectID": "lesson-3/blood.html",
+    "href": "lesson-3/blood.html",
+    "title": "Identify all Blood Cells",
+    "section": "",
+    "text": "Identify all blood cells\n\n\n\n\n   \n   \n   \n   \n   \n   \n\n\n\nSubmit"
+  },
+  {
+    "objectID": "lesson-3/completed.html",
+    "href": "lesson-3/completed.html",
+    "title": "Lesson 3: Buccal or Blood – Completed",
+    "section": "",
+    "text": "Congratulations! You’ve reached the end of Lesson 3: Buccal or Blood Game\n\n\nFinal score: —\n\nRetry Home Next"
+  },
+  {
+    "objectID": "lesson-3/complete.html",
+    "href": "lesson-3/complete.html",
+    "title": "Lesson 3: Buccal or Blood – Completed",
+    "section": "",
+    "text": "Congratulations! You’ve reached the end of Lesson 3: Buccal or Blood Game\n\n\nFinal score: —\n\nRetry Home Next"
   }
 ]

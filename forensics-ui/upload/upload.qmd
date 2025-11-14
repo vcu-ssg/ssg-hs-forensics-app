@@ -1,10 +1,11 @@
 ---
-title: ""
+title: "Upload" # any non-empty string is fine
 format:
   html:
     css: styles2.css
     page-layout: full
     toc: false
+    title-block-style: none # hides the page title block
 ---
 
 <div class="shell">

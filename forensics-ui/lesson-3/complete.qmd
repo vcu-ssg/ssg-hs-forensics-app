@@ -1,0 +1,22 @@
+---
+title: "Lesson 3: Buccal or Blood – Completed"
+format:
+  html:
+    css: styles.css
+---
+
+<div class="lesson-card">
+  <h2>Congratulations! You’ve reached the end of Lesson 3: Buccal or Blood Game</h2>
+  <p>Final score: <strong><span id="final-score">—</span></strong></p>
+
+  <a href="buccal.html"><button class="btn">Retry</button></a>
+  <a href="../index.html"><button class="btn">Home</button></a>
+  <a href="certificate.html"><button class="btn">Next</button></a>
+</div>
+
+<script>
+// read and display the aggregate score
+const s = localStorage.getItem('lesson3Score');
+const t = localStorage.getItem('lesson3Total');
+document.getElementById('final-score').textContent = (s && t) ? `${s} / ${t}` : '—';
+</script>

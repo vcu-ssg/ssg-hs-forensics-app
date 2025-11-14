@@ -1,0 +1,105 @@
+---
+title: "Identify all Blood Cells"
+format:
+  html:
+    css: styles.css
+    page-layout: full
+---
+
+<div class="shell" style="display:grid;place-items:center;min-height:100vh;background:#f3f4f6;">
+  <main class="card" style="background:white;padding:2rem 3rem;border-radius:1rem;box-shadow:0 10px 20px rgba(0,0,0,.05);text-align:center;width:min(800px,90%);">
+    <h2 style="font-weight:700;margin-bottom:1.5rem;">Identify all blood cells</h2>
+
+<!-- Image Grid -->
+<form id="blood-form">
+  <div class="grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:2rem;">
+
+  <label class="img-choice">
+    <input type="checkbox" name="cell" value="assets/bucCell1.png" hidden>
+    <img src="assets/bucCell1.png" alt="blood cell 1">
+  </label>
+
+  <label class="img-choice">
+    <input type="checkbox" name="cell" value="assets/saliva4.png" hidden>
+    <img src="assets/saliva4.png" alt="blood cell 2">
+  </label>
+
+  <label class="img-choice">
+    <input type="checkbox" name="cell" value="assets/saliva2.png" hidden>
+    <img src="assets/saliva2.png" alt="blood cell 3">
+  </label>
+
+  <label class="img-choice">
+    <input type="checkbox" name="cell" value="assets/bucCell5.png" hidden>
+    <img src="assets/bucCell5.png" alt="blood cell 4">
+  </label>
+
+  <label class="img-choice">
+    <input type="checkbox" name="cell" value="assets/saliva3.png" hidden>
+    <img src="assets/saliva3.png" alt="blood cell 5">
+  </label>
+
+  <label class="img-choice">
+    <input type="checkbox" name="cell" value="assets/bucCell4.png" hidden>
+    <img src="assets/bucCell4.png" alt="blood cell 6">
+  </label>
+
+  </div>
+
+  <!-- Submit button -->
+  <button type="submit" class="btn" style="background:#d1d5db;color:#000;padding:.6rem 2rem;border-radius:2rem;border:none;cursor:pointer;font-weight:600;">Submit</button>
+
+</form>
+
+  </main>
+</div>
+
+<script>
+function addLesson3Score(score, total) {
+  const s = Number(localStorage.getItem('lesson3Score') || 0);
+  const t = Number(localStorage.getItem('lesson3Total') || 0);
+  localStorage.setItem('lesson3Score', s + score);
+  localStorage.setItem('lesson3Total', t + total);
+}
+
+// selection styling
+const choices = document.querySelectorAll('.img-choice');
+choices.forEach(choice => {
+  choice.addEventListener('click', () => {
+    const input = choice.querySelector('input');
+    input.checked = !input.checked;
+    choice.classList.toggle('selected', input.checked);
+  });
+});
+
+// submit
+const form = document.getElementById('blood-form');
+form.addEventListener('submit', e => {
+  e.preventDefault();
+  const selected = [...form.querySelectorAll('input:checked')].map(i => i.value);
+  if (selected.length === 0) {
+    alert('Please select at least one blood cell image.');
+    return;
+  }
+
+  // RANDOM demo "correct" set (keeps your exact values)
+  const correct = new Set([
+    "assets/saliva2.png",
+    "assets/bucCell5.png",
+    "assets/saliva3.png",
+  ]);
+  const scoreThisPage = selected.filter(v => correct.has(v)).length;
+  const totalThisPage = correct.size;
+
+  addLesson3Score(scoreThisPage, totalThisPage);
+
+  // go to Congrats page
+  window.location.href = 'complete.html';
+});
+</script>
+
+<style>
+  .img-choice img { width: 100%; height: auto; border-radius: 0.5rem; border: 3px solid transparent; cursor: pointer; transition: border-color .2s, transform .1s; }
+  .img-choice img:hover { transform: scale(1.02); }
+  .img-choice.selected img { border-color: #2563eb; box-shadow: 0 0 0 4px rgba(37,99,235,.2); }
+</style>

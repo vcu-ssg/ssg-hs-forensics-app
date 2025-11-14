@@ -116,7 +116,7 @@
     "href": "development.html#who-this-page-is-for",
     "title": "Developer Documentation",
     "section": "Who This Page Is For",
-    "text": "Who This Page Is For\nThis section of the documentation is intended for developers or those who are hoping to look under the hood of this project. If you know little about coding or are trying to figure out how to add your own lessons to the application, then this section of documentation is NOT for you. If you are looking for documentation about how to make your own lesson, please see ADD DOCUMENTATION NAME."
+    "text": "Who This Page Is For\nThis section of the documentation is intended for developers or those who are hoping to look under the hood of this project. If you know little about coding or are trying to figure out how to add your own lessons to the application, then this section of documentation is NOT for you. If you are looking for documentation about how to make your own lesson, please see the Creating New Lessons guide."
   },
   {
     "objectID": "development.html#location-of-files",
@@ -137,6 +137,90 @@
     "href": "index.html#documentation",
     "title": "Welcome",
     "section": "Documentation",
-    "text": "Documentation\n\nImage Gallery and Upload Guide - Learn how to upload images and use the gallery features\nDeveloper Documentation - Technical documentation for developers working on the project"
+    "text": "Documentation\n\nImage Gallery and Upload Guide - Learn how to upload images and use the gallery features\nDeveloper Documentation - Technical documentation for developers working on the project\nCreating New Lessons - Guide for developers to create new lesson content"
+  },
+  {
+    "objectID": "lesson-creation-guide.html",
+    "href": "lesson-creation-guide.html",
+    "title": "Creating New Lessons",
+    "section": "",
+    "text": "WarningTechnical Users Only\n\n\n\nThis guide is intended for developers and technical users who are comfortable with HTML, Quarto, and web development. If you’re looking for user guides on how to use the application, please see the Image Gallery and Upload Guide instead."
+  },
+  {
+    "objectID": "lesson-creation-guide.html#overview",
+    "href": "lesson-creation-guide.html#overview",
+    "title": "Creating New Lessons",
+    "section": "Overview",
+    "text": "Overview\nThis guide explains how to create new forensic science lessons for the SSG High School Forensics Application. Lessons are built using Quarto (QMD files) and can include text, images, videos, interactive quizzes, and custom styling."
+  },
+  {
+    "objectID": "lesson-creation-guide.html#lesson-structure",
+    "href": "lesson-creation-guide.html#lesson-structure",
+    "title": "Creating New Lessons",
+    "section": "Lesson Structure",
+    "text": "Lesson Structure\n\nDirectory Organization\nEach lesson is contained in its own directory within forensics-ui/. The structure follows this pattern:\nforensics-ui/\n├── lesson-1/           # Example lesson\n│   ├── index.qmd       # Lesson landing page\n│   ├── 1-objectives.qmd\n│   ├── 2-saliva.qmd\n│   ├── 3-skin.qmd\n│   ├── 4-blood.qmd\n│   ├── 5-buccal.qmd\n│   ├── 6-epithelial.qmd\n│   ├── 7-quiz.qmd\n│   ├── 8-analysis-introduction.qmd\n│   ├── styles.css      # Lesson-specific styles\n│   └── assets/         # Images, videos, etc.\n└── lesson-2/           # Your new lesson\n    ├── index.qmd\n    ├── 1-topic.qmd\n    ├── 2-topic.qmd\n    └── ..."
+  },
+  {
+    "objectID": "lesson-creation-guide.html#creating-a-new-lesson",
+    "href": "lesson-creation-guide.html#creating-a-new-lesson",
+    "title": "Creating New Lessons",
+    "section": "Creating a New Lesson",
+    "text": "Creating a New Lesson\n\nStep 1: Create Lesson Directory\n\nNavigate to forensics-ui/\nCreate a new directory with a descriptive name (e.g., lesson-2, dna-analysis, etc.)\n\ncd forensics-ui\nmkdir lesson-2\ncd lesson-2\n\n\nStep 2: Create the Index Page\nCreate an index.qmd file as the lesson landing page:\n---\ntitle: \"Lesson 2: DNA Analysis\"\n---\n\n## Introduction\n\nBrief overview of what this lesson covers.\n\n## Topics Covered\n\n- [Topic 1](1-topic1.qmd)\n- [Topic 2](2-topic2.qmd)\n- [Quiz](3-quiz.qmd)\n\n\nStep 3: Create Lesson Pages\nEach lesson page should be a separate QMD file. Number them sequentially for organization.\nExample: 1-introduction.qmd\n---\ntitle: \"Introduction to DNA\"\n---\n\n## What is DNA?\n\nYour content here...\n\n### Key Concepts\n\n- Concept 1\n- Concept 2\n\n## Next Steps\n\n[Continue to next section →](2-structure.qmd)\n\n\nStep 4: Add Custom Styling (Optional)\nCreate a styles.css file for lesson-specific styling:\n/* Lesson 2 Custom Styles */\n.lesson-header {\n  background-color: #4a90e2;\n  padding: 2rem;\n  color: white;\n}\n\n.key-term {\n  font-weight: bold;\n  color: #2c3e50;\n}\nReference it in your QMD files:\n---\ntitle: \"Page Title\"\nformat:\n  html:\n    css: styles.css\n---\n\n\nStep 5: Add to Site Navigation\nEdit forensics-ui/_quarto.yml to add your lesson to the site navigation:\nwebsite:\n  navbar:\n    left:\n      - text: Home\n        href: index.qmd\n      - text: Lesson 1\n        href: lesson-1/index.qmd\n      - text: Lesson 2        # Add this\n        href: lesson-2/index.qmd\n      - text: Gallery\n        href: cell-gallery/gallery.qmd\n\n\nStep 6: Render and Test\ncd forensics-ui\nquarto render\nOpen the generated site in _site/ to test your lesson."
+  },
+  {
+    "objectID": "lesson-creation-guide.html#lesson-components",
+    "href": "lesson-creation-guide.html#lesson-components",
+    "title": "Creating New Lessons",
+    "section": "Lesson Components",
+    "text": "Lesson Components\n\nText and Markdown\nUse standard Markdown syntax:\n# Heading 1\n## Heading 2\n\n**Bold text**\n*Italic text*\n\n- Bullet list\n1. Numbered list\n\n[Link text](url)\n\n\nImages\nPlace images in an assets/ folder within your lesson directory:\n![Image description](assets/dna-structure.png)\n\n\nVideos\nEmbed videos using HTML:\n```{=html}\n&lt;video width=\"100%\" controls&gt;\n  &lt;source src=\"assets/video.mp4\" type=\"video/mp4\"&gt;\n&lt;/video&gt;\n\nOr embed from external sources:\n\n```markdown\n```{=html}\n&lt;iframe width=\"560\" height=\"315\" \n  src=\"https://www.youtube.com/embed/VIDEO_ID\" \n  frameborder=\"0\" allowfullscreen&gt;\n&lt;/iframe&gt;\n\n### Callouts and Alerts\n\nUse Quarto's built-in callout blocks:\n\n```markdown\n:::{.callout-note}\nThis is an important note for students.\n:::\n\n:::{.callout-tip}\nHere's a helpful tip!\n:::\n\n:::{.callout-warning}\nPay attention to this warning.\n:::\n\n\nInteractive Quizzes\nCreate quiz pages with HTML forms:\n&lt;form id=\"quiz\"&gt;\n  &lt;div class=\"question\"&gt;\n    &lt;p&gt;1. What is DNA?&lt;/p&gt;\n    &lt;label&gt;&lt;input type=\"radio\" name=\"q1\" value=\"a\"&gt; Answer A&lt;/label&gt;\n    &lt;label&gt;&lt;input type=\"radio\" name=\"q1\" value=\"b\"&gt; Answer B&lt;/label&gt;\n    &lt;label&gt;&lt;input type=\"radio\" name=\"q1\" value=\"c\"&gt; Answer C&lt;/label&gt;\n  &lt;/div&gt;\n  \n  &lt;button type=\"submit\"&gt;Submit Quiz&lt;/button&gt;\n&lt;/form&gt;\n\n&lt;script&gt;\ndocument.getElementById('quiz').addEventListener('submit', function(e) {\n  e.preventDefault();\n  // Quiz logic here\n  alert('Quiz submitted!');\n});\n&lt;/script&gt;\n\n\nCode Blocks\nDisplay code with syntax highlighting:\n```python\ndef analyze_dna(sequence):\n    return sequence.upper()\n```"
+  },
+  {
+    "objectID": "lesson-creation-guide.html#best-practices",
+    "href": "lesson-creation-guide.html#best-practices",
+    "title": "Creating New Lessons",
+    "section": "Best Practices",
+    "text": "Best Practices\n\nContent Organization\n\nBreak content into manageable chunks: Each page should cover one main topic\nUse descriptive filenames: 3-dna-extraction.qmd is better than page3.qmd\nNumber pages sequentially: Makes navigation and ordering clear\nInclude navigation links: Add “Previous” and “Next” links at the bottom of each page\n\n\n\nStyling\n\nKeep styles consistent: Use existing lesson styles as a template\nUse semantic HTML: Use &lt;article&gt;, &lt;section&gt;, etc. appropriately\nMake it responsive: Test on different screen sizes\nFollow accessibility guidelines: Use alt text, proper heading hierarchy, etc.\n\n\n\nMedia Files\n\nOptimize images: Compress images before adding them\nUse web-friendly formats: JPG for photos, PNG for graphics, WebP when possible\nProvide alt text: Always include descriptive alt text for images\nHost large videos externally: Use YouTube or Vimeo for large video files\n\n\n\nNavigation\n\nProvide clear navigation: Table of contents, breadcrumbs, next/previous links\nLink back to lesson index: Always provide a way to return to the lesson overview\nUse descriptive link text: “Learn about DNA structure” instead of “Click here”"
+  },
+  {
+    "objectID": "lesson-creation-guide.html#example-complete-lesson-page",
+    "href": "lesson-creation-guide.html#example-complete-lesson-page",
+    "title": "Creating New Lessons",
+    "section": "Example: Complete Lesson Page",
+    "text": "Example: Complete Lesson Page\n---\ntitle: \"DNA Structure\"\nformat:\n  html:\n    css: styles.css\n---\n\n[← Back to Lesson Index](index.qmd)\n\n## Introduction\n\nDNA (Deoxyribonucleic Acid) is the hereditary material in humans and most other organisms.\n\n:::{.callout-note}\nDNA is found in nearly every cell of the human body!\n:::\n\n## The Double Helix\n\n![DNA Double Helix](assets/dna-helix.png){width=50%}\n\nThe structure of DNA was discovered by Watson and Crick in 1953.\n\n### Key Components\n\n1. **Sugar-phosphate backbone**\n2. **Nitrogenous bases**\n   - Adenine (A)\n   - Thymine (T)\n   - Guanine (G)\n   - Cytosine (C)\n\n## Interactive Activity\n\nTry identifying the bases in this DNA sequence:\n\n&lt;div class=\"activity\"&gt;\n  &lt;p&gt;Sequence: ATCG TACG GCTA&lt;/p&gt;\n  &lt;input type=\"text\" placeholder=\"Your answer\"&gt;\n  &lt;button&gt;Check Answer&lt;/button&gt;\n&lt;/div&gt;\n\n## Quiz Yourself\n\n:::{.callout-tip}\nTest your knowledge with the [DNA Structure Quiz →](quiz.qmd)\n:::\n\n---\n\n[← Previous: Introduction](1-introduction.qmd) | [Next: DNA Extraction →](3-extraction.qmd)"
+  },
+  {
+    "objectID": "lesson-creation-guide.html#testing-your-lesson",
+    "href": "lesson-creation-guide.html#testing-your-lesson",
+    "title": "Creating New Lessons",
+    "section": "Testing Your Lesson",
+    "text": "Testing Your Lesson\n\nLocal Testing\n\nRender the lesson:\ncd forensics-ui\nquarto render lesson-2/\nCheck the output in forensics-ui/_site/lesson-2/\nOpen in a browser to test:\n# Start a local server\npython -m http.server 8080 --directory _site\nNavigate to http://localhost:8080/lesson-2/\n\n\n\nChecklist\n\nAll links work correctly\nImages load properly\nVideos play correctly\nQuizzes function as expected\nNavigation is clear and intuitive\nContent is accessible (alt text, headings, etc.)\nStyling is consistent with other lessons\nMobile responsive design works"
+  },
+  {
+    "objectID": "lesson-creation-guide.html#deploying-your-lesson",
+    "href": "lesson-creation-guide.html#deploying-your-lesson",
+    "title": "Creating New Lessons",
+    "section": "Deploying Your Lesson",
+    "text": "Deploying Your Lesson\nOnce your lesson is complete and tested:\n\nEnsure all files are committed to version control\nRender the entire site:\ncd forensics-ui\nquarto render\nThe Docker setup will serve the new lesson automatically"
+  },
+  {
+    "objectID": "lesson-creation-guide.html#troubleshooting",
+    "href": "lesson-creation-guide.html#troubleshooting",
+    "title": "Creating New Lessons",
+    "section": "Troubleshooting",
+    "text": "Troubleshooting\n\nLesson Not Appearing in Navigation\n\nCheck that you added it to _quarto.yml\nVerify the file path is correct\nRe-render the entire site\n\n\n\nStyles Not Applying\n\nEnsure css: styles.css is in the YAML front matter\nCheck that the CSS file is in the correct directory\nClear browser cache and refresh\n\n\n\nImages Not Loading\n\nVerify image paths are correct (relative to the QMD file)\nCheck that images are in the assets/ folder\nEnsure image file names match exactly (case-sensitive)\n\n\n\nVideos Not Playing\n\nTest video format compatibility (MP4 is most widely supported)\nCheck video file size (large files may need external hosting)\nVerify video codec is web-compatible"
+  },
+  {
+    "objectID": "lesson-creation-guide.html#additional-resources",
+    "href": "lesson-creation-guide.html#additional-resources",
+    "title": "Creating New Lessons",
+    "section": "Additional Resources",
+    "text": "Additional Resources\n\nQuarto Documentation\nQuarto Website Guide\nMarkdown Basics\nHTML in Quarto"
+  },
+  {
+    "objectID": "lesson-creation-guide.html#getting-help",
+    "href": "lesson-creation-guide.html#getting-help",
+    "title": "Creating New Lessons",
+    "section": "Getting Help",
+    "text": "Getting Help\nIf you encounter issues or have questions:\n\nCheck the existing lessons for examples\nReview Quarto documentation\nConsult the development team\nCheck browser console for errors"
   }
 ]

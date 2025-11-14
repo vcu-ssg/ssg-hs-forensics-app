@@ -1,0 +1,434 @@
+---
+title: "Creating New Lessons"
+author: "SSG Forensics Team"
+date: last-modified
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: false
+---
+
+::: {.callout-warning}
+## Technical Users Only
+This guide is intended for developers and technical users who are comfortable with HTML, Quarto, and web development. If you're looking for user guides on how to use the application, please see the [Image Gallery and Upload Guide](image-gallery-guide.qmd) instead.
+:::
+
+## Overview
+
+This guide explains how to create new forensic science lessons for the SSG High School Forensics Application. Lessons are built using Quarto (QMD files) and can include text, images, videos, interactive quizzes, and custom styling.
+
+## Lesson Structure
+
+### Directory Organization
+
+Each lesson is contained in its own directory within `forensics-ui/`. The structure follows this pattern:
+
+```
+forensics-ui/
+├── lesson-1/           # Example lesson
+│   ├── index.qmd       # Lesson landing page
+│   ├── 1-objectives.qmd
+│   ├── 2-saliva.qmd
+│   ├── 3-skin.qmd
+│   ├── 4-blood.qmd
+│   ├── 5-buccal.qmd
+│   ├── 6-epithelial.qmd
+│   ├── 7-quiz.qmd
+│   ├── 8-analysis-introduction.qmd
+│   ├── styles.css      # Lesson-specific styles
+│   └── assets/         # Images, videos, etc.
+└── lesson-2/           # Your new lesson
+    ├── index.qmd
+    ├── 1-topic.qmd
+    ├── 2-topic.qmd
+    └── ...
+```
+
+## Creating a New Lesson
+
+### Step 1: Create Lesson Directory
+
+1. Navigate to `forensics-ui/`
+2. Create a new directory with a descriptive name (e.g., `lesson-2`, `dna-analysis`, etc.)
+
+```bash
+cd forensics-ui
+mkdir lesson-2
+cd lesson-2
+```
+
+### Step 2: Create the Index Page
+
+Create an `index.qmd` file as the lesson landing page:
+
+```yaml
+---
+title: "Lesson 2: DNA Analysis"
+---
+
+## Introduction
+
+Brief overview of what this lesson covers.
+
+## Topics Covered
+
+- [Topic 1](1-topic1.qmd)
+- [Topic 2](2-topic2.qmd)
+- [Quiz](3-quiz.qmd)
+```
+
+### Step 3: Create Lesson Pages
+
+Each lesson page should be a separate QMD file. Number them sequentially for organization.
+
+**Example: `1-introduction.qmd`**
+
+```yaml
+---
+title: "Introduction to DNA"
+---
+
+## What is DNA?
+
+Your content here...
+
+### Key Concepts
+
+- Concept 1
+- Concept 2
+
+## Next Steps
+
+[Continue to next section →](2-structure.qmd)
+```
+
+### Step 4: Add Custom Styling (Optional)
+
+Create a `styles.css` file for lesson-specific styling:
+
+```css
+/* Lesson 2 Custom Styles */
+.lesson-header {
+  background-color: #4a90e2;
+  padding: 2rem;
+  color: white;
+}
+
+.key-term {
+  font-weight: bold;
+  color: #2c3e50;
+}
+```
+
+Reference it in your QMD files:
+
+```yaml
+---
+title: "Page Title"
+format:
+  html:
+    css: styles.css
+---
+```
+
+### Step 5: Add to Site Navigation
+
+Edit `forensics-ui/_quarto.yml` to add your lesson to the site navigation:
+
+```yaml
+website:
+  navbar:
+    left:
+      - text: Home
+        href: index.qmd
+      - text: Lesson 1
+        href: lesson-1/index.qmd
+      - text: Lesson 2        # Add this
+        href: lesson-2/index.qmd
+      - text: Gallery
+        href: cell-gallery/gallery.qmd
+```
+
+### Step 6: Render and Test
+
+```bash
+cd forensics-ui
+quarto render
+```
+
+Open the generated site in `_site/` to test your lesson.
+
+## Lesson Components
+
+### Text and Markdown
+
+Use standard Markdown syntax:
+
+```markdown
+# Heading 1
+## Heading 2
+
+**Bold text**
+*Italic text*
+
+- Bullet list
+1. Numbered list
+
+[Link text](url)
+```
+
+### Images
+
+Place images in an `assets/` folder within your lesson directory:
+
+```markdown
+![Image description](assets/dna-structure.png)
+```
+
+### Videos
+
+Embed videos using HTML:
+
+```markdown
+```{=html}
+<video width="100%" controls>
+  <source src="assets/video.mp4" type="video/mp4">
+</video>
+```
+```
+
+Or embed from external sources:
+
+```markdown
+```{=html}
+<iframe width="560" height="315" 
+  src="https://www.youtube.com/embed/VIDEO_ID" 
+  frameborder="0" allowfullscreen>
+</iframe>
+```
+```
+
+### Callouts and Alerts
+
+Use Quarto's built-in callout blocks:
+
+```markdown
+:::{.callout-note}
+This is an important note for students.
+:::
+
+:::{.callout-tip}
+Here's a helpful tip!
+:::
+
+:::{.callout-warning}
+Pay attention to this warning.
+:::
+```
+
+### Interactive Quizzes
+
+Create quiz pages with HTML forms:
+
+```html
+<form id="quiz">
+  <div class="question">
+    <p>1. What is DNA?</p>
+    <label><input type="radio" name="q1" value="a"> Answer A</label>
+    <label><input type="radio" name="q1" value="b"> Answer B</label>
+    <label><input type="radio" name="q1" value="c"> Answer C</label>
+  </div>
+  
+  <button type="submit">Submit Quiz</button>
+</form>
+
+<script>
+document.getElementById('quiz').addEventListener('submit', function(e) {
+  e.preventDefault();
+  // Quiz logic here
+  alert('Quiz submitted!');
+});
+</script>
+```
+
+### Code Blocks
+
+Display code with syntax highlighting:
+
+````markdown
+```python
+def analyze_dna(sequence):
+    return sequence.upper()
+```
+````
+
+## Best Practices
+
+### Content Organization
+
+1. **Break content into manageable chunks**: Each page should cover one main topic
+2. **Use descriptive filenames**: `3-dna-extraction.qmd` is better than `page3.qmd`
+3. **Number pages sequentially**: Makes navigation and ordering clear
+4. **Include navigation links**: Add "Previous" and "Next" links at the bottom of each page
+
+### Styling
+
+1. **Keep styles consistent**: Use existing lesson styles as a template
+2. **Use semantic HTML**: Use `<article>`, `<section>`, etc. appropriately
+3. **Make it responsive**: Test on different screen sizes
+4. **Follow accessibility guidelines**: Use alt text, proper heading hierarchy, etc.
+
+### Media Files
+
+1. **Optimize images**: Compress images before adding them
+2. **Use web-friendly formats**: JPG for photos, PNG for graphics, WebP when possible
+3. **Provide alt text**: Always include descriptive alt text for images
+4. **Host large videos externally**: Use YouTube or Vimeo for large video files
+
+### Navigation
+
+1. **Provide clear navigation**: Table of contents, breadcrumbs, next/previous links
+2. **Link back to lesson index**: Always provide a way to return to the lesson overview
+3. **Use descriptive link text**: "Learn about DNA structure" instead of "Click here"
+
+## Example: Complete Lesson Page
+
+```yaml
+---
+title: "DNA Structure"
+format:
+  html:
+    css: styles.css
+---
+
+[← Back to Lesson Index](index.qmd)
+
+## Introduction
+
+DNA (Deoxyribonucleic Acid) is the hereditary material in humans and most other organisms.
+
+:::{.callout-note}
+DNA is found in nearly every cell of the human body!
+:::
+
+## The Double Helix
+
+![DNA Double Helix](assets/dna-helix.png){width=50%}
+
+The structure of DNA was discovered by Watson and Crick in 1953.
+
+### Key Components
+
+1. **Sugar-phosphate backbone**
+2. **Nitrogenous bases**
+   - Adenine (A)
+   - Thymine (T)
+   - Guanine (G)
+   - Cytosine (C)
+
+## Interactive Activity
+
+Try identifying the bases in this DNA sequence:
+
+<div class="activity">
+  <p>Sequence: ATCG TACG GCTA</p>
+  <input type="text" placeholder="Your answer">
+  <button>Check Answer</button>
+</div>
+
+## Quiz Yourself
+
+:::{.callout-tip}
+Test your knowledge with the [DNA Structure Quiz →](quiz.qmd)
+:::
+
+---
+
+[← Previous: Introduction](1-introduction.qmd) | [Next: DNA Extraction →](3-extraction.qmd)
+```
+
+## Testing Your Lesson
+
+### Local Testing
+
+1. Render the lesson:
+   ```bash
+   cd forensics-ui
+   quarto render lesson-2/
+   ```
+
+2. Check the output in `forensics-ui/_site/lesson-2/`
+
+3. Open in a browser to test:
+   ```bash
+   # Start a local server
+   python -m http.server 8080 --directory _site
+   ```
+
+4. Navigate to `http://localhost:8080/lesson-2/`
+
+### Checklist
+
+- [ ] All links work correctly
+- [ ] Images load properly
+- [ ] Videos play correctly
+- [ ] Quizzes function as expected
+- [ ] Navigation is clear and intuitive
+- [ ] Content is accessible (alt text, headings, etc.)
+- [ ] Styling is consistent with other lessons
+- [ ] Mobile responsive design works
+
+## Deploying Your Lesson
+
+Once your lesson is complete and tested:
+
+1. Ensure all files are committed to version control
+2. Render the entire site:
+   ```bash
+   cd forensics-ui
+   quarto render
+   ```
+3. The Docker setup will serve the new lesson automatically
+
+## Troubleshooting
+
+### Lesson Not Appearing in Navigation
+
+- Check that you added it to `_quarto.yml`
+- Verify the file path is correct
+- Re-render the entire site
+
+### Styles Not Applying
+
+- Ensure `css: styles.css` is in the YAML front matter
+- Check that the CSS file is in the correct directory
+- Clear browser cache and refresh
+
+### Images Not Loading
+
+- Verify image paths are correct (relative to the QMD file)
+- Check that images are in the `assets/` folder
+- Ensure image file names match exactly (case-sensitive)
+
+### Videos Not Playing
+
+- Test video format compatibility (MP4 is most widely supported)
+- Check video file size (large files may need external hosting)
+- Verify video codec is web-compatible
+
+## Additional Resources
+
+- [Quarto Documentation](https://quarto.org/docs/guide/)
+- [Quarto Website Guide](https://quarto.org/docs/websites/)
+- [Markdown Basics](https://quarto.org/docs/authoring/markdown-basics.html)
+- [HTML in Quarto](https://quarto.org/docs/output-formats/html-basics.html)
+
+## Getting Help
+
+If you encounter issues or have questions:
+
+1. Check the existing lessons for examples
+2. Review Quarto documentation
+3. Consult the development team
+4. Check browser console for errors

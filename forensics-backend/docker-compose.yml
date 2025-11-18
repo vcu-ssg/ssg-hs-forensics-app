@@ -9,9 +9,9 @@ services:
       - "8000"
     restart: always
     volumes:
-      - ../images/sample-gallery-images:/images/sample-gallery-images
-      - ../images/uploaded-images:/images/uploaded-images
-      - ../images/processed-images:/images/processed-images
+      - fastapi_uploads:/app/processed-user-images 
+      - fastapi_originals:/app/orginial-user-images
+      - ../images/sample-gallery-images:/images/sample-gallery-images:ro
 
 
   nginx:
@@ -23,7 +23,13 @@ services:
       # bind mounts
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
       - ../forensics-ui/_site:/usr/share/nginx/html:ro
+      - fastapi_uploads:/app-data/processed-images:ro
+      - fastapi_originals:/app-data/original-images:ro
       - ../images:/usr/share/nginx/images:ro
     depends_on:
       - fastapi
     restart: always
+
+volumes:
+  fastapi_uploads: # Stores processed files
+  fastapi_originals: # Stores original files

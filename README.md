@@ -4,7 +4,7 @@
 
 ## Activities
 
-* If you want to run SAM on an image, jump into the ./reports folder and review <example1.qmd>. This file can be used as a template for running SAM in single images.
+* If you want to run SAM on an image, jump into the ./reports folder and review [reports/example1.qmd](./reports/example1.qmd). This file can be used as a template for running SAM in single images.  Here is the [report created by quarto](https://vcu-ssg.github.io/ssg-hs-forensics-app/example1.html)..
 
         cd reports
         quarto render example1.qmd
@@ -30,11 +30,12 @@
 
 This system requires that the host workstation have various software tools installed and ready to run.  This suite of software tools varies, depending on what the user expects to do:
 
-* quarto
-* docker desktop
-* make
-* pyenv 
-* poetry
+* visual studio code - for editing files,
+* quarto - for rendering qmd files into HTML,
+* docker desktop - for building and hosting the webapp
+* make - tool for automating activities
+* pyenv - python version selection tool
+* poetry - python library and virtual environment manager
 
 The system can be built under Windows (powershell), Linux (wsl/ubuntu), or Mac (zsh). 
 

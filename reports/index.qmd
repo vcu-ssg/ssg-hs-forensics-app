@@ -12,7 +12,7 @@ First draft of a working website documenting our work on this project.
 
 ## Example Quarto runs
 
-- [Using Quarto and SAM to process an image](example1.qmd) - This is the file that started it all!  Alina brought a Jupyter notebook to SSG.  Our first step was to convert it to a Quarto QMD.  This is the Quarto QMD.  Use this file as a template when wanting to run the SAM model and create quick-hit reports of cell images. It provides examples of how to load the image, process the image with SAM, and present the results in a [clean, quarto HTML report](report.html).
+- [Using Quarto and SAM to process an image](https://github.com/vcu-ssg/ssg-hs-forensics-app/reports/example1.qmd) - This is the file that started it all!  Alina brought a Jupyter notebook to SSG.  Our first step was to convert it to a Quarto QMD.  This is the Quarto QMD.  Use this file as a template when wanting to run the SAM model and create quick-hit reports of cell images. It provides examples of how to load the image, process the image with SAM, and present the results in a [clean, quarto HTML report](./report.html).
 
 
 ## Intro presentation

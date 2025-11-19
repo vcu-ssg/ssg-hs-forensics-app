@@ -10,6 +10,11 @@ First draft of a working website documenting our work on this project.
 - [Developer Documentation](development.qmd) - Technical documentation for developers working on the project
 - [Creating New Lessons](lesson-creation-guide.qmd) - Guide for developers to create new lesson content
 
+## Example Quarto runs
+
+- [Using Quarto and SAM to process an image](example1.qmd) - This is the file that started it all!  Alina brought a Jupyter notebook to SSG.  Our first step was to convert it to a Quarto QMD.  This is the Quarto QMD.  Use this file as a template when wanting to run the SAM model and create quick-hit reports of cell images. It provides examples of how to load the image, process the image with SAM, and present the results in a [clean, quarto HTML report](report.html).
+
+
 ## Intro presentation
 
 Below is the intro presentation shared by Alina.  Here a [direct link to the google slides](https://docs.google.com/presentation/d/1Dvj30uIWChAgkIMVAGFMYwBHVhdFYcJw6l3nDvWGdbM/edit?slide=id.p#slide=id.p) source.

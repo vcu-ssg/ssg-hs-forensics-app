@@ -33,6 +33,22 @@
   border-radius: 12px;
   padding: 24px;
   background: #fafafa;
+  cursor: pointer;
+}
+.upload-zone.processed {
+  cursor: default;
+}
+/* Change to whatever looks good for visual cue when dragging a file into the box */
+.upload-zone.drag-over {
+  border-color: #007bff;
+  background-color: #f0f8ff;
+}
+.upload-zone img {
+  cursor: default;
+}
+
+#file-name {
+  cursor: default;
 }
 
 .upload-title {
@@ -64,3 +80,34 @@
 
 .btn:hover { background: #d1d5db; }
 .btn:active { transform: translateY(1px); }
+
+.process-controls {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+}
+
+.btn-cancel {
+  height: 36px;
+  line-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+}
+
+.btn-process {
+  height: 36px;
+  line-height: 36px;
+  padding: 0 12px;
+}
+
+.img-preview {
+  display: block;
+  max-width: 100%; /* prevents it from ever being wider than its container */
+  height: auto; /* lets the height adjust automatically to the aspect ratio */
+  object-fit: contain;
+  margin: 0 auto; /* center any images that are smaller than the container */
+}

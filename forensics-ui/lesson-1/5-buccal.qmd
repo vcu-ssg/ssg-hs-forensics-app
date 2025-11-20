@@ -17,10 +17,17 @@ format:
 
 ::::
 
-<div class="lesson-card">
-  <p>Buccal cells, also known as cheek cells, are the epithelial cells that line the inside of a person’s cheeks and mouth. They are easy to collect by gently swabbing the inner cheek with a cotton swab, which makes them one of the most common and non-invasive sources of DNA in forensic science. </p> 
+```{=html}
 
-  <p>Because buccal cells contain a complete set of an individual’s genetic material, they are frequently used in criminal investigations, paternity testing, and medical research. Buccal swabs are especially valuable because they are painless to obtain, do not require blood or invasive procedures, and provide reliable DNA samples for identification.</p>
+<div class="lesson-card">
+  <p>Buccal cells, also known as cheek cells, are the epithelial cells that line the inside of a person's cheeks and mouth. They are easy to collect by gently swabbing the inner cheek with a cotton swab, which makes them one of the most common and non-invasive sources of DNA in forensic science. </p> 
+
+  <p>Because buccal cells contain a complete set of an individual's genetic material, they are frequently used in criminal investigations, paternity testing, and medical research. Buccal swabs are especially valuable because they are painless to obtain, do not require blood or invasive procedures, and provide reliable DNA samples for identification.</p>
+  <div style="text-align: center; margin: 1.5rem 0;">
+    <button class="btn video-btn" onclick="openVideoLightbox('assets/buccalcells.mp4')">
+      Watch Buccal Cells Video
+    </button>
+  </div>
   <a href="4-blood.html">
     <button class="btn">Back</button>
   </a>
@@ -28,3 +35,7 @@ format:
     <button class="btn">Next</button>
   </a>
 </div>
+
+{{< include _video-lightbox.html >}}
+
+```

@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.32">
+<meta name="generator" content="quarto-1.8.25">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -32,14 +32,15 @@ ul.task-list li input[type="checkbox"] {
 <meta name="quarto:offset" content="./">
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-54061a0d7910f7c50b84f3ace82f7db1.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-5b4ad623e5705c0698d39aec6f10cf02.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -79,6 +80,8 @@ ul.task-list li input[type="checkbox"] {
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
+    <a href="./index.html" class="navbar-brand navbar-brand-logo">
+    </a>
     <a class="navbar-brand" href="./index.html">
     <span class="navbar-title">SSG - HS Forensics</span>
     </a>
@@ -101,6 +104,10 @@ ul.task-list li input[type="checkbox"] {
     <a class="nav-link" href="https://github.com/vcu-ssg/ssg-hs-forensics-app"> 
 <span class="menu-text">Repository</span></a>
   </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./cell-gallery/gallery.qmd"> 
+<span class="menu-text">Gallery</span></a>
+  </li>  
 </ul>
           </div> <!-- /navcollapse -->
             <div class="quarto-navbar-tools">
@@ -117,7 +124,8 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#intro-presentation" id="toc-intro-presentation" class="nav-link active" data-scroll-target="#intro-presentation">Intro presentation</a></li>
+  <li><a href="#documentation" id="toc-documentation" class="nav-link active" data-scroll-target="#documentation">Documentation</a></li>
+  <li><a href="#intro-presentation" id="toc-intro-presentation" class="nav-link" data-scroll-target="#intro-presentation">Intro presentation</a></li>
   </ul>
 </nav>
     </div>
@@ -144,6 +152,14 @@ ul.task-list li input[type="checkbox"] {
 
 
 <p>First draft of a working website documenting our work on this project.</p>
+<section id="documentation" class="level2">
+<h2 class="anchored" data-anchor-id="documentation">Documentation</h2>
+<ul>
+<li><a href="./image-gallery-guide.html">Image Gallery and Upload Guide</a> - Learn how to upload images and use the gallery features</li>
+<li><a href="./development.html">Developer Documentation</a> - Technical documentation for developers working on the project</li>
+<li><a href="./lesson-creation-guide.html">Creating New Lessons</a> - Guide for developers to create new lesson content</li>
+</ul>
+</section>
 <section id="intro-presentation" class="level2">
 <h2 class="anchored" data-anchor-id="intro-presentation">Intro presentation</h2>
 <p>Below is the intro presentation shared by Alina. Here a <a href="https://docs.google.com/presentation/d/1Dvj30uIWChAgkIMVAGFMYwBHVhdFYcJw6l3nDvWGdbM/edit?slide=id.p#slide=id.p">direct link to the google slides</a> source.</p>
@@ -204,13 +220,14 @@ ul.task-list li input[type="checkbox"] {
       e.clearSelection();
     }
     const getTextToCopy = function(trigger) {
-        const codeEl = trigger.previousElementSibling.cloneNode(true);
-        for (const childEl of codeEl.children) {
-          if (isCodeAnnotation(childEl)) {
-            childEl.remove();
-          }
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
         }
-        return codeEl.innerText;
+      }
+      return codeEl.innerText;
     }
     const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
       text: getTextToCopy

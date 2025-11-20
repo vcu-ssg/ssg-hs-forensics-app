@@ -105,6 +105,18 @@ ul.task-list li input[type="checkbox"] {
     <a class="nav-link" href="../lesson-1/index.html"> 
 <span class="menu-text">Lesson 1: Important Cells in Forensics</span></a>
   </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../lesson-3/index3.html"> 
+<span class="menu-text">Lesson 3: Buccal or Blood Game</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../upload/upload.html"> 
+<span class="menu-text">Upload Image</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../cell-gallery/gallery.html"> 
+<span class="menu-text">Gallery</span></a>
+  </li>  
 </ul>
           </div> <!-- /navcollapse -->
             <div class="quarto-navbar-tools">
@@ -144,10 +156,13 @@ ul.task-list li input[type="checkbox"] {
 <p>Test your knowledge of the important cell types used in forensic science. Select the best answer for each question and click “Check Answer” to see if you got it right.</p>
 <div class="lesson-card">
 <h3 class="anchored">
-What type of cells in saliva are used in forensic investigations, and why are they useful?
+Examine the microscope image below. What type of cells are shown in this forensic sample?
 </h3>
+<div style="text-align: center; margin: 20px 0;">
+<img src="assets/buccal1.png" alt="Microscope image of cells" style="max-width: 500px; border: 2px solid #ddd; border-radius: 8px;">
+</div>
 <div class="question-options">
-<p><label><input type="radio" name="q1" value="1"> Epithelial cells, because they contain DNA that can be used to identify individuals</label> <label><input type="radio" name="q1" value="2"> Red blood cells, because they carry oxygen</label> <label><input type="radio" name="q1" value="3"> White blood cells, because they fight infections</label> <label><input type="radio" name="q1" value="4"> Nerve cells, because they transmit signals</label></p>
+<p><label><input type="radio" name="q1" value="1"> Buccal epithelial cells from the inside of the cheek</label> <label><input type="radio" name="q1" value="2"> Red blood cells from a blood sample</label> <label><input type="radio" name="q1" value="3"> Skin cells from fingerprint evidence</label> <label><input type="radio" name="q1" value="4"> Saliva cells from a drinking glass</label></p>
 </div>
 <button class="btn check-btn" onclick="checkAnswer(1)">Check Answer</button>
 <div id="result-1" class="result-message">
@@ -209,7 +224,7 @@ if (selected.value === correctAnswer) {
   resultDiv.innerHTML = '<p style="color: green;">✓ Correct!</p>';
 } else {
   const correctText = {
-    1: 'Epithelial cells, because they contain DNA that can be used to identify individuals',
+    1: 'Buccal epithelial cells from the inside of the cheek',
     2: 'Cups, cigarettes, and bite marks',
     3: 'To understand and compare physical attributes of cells from different body sources',
     4: 'It can link suspects to crimes or confirm identities'

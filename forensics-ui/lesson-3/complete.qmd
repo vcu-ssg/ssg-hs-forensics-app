@@ -7,16 +7,50 @@ format:
 
 <div class="lesson-card">
   <h2>Congratulations! You’ve reached the end of Lesson 3: Buccal or Blood Game</h2>
-  <p>Final score: <strong><span id="final-score">—</span></strong></p>
+
+  <p>
+    You correctly identified
+    <strong><span id="score-fraction">—</span></strong>
+    cell images.
+    That’s
+    <strong><span id="score-percent">—</span></strong>
+    accuracy.
+  </p>
+
+  <p id="score-summary">
+    <!-- This will be filled in by the script below -->
+  </p>
 
   <a href="buccal.html"><button class="btn">Retry</button></a>
-  <a href="../index.html"><button class="btn">Home</button></a>
+  <a href="index3.html"><button class="btn">Home</button></a>
   <a href="certificate.html"><button class="btn">Next</button></a>
 </div>
 
 <script>
-// read and display the aggregate score
-const s = localStorage.getItem('lesson3Score');
-const t = localStorage.getItem('lesson3Total');
-document.getElementById('final-score').textContent = (s && t) ? `${s} / ${t}` : '—';
+window.addEventListener('DOMContentLoaded', () => {
+  // Read totals from localStorage
+  const score = Number(localStorage.getItem('lesson3Score') || 0);
+  const totalCorrect = Number(localStorage.getItem('lesson3Total') || 0); // should be 11
+  const totalImages = 24; // 4 pages * 6 images each
+
+  const percent = totalCorrect ? Math.round((score / totalCorrect) * 100) : 0;
+
+  const fracSpan = document.getElementById('score-fraction');
+  const percentSpan = document.getElementById('score-percent');
+  const summaryP = document.getElementById('score-summary');
+
+  if (fracSpan) {
+    fracSpan.textContent = `${score} / ${totalCorrect}`;
+  }
+
+  if (percentSpan) {
+    percentSpan.textContent = `${percent}%`;
+  }
+
+  if (summaryP) {
+    summaryP.textContent = `There were ${totalCorrect} correct cell images across ` +
+      `${totalImages} total images. You correctly identified ${score} of those ` +
+      `${totalCorrect}.`;
+  }
+});
 </script>

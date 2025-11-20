@@ -106,8 +106,16 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">Lesson 1: Important Cells in Forensics</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../lesson-3/index.html"> 
+    <a class="nav-link" href="../lesson-3/index3.html"> 
 <span class="menu-text">Lesson 3: Buccal or Blood Game</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../upload/upload.html"> 
+<span class="menu-text">Upload Image</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../cell-gallery/gallery.html"> 
+<span class="menu-text">Gallery</span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -168,53 +176,116 @@ Submit
 </main>
 </div>
 <script>
-function addLesson3Score(score, total) {
-  const s = Number(localStorage.getItem('lesson3Score') || 0);
-  const t = Number(localStorage.getItem('lesson3Total') || 0);
-  localStorage.setItem('lesson3Score', s + score);
-  localStorage.setItem('lesson3Total', t + total);
-}
-
-// selection styling
-const choices = document.querySelectorAll('.img-choice');
-choices.forEach(choice => {
-  choice.addEventListener('click', () => {
-    const input = choice.querySelector('input');
-    input.checked = !input.checked;
-    choice.classList.toggle('selected', input.checked);
-  });
-});
-
-// submit
-const form = document.getElementById('blood-form');
-form.addEventListener('submit', e => {
-  e.preventDefault();
-  const selected = [...form.querySelectorAll('input:checked')].map(i => i.value);
-  if (selected.length === 0) {
-    alert('Please select at least one blood cell image.');
-    return;
+window.addEventListener('DOMContentLoaded', () => {
+  function addLesson3Score(score, total) {
+    const s = Number(localStorage.getItem('lesson3Score') || 0);
+    const t = Number(localStorage.getItem('lesson3Total') || 0);
+    localStorage.setItem('lesson3Score', s + score);
+    localStorage.setItem('lesson3Total', t + total);
   }
 
-  // RANDOM demo "correct" set (keeps your exact values)
+  const form = document.getElementById('blood-form');
+  if (!form) return;
+
+  const choices = form.querySelectorAll('.img-choice');
+
+  // ✅ Correct images for this page
   const correct = new Set([
     "assets/saliva2.png",
     "assets/bucCell5.png",
     "assets/saliva3.png",
   ]);
-  const scoreThisPage = selected.filter(v => correct.has(v)).length;
-  const totalThisPage = correct.size;
 
-  addLesson3Score(scoreThisPage, totalThisPage);
+  // Allow clicking the image to toggle the checkbox
+  choices.forEach(choice => {
+    choice.addEventListener('click', () => {
+      const input = choice.querySelector('input[name="cell"]');
+      if (!input) return;
+      input.checked = !input.checked;
+      choice.classList.toggle('selected', input.checked);
+    });
+  });
 
-  // go to Congrats page
-  window.location.href = 'complete.html';
+  let reviewed = false; // first submit = review, second = go next
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+
+    // SECOND SUBMIT → go to next page
+    if (reviewed) {
+      window.location.href = 'skin.html';
+      return;
+    }
+
+    // FIRST SUBMIT → score + review mode
+    const inputs = [...form.querySelectorAll('input[name="cell"]')];
+    const selectedValues = inputs.filter(i => i.checked).map(i => i.value);
+
+    if (selectedValues.length === 0) {
+      alert('Please select at least one blood cell image.');
+      return;
+    }
+
+    // Remove any old classes
+    choices.forEach(choice => {
+      choice.classList.remove('correct', 'incorrect');
+    });
+
+    // Score this page
+    const scoreThisPage = selectedValues.filter(v => correct.has(v)).length;
+    const totalThisPage = correct.size;
+    addLesson3Score(scoreThisPage, totalThisPage);
+
+    // Highlight ALL correct images in green
+    choices.forEach(choice => {
+      const input = choice.querySelector('input[name="cell"]');
+      if (!input) return;
+      if (correct.has(input.value)) {
+        choice.classList.add('correct');
+      }
+    });
+
+    // Highlight incorrect selections in red
+    choices.forEach(choice => {
+      const input = choice.querySelector('input[name="cell"]');
+      if (!input) return;
+      if (input.checked && !correct.has(input.value)) {
+        choice.classList.add('incorrect');
+      }
+    });
+
+    // Page feedback
+    let feedback = document.getElementById('page-feedback');
+    if (!feedback) {
+      feedback = document.createElement('p');
+      feedback.id = 'page-feedback';
+      feedback.style.marginTop = '1rem';
+      feedback.style.fontWeight = '500';
+      form.appendChild(feedback);
+    }
+    feedback.textContent = `You selected ${scoreThisPage} of ${totalThisPage} correct images on this page.`;
+
+    // Legend
+    let legend = document.getElementById('page-legend');
+    if (!legend) {
+      legend = document.createElement('div');
+      legend.id = 'page-legend';
+      legend.style.marginTop = '0.75rem';
+      legend.innerHTML = `
+        ✅ <strong>Green border</strong>: correct cell type<br>
+        ❌ <strong>Red border</strong>: not this cell type
+      `;
+      form.appendChild(legend);
+    }
+
+    // Change button text to "Next"
+    const submitBtn = form.querySelector('button[type="submit"]');
+    if (submitBtn) submitBtn.textContent = 'Next';
+
+    reviewed = true; // next submit sends them forward
+  });
 });
 </script>
-<style>
-  .img-choice img { width: 100%; height: auto; border-radius: 0.5rem; border: 3px solid transparent; cursor: pointer; transition: border-color .2s, transform .1s; }
-  .img-choice img:hover { transform: scale(1.02); }
-  .img-choice.selected img { border-color: #2563eb; box-shadow: 0 0 0 4px rgba(37,99,235,.2); }
-</style>
 
 
 

@@ -14,11 +14,11 @@ This repo contains all the source code and images used by the SSG team.  This re
 * The lab manager - wanting to install the software in preparation for a tour of the Forensics lab,
 * A research student - wanting to run SAM on an image,
 * A research student - wanting to create and deploy a new lesson for system,
-* 
+* A developer - wanting a full install to extend the system.
 
 ## Prerequisites
 
-There are some key pieces of software to installed, regardless of how you plan to use this repo.  We make extensive use of the command line terminal (powershell on windows).  Press the <windows> key and enter "Terminal" to start it up.
+There are some key pieces of software to installed, regardless of how you plan to use this repo.  We make extensive use of the command line terminal (powershell on windows).  Press the &x229E; key and enter "Terminal" to start it up. 
 
 * [docker desktop](https://docs.docker.com/desktop/setup/install/windows-install/) - Because of security, etc. this needs to be installed manually.  It requires admin priveleges and is installed system-wide on your machine.
 

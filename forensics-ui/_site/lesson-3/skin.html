@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Lesson 3: Buccal or Blood – Completed – FORENSICS-UI</title>
+<title>Identify all Skin Cells – FORENSICS-UI</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -125,23 +125,23 @@ ul.task-list li input[type="checkbox"] {
     </nav>
 </header>
 <!-- content -->
-<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
         
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content">
+<main class="content column-page" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Lesson 3: Buccal or Blood – Completed</h1>
+<h1 class="title">Identify all Skin Cells</h1>
 </div>
 
 
 
-<div class="quarto-title-meta">
+<div class="quarto-title-meta column-page">
 
     
   
@@ -153,44 +153,136 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<div class="lesson-card">
-<h2 class="anchored">
-Congratulations! You’ve reached the end of Lesson 3: Buccal or Blood Game
+<div class="shell" style="display:grid;place-items:center;min-height:100vh;background:#f3f4f6;">
+<main class="card" style="background:white;padding:2rem 3rem;border-radius:1rem;box-shadow:0 10px 20px rgba(0,0,0,.05);text-align:center;width:min(800px,90%);">
+<h2 style="font-weight:700;margin-bottom:1.5rem;" class="anchored">
+Identify all skin cells
 </h2>
-<p>
-You correctly identified <strong><span id="score-fraction">—</span></strong> cell images. That’s <strong><span id="score-percent">—</span></strong> accuracy.
-</p>
-<p id="score-summary">
-<!-- This will be filled in by the script below -->
-</p>
-<p><a href="buccal.html"><button class="btn">Retry</button></a> <a href="index3.html"><button class="btn">Home</button></a> <a href="certificate.html"><button class="btn">Next</button></a></p>
+<!-- Image Grid -->
+<form id="skin-form">
+<div class="grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:2rem;">
+<p><label class="img-choice"> <input type="checkbox" name="cell" value="assets/saliva1.png" hidden=""> <img src="assets/saliva1.png" alt="skin cell 1"> </label></p>
+<p><label class="img-choice"> <input type="checkbox" name="cell" value="assets/bucCell4.png" hidden=""> <img src="assets/bucCell4.png" alt="skin cell 2"> </label></p>
+<p><label class="img-choice"> <input type="checkbox" name="cell" value="assets/SkinCell1.png" hidden=""> <img src="assets/SkinCell1.png" alt="skin cell 3"> </label></p>
+<p><label class="img-choice"> <input type="checkbox" name="cell" value="assets/SkinCell2.png" hidden=""> <img src="assets/SkinCell2.png" alt="skin cell 4"> </label></p>
+<p><label class="img-choice"> <input type="checkbox" name="cell" value="assets/bucCell1.png" hidden=""> <img src="assets/bucCell1.png" alt="skin cell 5"> </label></p>
+<p><label class="img-choice"> <input type="checkbox" name="cell" value="assets/saliva6.png" hidden=""> <img src="assets/saliva6.png" alt="skin cell 6"> </label></p>
+</div>
+<!-- Submit button -->
+<button type="submit" class="btn" style="background:#d1d5db;color:#000;padding:.6rem 2rem;border-radius:2rem;border:none;cursor:pointer;font-weight:600;">
+Submit
+</button>
+</form>
+</main>
 </div>
 <script>
 window.addEventListener('DOMContentLoaded', () => {
-  // Read totals from localStorage
-  const score = Number(localStorage.getItem('lesson3Score') || 0);
-  const totalCorrect = Number(localStorage.getItem('lesson3Total') || 0); // should be 11
-  const totalImages = 24; // 4 pages * 6 images each
-
-  const percent = totalCorrect ? Math.round((score / totalCorrect) * 100) : 0;
-
-  const fracSpan = document.getElementById('score-fraction');
-  const percentSpan = document.getElementById('score-percent');
-  const summaryP = document.getElementById('score-summary');
-
-  if (fracSpan) {
-    fracSpan.textContent = `${score} / ${totalCorrect}`;
+  function addLesson3Score(score, total) {
+    const s = Number(localStorage.getItem('lesson3Score') || 0);
+    const t = Number(localStorage.getItem('lesson3Total') || 0);
+    localStorage.setItem('lesson3Score', s + score);
+    localStorage.setItem('lesson3Total', t + total);
   }
 
-  if (percentSpan) {
-    percentSpan.textContent = `${percent}%`;
-  }
+  const form = document.getElementById('skin-form');
+  if (!form) return;
 
-  if (summaryP) {
-    summaryP.textContent = `There were ${totalCorrect} correct cell images across ` +
-      `${totalImages} total images. You correctly identified ${score} of those ` +
-      `${totalCorrect}.`;
-  }
+  const choices = form.querySelectorAll('.img-choice');
+
+  // ✅ Correct images for this page
+  const correct = new Set([
+    "assets/SkinCell1.png",
+    "assets/SkinCell2.png"
+  ]);
+
+  // Allow clicking the image to toggle the checkbox
+  choices.forEach(choice => {
+    choice.addEventListener('click', () => {
+      const input = choice.querySelector('input[name="cell"]');
+      if (!input) return;
+      input.checked = !input.checked;
+      choice.classList.toggle('selected', input.checked);
+    });
+  });
+
+  let reviewed = false; // first submit = review, second = go to complete
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+
+    // SECOND SUBMIT → go to completion page
+    if (reviewed) {
+      window.location.href = 'complete.html';
+      return;
+    }
+
+    // FIRST SUBMIT → score + review mode
+    const inputs = [...form.querySelectorAll('input[name="cell"]')];
+    const selectedValues = inputs.filter(i => i.checked).map(i => i.value);
+
+    if (selectedValues.length === 0) {
+      alert('Please select at least one skin cell image.');
+      return;
+    }
+
+    // Clear old review classes
+    choices.forEach(choice => {
+      choice.classList.remove('correct', 'incorrect');
+    });
+
+    // Score this page
+    const scoreThisPage = selectedValues.filter(v => correct.has(v)).length;
+    const totalThisPage = correct.size;
+    addLesson3Score(scoreThisPage, totalThisPage);
+
+    // Highlight ALL correct images in green
+    choices.forEach(choice => {
+      const input = choice.querySelector('input[name="cell"]');
+      if (!input) return;
+      if (correct.has(input.value)) {
+        choice.classList.add('correct');
+      }
+    });
+
+    // Highlight incorrect selections in red
+    choices.forEach(choice => {
+      const input = choice.querySelector('input[name="cell"]');
+      if (!input) return;
+      if (input.checked && !correct.has(input.value)) {
+        choice.classList.add('incorrect');
+      }
+    });
+
+    // Page feedback
+    let feedback = document.getElementById('page-feedback');
+    if (!feedback) {
+      feedback = document.createElement('p');
+      feedback.id = 'page-feedback';
+      feedback.style.marginTop = '1rem';
+      feedback.style.fontWeight = '500';
+      form.appendChild(feedback);
+    }
+    feedback.textContent = `You selected ${scoreThisPage} of ${totalThisPage} correct images on this page.`;
+
+    // Legend
+    let legend = document.getElementById('page-legend');
+    if (!legend) {
+      legend = document.createElement('div');
+      legend.id = 'page-legend';
+      legend.style.marginTop = '0.75rem';
+      legend.innerHTML = `
+        ✅ <strong>Green border</strong>: correct cell type<br>
+        ❌ <strong>Red border</strong>: not this cell type
+      `;
+      form.appendChild(legend);
+    }
+
+    // Change button text to "Next"
+    const submitBtn = form.querySelector('button[type="submit"]');
+    if (submitBtn) submitBtn.textContent = 'Next';
+
+    reviewed = true; // next submit goes to complete.html
+  });
 });
 </script>
 

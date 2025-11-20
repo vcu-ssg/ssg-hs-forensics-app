@@ -54,50 +54,118 @@ format:
 </div>
 
 <script>
-// reuse helper from previous page (duplicates are fine for simplicity)
-function addLesson3Score(score, total) {
-  const s = Number(localStorage.getItem('lesson3Score') || 0);
-  const t = Number(localStorage.getItem('lesson3Total') || 0);
-  localStorage.setItem('lesson3Score', s + score);
-  localStorage.setItem('lesson3Total', t + total);
-}
-
-// selection styling
-const choices = document.querySelectorAll('.img-choice');
-choices.forEach(choice => {
-  choice.addEventListener('click', () => {
-    const input = choice.querySelector('input');
-    input.checked = !input.checked;
-    choice.classList.toggle('selected', input.checked);
-  });
-});
-
-// submit
-const form = document.getElementById('saliva-form');
-form.addEventListener('submit', e => {
-  e.preventDefault();
-  const selected = [...form.querySelectorAll('input:checked')].map(i => i.value);
-  if (selected.length === 0) {
-    alert('Please select at least one saliva cell image.');
-    return;
+window.addEventListener('DOMContentLoaded', () => {
+  function addLesson3Score(score, total) {
+    const s = Number(localStorage.getItem('lesson3Score') || 0);
+    const t = Number(localStorage.getItem('lesson3Total') || 0);
+    localStorage.setItem('lesson3Score', s + score);
+    localStorage.setItem('lesson3Total', t + total);
   }
-  // RANDOM demo "correct" set (keeps your exact values)
+
+  const form = document.getElementById('saliva-form');
+  if (!form) return;
+
+  const choices = form.querySelectorAll('.img-choice');
+
+  // ✅ Correct images for THIS PAGE
   const correct = new Set([
     "assets/saliva1.png",
     "assets/saliva4.png",
     "assets/buccal1.png",
   ]);
-  const scoreThisPage = selected.filter(v => correct.has(v)).length;
-  const totalThisPage = correct.size;
 
-  addLesson3Score(scoreThisPage, totalThisPage);
+  // Let users toggle selection by clicking images
+  choices.forEach(choice => {
+    choice.addEventListener('click', () => {
+      const input = choice.querySelector('input[name="cell"]');
+      if (!input) return;
+      input.checked = !input.checked;
+      choice.classList.toggle('selected', input.checked);
+    });
+  });
 
-  window.location.href = 'blood.html';
+  let reviewed = false; // first submit = review, second submit = go next
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+
+    // SECOND click: after review → go to next page (skin)
+    if (reviewed) {
+      window.location.href = 'blood.html';
+      return;
+    }
+
+    // FIRST click: do grading + highlight images
+    const inputs = [...form.querySelectorAll('input[name="cell"]')];
+    const selectedValues = inputs.filter(i => i.checked).map(i => i.value);
+
+    if (selectedValues.length === 0) {
+      alert('Please select at least one saliva cell image.');
+      return;
+    }
+
+    // Clear any previous review state
+    choices.forEach(choice => {
+      choice.classList.remove('correct', 'incorrect');
+    });
+
+    // Scoring for this page
+    const scoreThisPage = selectedValues.filter(v => correct.has(v)).length;
+    const totalThisPage = correct.size;
+    addLesson3Score(scoreThisPage, totalThisPage);
+
+    // Highlight ALL correct images (even if not selected)
+    choices.forEach(choice => {
+      const input = choice.querySelector('input[name="cell"]');
+      if (!input) return;
+      const value = input.value;
+      if (correct.has(value)) {
+        choice.classList.add('correct');
+      }
+    });
+
+    // Highlight incorrect selections in red
+    choices.forEach(choice => {
+      const input = choice.querySelector('input[name="cell"]');
+      if (!input) return;
+      const value = input.value;
+      if (input.checked && !correct.has(value)) {
+        choice.classList.add('incorrect');
+      }
+    });
+
+    // Add feedback text under the form
+    let feedback = document.getElementById('page-feedback');
+    if (!feedback) {
+      feedback = document.createElement('p');
+      feedback.id = 'page-feedback';
+      feedback.style.marginTop = '1rem';
+      feedback.style.fontWeight = '500';
+      form.appendChild(feedback);
+    }
+    feedback.textContent = `You selected ${scoreThisPage} of ${totalThisPage} correct images on this page.`;
+
+    // Add legend
+    let legend = document.getElementById('page-legend');
+    if (!legend) {
+      legend = document.createElement('div');
+      legend.id = 'page-legend';
+      legend.style.marginTop = '0.75rem';
+      legend.innerHTML = `
+        ✅ <strong>Green border</strong>: correct cell type<br>
+        ❌ <strong>Red border</strong>: not this cell type
+      `;
+      form.appendChild(legend);
+    }
+
+    // Change button text to "Next"
+    const submitBtn = form.querySelector('button[type="submit"]');
+    if (submitBtn) submitBtn.textContent = 'Next';
+
+    reviewed = true; // next submit goes to skin.html
+  });
 });
 </script>
 
-<style>
-  .img-choice img { width: 100%; height: auto; border-radius: 0.5rem; border: 3px solid transparent; cursor: pointer; transition: border-color .2s, transform .1s; }
-  .img-choice img:hover { transform: scale(1.02); }
-  .img-choice.selected img { border-color: #2563eb; box-shadow: 0 0 0 4px rgba(37,99,235,.2); }
-</style>
+
+

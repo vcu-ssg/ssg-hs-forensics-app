@@ -2,9 +2,9 @@
   {
     "objectID": "upload/upload.html",
     "href": "upload/upload.html",
-    "title": "SSG Forensics",
+    "title": "Upload",
     "section": "",
-    "text": "Upload microscope images to automatically segment and count cells,\n      while also distinguishing between different cell types. The system\n      highlights cells in the image, generates size data, and allows you to save\n      annotated results for classroom learning or forensic analysis.\n    \n    \n      Upload Image\n      \n        Upload your own image, or choose one from our gallery.\n      \n      \n        \n          Gallery\n        \n        Upload\n        \n          Next"
+    "text": "SSG Forensics\n    \n      Upload microscope images to automatically segment and count cells,\n      while also distinguishing between different cell types. The system\n      highlights cells in the image, generates size data, and allows you to save\n      annotated results for classroom learning or forensic analysis.\n    \n    \n      Upload Image\n      \n        Upload your own image, or choose one from our gallery.\n      \n      \n        \n          Gallery\n        \n        Upload\n        \n          Next"
   },
   {
     "objectID": "about.html",
@@ -102,7 +102,7 @@
     "href": "index.html",
     "title": "Interactive Forensics",
     "section": "",
-    "text": "Lesson 1: Important Cells in Forensics"
+    "text": "Lesson 1: Important Cells in Forensics\nLesson 3: Buccal or Blood"
   },
   {
     "objectID": "protoype.html",
@@ -114,9 +114,9 @@
   {
     "objectID": "lesson-3/index.html",
     "href": "lesson-3/index.html",
-    "title": "Certificate of Completion",
+    "title": "Buccal or Blood Game",
     "section": "",
-    "text": "Cell Expert\n\n \n\n&lt;a href=\"../index.html\"&gt;&lt;button class=\"btn\"&gt;Home&lt;/button&gt;&lt;/a&gt;\n&lt;a href=\"assets/diploma.png\" download&gt;&lt;button class=\"btn\"&gt;Download&lt;/button&gt;&lt;/a&gt;"
+    "text": "Buccal or Blood Game\n\n\nAs we have learned throughout Introduction to Cells, there are many types of cells: saliva, buccal, blood, and skin.\n\n\nDuring this lesson, you will be tasked with identifying different types of cells.\n\n\n\nRandom Image\n\n\nRandomize an image from our gallery.\n\n Randomize"
   },
   {
     "objectID": "lesson-3/1-bloodORbuccal.html",
@@ -151,7 +151,7 @@
     "href": "lesson-3/certificate.html",
     "title": "Certificate of Completion",
     "section": "",
-    "text": "Cell Expert\n\n \n\n&lt;a href=\"../index.html\"&gt;&lt;button class=\"btn\"&gt;Home&lt;/button&gt;&lt;/a&gt;\n&lt;a href=\"assets/diploma.png\" download&gt;&lt;button class=\"btn\"&gt;Download&lt;/button&gt;&lt;/a&gt;"
+    "text": "Cell Expert\n\n \n\nHome Download"
   },
   {
     "objectID": "lesson-3/blood.html",
@@ -172,6 +172,20 @@
     "href": "lesson-3/complete.html",
     "title": "Lesson 3: Buccal or Blood – Completed",
     "section": "",
-    "text": "Congratulations! You’ve reached the end of Lesson 3: Buccal or Blood Game\n\n\nFinal score: —\n\nRetry Home Next"
+    "text": "Congratulations! You’ve reached the end of Lesson 3: Buccal or Blood Game\n\n\nYou correctly identified — cell images. That’s — accuracy.\n\n\n\n\nRetry Home Next"
+  },
+  {
+    "objectID": "lesson-3/index3.html",
+    "href": "lesson-3/index3.html",
+    "title": "Buccal or Blood Game",
+    "section": "",
+    "text": "Buccal or Blood Game\n\n\nAs we have learned throughout Introduction to Cells, there are many types of cells: saliva, buccal, blood, and skin.\n\n\nDuring this lesson, you will be tasked with identifying different types of cells.\n\n\n\nRandom Image\n\n\nRandomize an image from our gallery.\n\n Randomize"
+  },
+  {
+    "objectID": "lesson-3/skin.html",
+    "href": "lesson-3/skin.html",
+    "title": "Identify all Skin Cells",
+    "section": "",
+    "text": "Identify all skin cells\n\n\n\n\n   \n   \n   \n   \n   \n   \n\n\n\nSubmit"
   }
 ]

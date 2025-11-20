@@ -9,6 +9,7 @@ First draft of a working website documenting our work on this project.
 - [Image Gallery and Upload Guide](image-gallery-guide.qmd) - Learn how to upload images and use the gallery features
 - [Developer Documentation](development.qmd) - Technical documentation for developers working on the project
 - [Creating New Lessons](lesson-creation-guide.qmd) - Guide for developers to create new lesson content
+- [GITHUB repository with source and other documents](https://github.com/vcu-ssg/ssg-hs-forensics-app) - our project repository
 
 ## Example Quarto runs
 

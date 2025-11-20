@@ -2,7 +2,7 @@
 
 
 
-## Activities
+## Major Activities
 
 * If you want to run SAM on an image, jump into the ./reports folder and review [reports/example1.qmd](./reports/example1.qmd). This file can be used as a template for running SAM in single images.  Here is the [report created by quarto](https://vcu-ssg.github.io/ssg-hs-forensics-app/example1.html)..
 
@@ -14,7 +14,7 @@
         cd forensics-ui
         quarto render
 
-* If you want to rebuild and run the web application:
+* If you want to rebuild and run the web application, first rebuild the front-end, then:
 
         cd forensics-backend
         docker compose up -d

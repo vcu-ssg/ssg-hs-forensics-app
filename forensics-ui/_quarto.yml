@@ -1,5 +1,7 @@
 project:
   type: website
+  resources:
+    - "lesson-1/assets/*.mp4"
 
 website:
   title: "FORENSICS-UI"
@@ -11,9 +13,13 @@ website:
         text: About
       - href: lesson-1/index.qmd
         text: "Lesson 1: Important Cells in Forensics"
-      - href: lesson-3/index.qmd
+      - href: lesson-3/index3.qmd
         text: "Lesson 3: Buccal or Blood Game"
     
+      - href: upload/upload.qmd
+        text: "Upload Image"
+      - href: cell-gallery/gallery.qmd
+        text: "Gallery"
 
 format:
   html:

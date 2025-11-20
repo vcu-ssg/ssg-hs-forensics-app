@@ -105,6 +105,18 @@ ul.task-list li input[type="checkbox"] {
     <a class="nav-link" href="../lesson-1/index.html"> 
 <span class="menu-text">Lesson 1: Important Cells in Forensics</span></a>
   </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../lesson-3/index3.html"> 
+<span class="menu-text">Lesson 3: Buccal or Blood Game</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../upload/upload.html"> 
+<span class="menu-text">Upload Image</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../cell-gallery/gallery.html"> 
+<span class="menu-text">Gallery</span></a>
+  </li>  
 </ul>
           </div> <!-- /navcollapse -->
             <div class="quarto-navbar-tools">
@@ -159,15 +171,68 @@ ul.task-list li input[type="checkbox"] {
 </div>
 </div>
 </div>
+
 <div class="lesson-card">
-<p>
-Skin cells are frequently left behind through touch and can serve as trace evidence in forensic investigations.
-</p>
-<p>
-Even small amounts, known as “touch DNA,” can provide genetic material for identification, helping link a suspect or victim to objects, locations, or other individuals involved in a case.
-</p>
-<p><a href="2-saliva.html"> <button class="btn">Back</button> </a> <a href="4-blood.html"> <button class="btn">Next</button> </a></p>
+  <p>Skin cells are frequently left behind through touch and can serve as trace evidence in forensic investigations.</p> 
+
+  <p>Even small amounts, known as "touch DNA," can provide genetic material for identification, helping link a suspect or victim to objects, locations, or other individuals involved in a case.</p>
+  <div style="text-align: center; margin: 1.5rem 0;">
+    <button class="btn video-btn" onclick="openVideoLightbox('assets/skincells.mp4')">
+      Watch Skin Cells Video
+    </button>
+  </div>
+  <a href="2-saliva.html">
+    <button class="btn">Back</button>
+  </a>
+  <a href="4-blood.html">
+    <button class="btn">Next</button>
+  </a>
 </div>
+
+<div id="videoLightbox" class="lightbox" onclick="closeLightbox(event)">
+  <div class="lightbox-content">
+    <span class="close-btn" onclick="closeLightbox(event)">×</span>
+    <video id="lightboxVideo" controls="">
+    <source src="" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+  </div>
+</div>
+
+<script>
+
+function openVideoLightbox(videoSrc) {
+  const lightbox = document.getElementById('videoLightbox');
+  const video = document.getElementById('lightboxVideo');
+  video.src = videoSrc;
+  lightbox.style.display = 'flex';
+  video.play();
+}
+
+function closeLightbox(event) {
+  const lightbox = document.getElementById('videoLightbox');
+  const video = document.getElementById('lightboxVideo');
+  
+  if (event.target === lightbox || event.target.className === 'close-btn') {
+    lightbox.style.display = 'none';
+    video.pause();
+    video.currentTime = 0;
+  }
+}
+
+// Close lightbox with Escape key
+document.addEventListener('keydown', function(event) {
+  if (event.key === 'Escape') {
+    const lightbox = document.getElementById('videoLightbox');
+    const video = document.getElementById('lightboxVideo');
+    lightbox.style.display = 'none';
+    video.pause();
+    video.currentTime = 0;
+  }
+});
+</script>
+
+
 
 
 

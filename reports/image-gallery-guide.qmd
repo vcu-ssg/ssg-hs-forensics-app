@@ -1,0 +1,140 @@
+---
+title: "Image Gallery and Upload Guide"
+author: "SSG Forensics Team"
+date: last-modified
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: false
+---
+
+## Overview
+
+This guide explains how to use the forensic cell image gallery and upload functionality in the SSG High School Forensics Application. The system allows users to view sample images, upload their own cell images, and process them using AI-powered analysis tools.
+
+## Image Gallery
+
+The image gallery is organized into three main sections, each serving a specific purpose in the forensic analysis workflow.
+
+### Sample Images
+
+The Sample Images section contains pre-loaded reference images of different cell types:
+
+- **Buccal Cells**: Epithelial cells collected from the inside of the cheek, commonly used in forensic DNA analysis
+- **Epidermal Cells**: Skin cells that can be found in fingerprints and touch DNA samples
+- **Saliva Cells**: A mixture of epithelial cells found in biological evidence
+
+These images are provided for educational purposes and can be used to:
+
+- Learn to identify different cell types
+- Practice with the image processing tools
+- Compare against uploaded images
+
+#### Using Sample Images
+
+1. Navigate to the gallery page
+2. Browse images organized by cell type
+3. Hover over any image to reveal action buttons:
+   - **View**: Opens the full-size image in a new tab
+   - **Process**: Sends the image to the AI analysis pipeline
+
+### Uploaded Images
+
+This section displays all images that have been uploaded by users through the upload tool.
+
+#### How to Upload Images
+
+1. Navigate to the Upload page
+2. Click the upload area or drag and drop an image file
+3. Supported formats: JPG, JPEG, PNG
+4. Once uploaded, the image will appear in the Uploaded Images section of the gallery
+
+#### Processing Uploaded Images
+
+After uploading an image:
+
+1. Go to the gallery page
+2. Find your image in the Uploaded Images section
+3. Hover over the image to reveal action buttons
+4. Click **Process** to analyze the image
+5. Wait for the processing to complete (indicated by status messages)
+6. View the processed result in the Processed Images section
+
+### Processed Images
+
+This section contains all images that have been analyzed by the AI segmentation and identification tools.
+
+Processed images include:
+
+- Segmented cell boundaries
+- Cell type identification
+- Analysis metadata
+
+#### Viewing Processed Results
+
+- Click on any processed image to view it full-size
+- Processed images are named with a `processed_` prefix
+- Results are stored persistently and can be reviewed at any time
+
+## Technical Implementation
+
+::: {.callout-note}
+This section contains technical details about the system architecture and implementation. Feel free to skip this if you're primarily interested in using the application.
+:::
+
+### Architecture
+
+The gallery system uses a dynamic, API-driven architecture:
+
+```
+Frontend (Quarto/HTML/JS) → NGINX → FastAPI Backend → File System
+```
+
+### API Endpoints
+
+The backend provides three main endpoints for the gallery:
+
+- `GET /api/gallery/sample-images`: Returns organized list of sample images by cell type
+- `GET /api/gallery/uploaded-images`: Returns list of user-uploaded images
+- `GET /api/gallery/processed-images`: Returns list of processed images
+
+### Image Storage
+
+Images are organized in the following directory structure:
+
+```
+images/
+├── sample-gallery-images/
+│   ├── buccal_cells/
+│   ├── epidermal_cells/
+│   └── saliva_cells/
+├── uploaded-images/
+└── processed-images/
+```
+
+### Processing Workflow
+
+1. User selects an image to process
+2. Frontend fetches the image as a blob
+3. Image is sent to `/api/process-img` endpoint via POST request
+4. Backend processes the image using the SAM2 model (or current processing logic)
+5. Processed image is saved to `processed-images/` directory
+6. Frontend refreshes the Processed Images gallery
+7. User is notified of successful processing
+
+## Best Practices
+
+### For Students
+
+- Start by exploring sample images to learn different cell types
+- Upload clear, well-focused microscope images for best results
+- Process images one at a time to avoid overwhelming the system
+- Compare processed results against sample images to verify accuracy
+
+### For Educators
+
+- Use sample images for demonstrations and teaching
+- Guide students to upload their own collected samples
+- Review processed images with students to discuss cell identification
+- Leverage the gallery for comparative analysis exercises

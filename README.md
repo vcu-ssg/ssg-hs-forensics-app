@@ -76,6 +76,27 @@ That's it!  You should be able to undertake any of the major activities below.
 
 ## Major Activities
 
+Many of the activities below have been automated in the Makefile found in the project home directory.  To see the automated commands, open a terminal, move the project repo home and enter:
+
+        make
+        
+Here is an example of what gets displayed:
+
+        Available commands:
+        -------------------
+        help    Show this help message
+        forensics-ui    Build the frontend using Quarto
+        forensics-backend       Build the backend without running server
+        start-server    Start backend in detached mode (listens on localhost:80)
+        stop-server     Stop backend server
+        open-webapp     Start server (if needed) and open the browser
+
+Any of the commands can be run directly from the command line, for example:
+
+        make start-server
+
+Here are the explicit commands from the command line.  These are intended as reminders, your mileage may very.
+
 * If you want to run SAM on an image, jump into the ./reports folder and review [reports/example1.qmd](./reports/example1.qmd). This file can be used as a template for running SAM in single images.  Here is the [report created by quarto](https://vcu-ssg.github.io/ssg-hs-forensics-app/example1.html)..
 
         cd reports

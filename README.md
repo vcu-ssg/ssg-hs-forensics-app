@@ -16,6 +16,8 @@ This repo contains all the source code and images used by the SSG team.  This re
 * A research student - wanting to create and deploy a new lesson for system,
 * A developer - wanting a full install to extend the system.
 
+Additional documentation can be found on [this project's ghpages site](https://vcu-ssg.github.io/ssg-hs-forensics-app).
+
 ## Prerequisites
 
 There are some key pieces of software to installed, regardless of how you plan to use this repo.  We make extensive use of the command line terminal (powershell on windows).  Press the ⊞ key and enter "Terminal" to start it up. 

@@ -18,7 +18,7 @@ This repo contains all the source code and images used by the SSG team.  This re
 
 ## Prerequisites
 
-There are some key pieces of software to installed, regardless of how you plan to use this repo.  We make extensive use of the command line terminal (powershell on windows).  Press the &#229E; key and enter "Terminal" to start it up. 
+There are some key pieces of software to installed, regardless of how you plan to use this repo.  We make extensive use of the command line terminal (powershell on windows).  Press the ⊞ key and enter "Terminal" to start it up. 
 
 * [docker desktop](https://docs.docker.com/desktop/setup/install/windows-install/) - Because of security, etc. this needs to be installed manually.  It requires admin priveleges and is installed system-wide on your machine.
 

@@ -124,7 +124,7 @@ def cmd_generate(image_path, overwrite):
     click.echo(f"Processing image: {img_path}")
     logger.info(f"Running mask generator for: {img_path}")
 
-    masks = run_generator(generator, img_path)
+    masks = run_generator(generator, img_path, mg_cfg=mg_cfg)
 
     # --------------------------------------------------------
     # DEBUG: Log what run_generator returned

@@ -40,7 +40,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-ffa9a6279353761231ec249df0a7fdd3.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-f93c2b1f3f0577f377aefa4848a86a36.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -315,15 +315,186 @@ function createImageElement(src, alt = 'Cell image', canProcess = false) {
     overlay.appendChild(processBtn);
     overlay.appendChild(viewBtn);
     container.appendChild(overlay);
-  } else {
-    // For processed images, just add click to view
-    img.style.cursor = 'pointer';
-    img.addEventListener('click', () => {
-      window.open(src, '_blank');
-    });
   }
   
   return container;
+}
+
+// creates an image element for processed images with compare functionality
+function createProcessedImageElement(src, alt = 'Processed image') {
+  const container = document.createElement('div');
+  container.className = 'image-container';
+  
+  const img = document.createElement('img');
+  img.src = src;
+  img.alt = alt;
+  img.className = 'gallery-image';
+  img.loading = 'lazy';
+  
+  img.addEventListener('error', () => {
+    img.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="250" height="250"%3E%3Crect fill="%23ddd" width="250" height="250"/%3E%3Ctext fill="%23999" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3EImage not found%3C/text%3E%3C/svg%3E';
+  });
+  
+  container.appendChild(img);
+  
+  // Add overlay with Compare button
+  const overlay = document.createElement('div');
+  overlay.className = 'image-overlay';
+  
+  const compareBtn = document.createElement('button');
+  compareBtn.className = 'btn-view'; // reuse existing style
+  compareBtn.textContent = 'Compare';
+  compareBtn.onclick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    showComparisonModal(src);
+  };
+  
+  overlay.appendChild(compareBtn);
+  container.appendChild(overlay);
+  
+  return container;
+}
+
+// TODO: extract css to styles
+
+// Show modal with original and processed images side by side
+function showComparisonModal(processedSrc) {
+  // Extract the filename from the processed image path
+  const filename = processedSrc.split('/').pop();
+  
+  // Get original filename by removing 'processed_' prefix
+  const originalFilename = filename.replace(/^processed_/, '');
+  
+  // Construct original image path
+  const originalSrc = processedSrc
+    .replace('/processed-images/', '/uploaded-images/')
+    .replace(filename, originalFilename);
+  
+  // Create modal backdrop
+  const modal = document.createElement('div');
+  modal.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    padding: 20px;
+  `;
+  
+  // Create modal content
+  const content = document.createElement('div');
+  content.style.cssText = `
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    max-width: 1400px;
+    width: 100%;
+    max-height: 90vh;
+    overflow: auto;
+    position: relative;
+  `;
+  
+  // Close button
+  const closeBtn = document.createElement('button');
+  closeBtn.innerHTML = '×';
+  closeBtn.style.cssText = `
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 28px;
+    cursor: pointer;
+    line-height: 1;
+    z-index: 10;
+  `;
+  closeBtn.onclick = () => {
+    document.body.style.overflow = '';
+    modal.remove();
+  };
+  
+  // Container for images
+  const imagesContainer = document.createElement('div');
+  imagesContainer.style.cssText = `
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-top: 20px;
+  `;
+  
+  // Original image section
+  const originalSection = document.createElement('div');
+  originalSection.style.cssText = 'text-align: center;';
+  
+  const originalTitle = document.createElement('h3');
+  originalTitle.textContent = 'Original Image';
+  originalTitle.style.cssText = 'color: #2c3e50; margin-bottom: 15px; font-size: 1.5rem;';
+  
+  const originalImg = document.createElement('img');
+  originalImg.src = originalSrc;
+  originalImg.style.cssText = `
+    width: 100%;
+    height: auto;
+    max-height: 70vh;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  `;
+  
+  originalSection.appendChild(originalTitle);
+  originalSection.appendChild(originalImg);
+  
+  // Processed image section
+  const processedSection = document.createElement('div');
+  processedSection.style.cssText = 'text-align: center;';
+  
+  const processedTitle = document.createElement('h3');
+  processedTitle.textContent = 'Processed Image';
+  processedTitle.style.cssText = 'color: #2c3e50; margin-bottom: 15px; font-size: 1.5rem;';
+  
+  const processedImg = document.createElement('img');
+  processedImg.src = processedSrc;
+  processedImg.style.cssText = `
+    width: 100%;
+    height: auto;
+    max-height: 70vh;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  `;
+  
+  processedSection.appendChild(processedTitle);
+  processedSection.appendChild(processedImg);
+  
+  // Assemble everything
+  imagesContainer.appendChild(originalSection);
+  imagesContainer.appendChild(processedSection);
+  
+  content.appendChild(closeBtn);
+  content.appendChild(imagesContainer);
+  modal.appendChild(content);
+  
+  // Close on backdrop click
+  modal.onclick = (e) => {
+    if (e.target === modal) {
+      document.body.style.overflow = '';
+      modal.remove();
+    }
+  };
+  
+  // Add to page
+  document.body.appendChild(modal);
+  document.body.style.overflow = 'hidden';
 }
 
 async function processImage(imageSrc, containerElement) {
@@ -406,7 +577,7 @@ function hideLoading(loadingElementId) {
   if (loadingEl) loadingEl.style.display = 'none';
 }
 
-function populateGallery(galleryId, images, altPrefix = 'Cell image', canProcess = false) {
+function populateGallery(galleryId, images, altPrefix = 'Cell image', canProcess = false, useProcessedElement = false) {
   const gallery = document.getElementById(galleryId);
   if (!gallery) return;
   
@@ -415,7 +586,9 @@ function populateGallery(galleryId, images, altPrefix = 'Cell image', canProcess
   } else {
     gallery.innerHTML = '';
     images.forEach((src, index) => {
-      const element = createImageElement(src, `${altPrefix} ${index + 1}`, canProcess);
+      const element = useProcessedElement 
+        ? createProcessedImageElement(src, `${altPrefix} ${index + 1}`)
+        : createImageElement(src, `${altPrefix} ${index + 1}`, canProcess);
       gallery.appendChild(element);
     });
   }
@@ -469,8 +642,8 @@ async function loadProcessedImages() {
     
     const data = await response.json();
     hideLoading('processed-loading');
-    // Processed images don't need processing button
-    populateGallery('processed-gallery', data.images || [], 'Processed image', false);
+    // Use special processed image elements with Compare button
+    populateGallery('processed-gallery', data.images || [], 'Processed image', false, true);
     
   } catch (error) {
     console.error('Error loading processed images:', error);

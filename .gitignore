@@ -57,3 +57,6 @@ sam*.pth
 
 masks/*
 !masks/.gitkeep
+
+models/*
+!models/.gitkeep

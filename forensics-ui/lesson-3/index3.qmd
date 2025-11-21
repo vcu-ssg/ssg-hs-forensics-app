@@ -1,0 +1,33 @@
+---
+title: "Buccal or Blood Game"
+format:
+  html:
+    css: styles.css
+---
+
+<div class="lesson-card" style="max-width: 800px;">
+
+<h2>Buccal or Blood Game</h2>
+
+<p>
+    As we have learned throughout Introduction to Cells, there are many types of
+    cells: saliva, buccal, blood, and skin.
+</p>
+
+  <p>
+    During this lesson, you will be tasked with identifying different types of cells.
+  </p>
+
+<div style="border: 1px solid #e0e0e0; padding: 1.5rem; border-radius: 10px; margin-top: 2rem;">
+<h3 style="margin-bottom: 0.5rem; font-weight: 600;">Random Image</h3>
+<p style="margin-bottom: 1.5rem; font-size: 0.9rem;">
+  Randomize an image from our gallery.
+</p>
+
+<a href="buccal.html">
+  <button class="btn">Randomize</button>
+</a>
+
+</div>
+
+</div>

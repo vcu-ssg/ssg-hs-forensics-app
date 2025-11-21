@@ -7,3 +7,5 @@ format:
 ---
 
 [Lesson 1: Important Cells in Forensics](lesson-1/index.qmd)
+
+[Lesson 3: Buccal or Blood](lesson-3/index3.qmd)

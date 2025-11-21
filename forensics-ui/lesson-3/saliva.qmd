@@ -1,0 +1,171 @@
+---
+title: "Identify all Saliva Cells"
+format:
+  html:
+    css: styles.css
+    page-layout: full
+---
+
+<div class="shell" style="display:grid;place-items:center;min-height:100vh;background:#f3f4f6;">
+  <main class="card" style="background:white;padding:2rem 3rem;border-radius:1rem;box-shadow:0 10px 20px rgba(0,0,0,.05);text-align:center;width:min(800px,90%);">
+    <h2 style="font-weight:700;margin-bottom:1.5rem;">Identify all Saliva Cells</h2>
+
+<!-- Image Grid -->
+<form id="saliva-form">
+  <div class="grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:2rem;">
+  <!-- 6 clickable images -->
+  <label class="img-choice">
+      <input type="checkbox" name="cell" value="assets/saliva1.png" hidden>
+      <img src="assets/saliva1.png" alt="cell 1">
+    </label>
+
+  <label class="img-choice">
+      <input type="checkbox" name="cell" value="assets/saliva2.png" hidden>
+      <img src="assets/saliva2.png" alt="cell 2">
+    </label>
+
+  <label class="img-choice">
+      <input type="checkbox" name="cell" value="assets/saliva3.png" hidden>
+      <img src="assets/saliva3.png" alt="cell 3">
+    </label>
+
+  <label class="img-choice">
+      <input type="checkbox" name="cell" value="assets/saliva4.png" hidden>
+      <img src="assets/saliva4.png" alt="cell 4">
+    </label>
+
+  <label class="img-choice">
+      <input type="checkbox" name="cell" value="assets/buccal1.png" hidden>
+      <img src="assets/bucCell1.png" alt="cell 5">
+    </label>
+
+  <label class="img-choice">
+      <input type="checkbox" name="cell" value="assets/saliva6.png" hidden>
+      <img src="assets/saliva6.png" alt="cell 6">
+    </label>
+  </div>
+
+  <!-- Submit button -->
+  <button type="submit" class="btn" style="background:#d1d5db;color:#000;padding:.6rem 2rem;border-radius:2rem;border:none;cursor:pointer;font-weight:600;">Submit</button>
+
+</form>
+
+  </main>
+</div>
+
+<script>
+window.addEventListener('DOMContentLoaded', () => {
+  function addLesson3Score(score, total) {
+    const s = Number(localStorage.getItem('lesson3Score') || 0);
+    const t = Number(localStorage.getItem('lesson3Total') || 0);
+    localStorage.setItem('lesson3Score', s + score);
+    localStorage.setItem('lesson3Total', t + total);
+  }
+
+  const form = document.getElementById('saliva-form');
+  if (!form) return;
+
+  const choices = form.querySelectorAll('.img-choice');
+
+  // ✅ Correct images for THIS PAGE
+  const correct = new Set([
+    "assets/saliva1.png",
+    "assets/saliva4.png",
+    "assets/buccal1.png",
+  ]);
+
+  // Let users toggle selection by clicking images
+  choices.forEach(choice => {
+    choice.addEventListener('click', () => {
+      const input = choice.querySelector('input[name="cell"]');
+      if (!input) return;
+      input.checked = !input.checked;
+      choice.classList.toggle('selected', input.checked);
+    });
+  });
+
+  let reviewed = false; // first submit = review, second submit = go next
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+
+    // SECOND click: after review → go to next page (skin)
+    if (reviewed) {
+      window.location.href = 'blood.html';
+      return;
+    }
+
+    // FIRST click: do grading + highlight images
+    const inputs = [...form.querySelectorAll('input[name="cell"]')];
+    const selectedValues = inputs.filter(i => i.checked).map(i => i.value);
+
+    if (selectedValues.length === 0) {
+      alert('Please select at least one saliva cell image.');
+      return;
+    }
+
+    // Clear any previous review state
+    choices.forEach(choice => {
+      choice.classList.remove('correct', 'incorrect');
+    });
+
+    // Scoring for this page
+    const scoreThisPage = selectedValues.filter(v => correct.has(v)).length;
+    const totalThisPage = correct.size;
+    addLesson3Score(scoreThisPage, totalThisPage);
+
+    // Highlight ALL correct images (even if not selected)
+    choices.forEach(choice => {
+      const input = choice.querySelector('input[name="cell"]');
+      if (!input) return;
+      const value = input.value;
+      if (correct.has(value)) {
+        choice.classList.add('correct');
+      }
+    });
+
+    // Highlight incorrect selections in red
+    choices.forEach(choice => {
+      const input = choice.querySelector('input[name="cell"]');
+      if (!input) return;
+      const value = input.value;
+      if (input.checked && !correct.has(value)) {
+        choice.classList.add('incorrect');
+      }
+    });
+
+    // Add feedback text under the form
+    let feedback = document.getElementById('page-feedback');
+    if (!feedback) {
+      feedback = document.createElement('p');
+      feedback.id = 'page-feedback';
+      feedback.style.marginTop = '1rem';
+      feedback.style.fontWeight = '500';
+      form.appendChild(feedback);
+    }
+    feedback.textContent = `You selected ${scoreThisPage} of ${totalThisPage} correct images on this page.`;
+
+    // Add legend
+    let legend = document.getElementById('page-legend');
+    if (!legend) {
+      legend = document.createElement('div');
+      legend.id = 'page-legend';
+      legend.style.marginTop = '0.75rem';
+      legend.innerHTML = `
+        ✅ <strong>Green border</strong>: correct cell type<br>
+        ❌ <strong>Red border</strong>: not this cell type
+      `;
+      form.appendChild(legend);
+    }
+
+    // Change button text to "Next"
+    const submitBtn = form.querySelector('button[type="submit"]');
+    if (submitBtn) submitBtn.textContent = 'Next';
+
+    reviewed = true; // next submit goes to skin.html
+  });
+});
+</script>
+
+
+

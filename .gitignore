@@ -50,3 +50,10 @@ Thumbs.db
 # SAM models
 # -----------------
 sam*.pth
+
+# -----------------
+# Masks folder (generated mask files)
+# -----------------
+
+masks/*
+!masks/.gitkeep

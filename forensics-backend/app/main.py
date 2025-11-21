@@ -5,14 +5,16 @@ import os
 from pathlib import Path
 #from run_sam2 import generate_segmentation
 
+from runsam import add_job, get_job, list_queue
+
 app = FastAPI()
 
-@app.get("/hello/*")
-def root():
+@app.get("/hello")
+def hello():
     return {"message": "Hello from FastAPI behind NGINX! on /api/hello"}
 
 @app.get("/goodbye")
-def root():
+def goodbye():
     return {"message": "Goodby from FastAPI behind NGINX! on /api/goodbye"}
 
 # TODO: Feature to add in the future.
@@ -22,6 +24,45 @@ def root():
     # get image file name without extension (it is used as the directory name)
     #directory_name = img_name.split(sep='.')[0]
     #if os.path.isdir(f"/usr/share/nginx/user-images/{directory_name}"):
+
+
+@app.get("/runsam/list-images")
+async def list_available_images():
+    """Return a list of uploaded images eligible for /runsam/add-image"""
+    if not UPLOAD_DIR.exists():
+        return {"images": []}
+
+    # Simple file extension filter
+    exts = {".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff", ".webp"}
+
+    files = [
+        f.name for f in UPLOAD_DIR.iterdir()
+        if f.is_file() and f.suffix.lower() in exts
+    ]
+
+    # Sort alphabetically for UI friendliness
+    files.sort()
+
+    return {"images": files}
+
+
+@app.post("/runsam/add-image")
+async def add_image(filename: str):
+    job_id = add_job(filename)
+    return {"job_id": job_id}
+
+
+@app.get("/runsam/show-queue")
+async def show_queue():
+    return {"queue": list_queue()}
+
+
+@app.get("/runsam/status/{job_id}")
+async def job_status(job_id: str):
+    job = get_job(job_id)
+    if not job:
+        return JSONResponse({"error": "job not found"}, status_code=404)
+    return job
 
 
 # TODO: Hook up the SAM model to this function so it instead passes the received image to the function.

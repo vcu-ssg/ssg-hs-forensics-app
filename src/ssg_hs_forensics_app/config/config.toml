@@ -1,0 +1,145 @@
+
+[application]
+# Log level used by Loguru for CLI + FastAPI backend initialization.
+log_level = "DEBUG"
+image_folder = "./images"
+mask_folder = "./masks"
+model_folder = "./models"
+
+
+[sam]
+# Which SAM variant to load from sam_model_registry.
+# Valid values: vit_h, vit_l, vit_b
+model_type = "vit_b"
+
+# Path to pretrained SAM checkpoint (overridable via CLI/API).
+checkpoint = "sam_vit_b_01ec64.pth"
+
+mask_config = "default"
+
+
+# =====================================================================
+# MASK GENERATOR → FULL PRESET PACK
+# =====================================================================
+
+[mask_generator]
+
+# ----------------------
+# --- ViT-B Presets ---
+# ----------------------
+[mask_generator.vit_b.default]
+points_per_side = 32
+pred_iou_thresh = 0.90
+stability_score_thresh = 0.96
+crop_n_layers = 1
+crop_n_points_downscale_factor = 2
+min_mask_region_area = 100
+output_mode = "binary_mask"
+
+[mask_generator.vit_b.fast]
+points_per_side = 16
+pred_iou_thresh = 0.90
+stability_score_thresh = 0.95
+crop_n_layers = 0
+min_mask_region_area = 200
+output_mode = "binary_mask"
+
+[mask_generator.vit_b.detailed]
+points_per_side = 40
+pred_iou_thresh = 0.88
+stability_score_thresh = 0.96
+crop_n_layers = 1
+crop_n_points_downscale_factor = 2
+min_mask_region_area = 50
+output_mode = "binary_mask"
+
+[mask_generator.vit_b.crops]
+points_per_side = 24
+pred_iou_thresh = 0.90
+stability_score_thresh = 0.96
+crop_n_layers = 2
+crop_n_points_downscale_factor = 2
+min_mask_region_area = 100
+output_mode = "binary_mask"
+
+
+# ----------------------
+# --- ViT-L Presets ---
+# ----------------------
+# ViT-L is heavier; defaults use smaller grids to avoid OOM.
+
+[mask_generator.vit_l.default]
+points_per_side = 24
+pred_iou_thresh = 0.90
+stability_score_thresh = 0.96
+crop_n_layers = 1
+crop_n_points_downscale_factor = 2
+min_mask_region_area = 100
+output_mode = "binary_mask"
+
+[mask_generator.vit_l.fast]
+points_per_side = 12
+pred_iou_thresh = 0.92
+stability_score_thresh = 0.95
+crop_n_layers = 0
+min_mask_region_area = 200
+output_mode = "binary_mask"
+
+[mask_generator.vit_l.detailed]
+points_per_side = 32
+pred_iou_thresh = 0.88
+stability_score_thresh = 0.96
+crop_n_layers = 1
+crop_n_points_downscale_factor = 2
+min_mask_region_area = 50
+output_mode = "binary_mask"
+
+[mask_generator.vit_l.crops]
+points_per_side = 20
+pred_iou_thresh = 0.90
+stability_score_thresh = 0.96
+crop_n_layers = 2
+crop_n_points_downscale_factor = 2
+min_mask_region_area = 100
+output_mode = "binary_mask"
+
+
+# ----------------------
+# --- ViT-H Presets ---
+# ----------------------
+# ViT-H is extremely heavy. Safe defaults chosen carefully.
+
+[mask_generator.vit_h.default]
+points_per_side = 16
+pred_iou_thresh = 0.90
+stability_score_thresh = 0.96
+crop_n_layers = 1
+crop_n_points_downscale_factor = 2
+min_mask_region_area = 150
+output_mode = "binary_mask"
+
+[mask_generator.vit_h.fast]
+points_per_side = 8
+pred_iou_thresh = 0.92
+stability_score_thresh = 0.95
+crop_n_layers = 0
+min_mask_region_area = 300
+output_mode = "binary_mask"
+
+[mask_generator.vit_h.detailed]
+points_per_side = 24
+pred_iou_thresh = 0.88
+stability_score_thresh = 0.96
+crop_n_layers = 1
+crop_n_points_downscale_factor = 2
+min_mask_region_area = 100
+output_mode = "binary_mask"
+
+[mask_generator.vit_h.crops]
+points_per_side = 16
+pred_iou_thresh = 0.90
+stability_score_thresh = 0.96
+crop_n_layers = 2
+crop_n_points_downscale_factor = 2
+min_mask_region_area = 150
+output_mode = "binary_mask"

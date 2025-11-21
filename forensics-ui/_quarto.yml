@@ -13,6 +13,9 @@ website:
         text: About
       - href: lesson-1/index.qmd
         text: "Lesson 1: Important Cells in Forensics"
+      - href: lesson-3/index3.qmd
+        text: "Lesson 3: Buccal or Blood Game"
+    
       - href: upload/upload.qmd
         text: "Upload Image"
       - href: cell-gallery/gallery.qmd

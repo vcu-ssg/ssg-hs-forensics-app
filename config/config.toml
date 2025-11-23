@@ -67,11 +67,11 @@ preset       = "default_windows"
 family       = "sam2"
 type         = "hiera_tiny"
 checkpoint   = "sam2_hiera_tiny.pt"
-config       = "sam2_hiera_tiny.yaml"
+config       = "sam2_hiera_t.yaml"
 description  = "SAM2 Hiera Tiny (July 2024) — fastest, lightweight segmentation."
-url          = "https://huggingface.co/facebook/sam2_hiera_tiny/resolve/main/sam2_hiera_tiny.pt"
-config_url   = "https://huggingface.co/facebook/sam2_hiera_tiny/raw/main/sam2_hiera_tiny.yaml"
-mask_config  = "default"
+url          = "https://dl.fbaipublicfiles.com/segment_anything_2/072824/sam2_hiera_tiny.pt"
+config_url   = "https://raw.githubusercontent.com/facebookresearch/sam2/refs/heads/main/sam2/configs/sam2/sam2_hiera_t.yaml"
+preset       = "default"
 
 # ------ sam2_hiera_small ------
 [models.sam2_hiera_small]
@@ -80,9 +80,9 @@ type         = "hiera_small"
 checkpoint   = "sam2_hiera_small.pt"
 config       = "sam2_hiera_small.yaml"
 description  = "SAM2 Hiera Small (July 2024) — balanced accuracy vs. speed."
-url          = "https://huggingface.co/facebook/sam2_hiera_small/resolve/main/sam2_hiera_small.pt"
-config_url   = "https://huggingface.co/facebook/sam2_hiera_small/raw/main/sam2_hiera_small.yaml"
-mask_config  = "default"
+url          = "https://dl.fbaipublicfiles.com/segment_anything_2/072824/sam2_hiera_small.pt"
+config_url   = "https://github.com/facebookresearch/sam2/blob/main/sam2/configs/sam2/sam2_hiera_s.yaml"
+preset       = "default"
 
 # ------ sam2_hiera_base_plus ------
 [models.sam2_hiera_base_plus]
@@ -91,9 +91,9 @@ type         = "hiera_base_plus"
 checkpoint   = "sam2_hiera_base_plus.pt"
 config       = "sam2_hiera_base_plus.yaml"
 description  = "SAM2 Hiera Base+ (July 2024) — best all-around SAM2 model."
-url          = "https://huggingface.co/facebook/sam2_hiera_base_plus/resolve/main/sam2_hiera_base_plus.pt"
-config_url   = "https://huggingface.co/facebook/sam2_hiera_base_plus/raw/main/sam2_hiera_base_plus.yaml"
-mask_config  = "sam2_detailed"
+url          = "https://dl.fbaipublicfiles.com/segment_anything_2/072824/sam2_hiera_base_plus.pt"
+config_url   = "https://github.com/facebookresearch/sam2/blob/main/sam2/configs/sam2/sam2_hiera_b+.yaml"
+preset       = "default"
 
 # ------ sam2_hiera_large ------
 [models.sam2_hiera_large]
@@ -102,9 +102,9 @@ type         = "hiera_large"
 checkpoint   = "sam2_hiera_large.pt"
 config       = "sam2_hiera_large.yaml"
 description  = "SAM2 Hiera Large (July 2024) — highest accuracy for SAM2."
-url          = "https://huggingface.co/facebook/sam2_hiera_large/resolve/main/sam2_hiera_large.pt"
-config_url   = "https://huggingface.co/facebook/sam2_hiera_large/raw/main/sam2_hiera_large.yaml"
-mask_config  = "sam2_detailed"
+url          = "https://dl.fbaipublicfiles.com/segment_anything_2/072824/sam2_hiera_large.pt"
+config_url   = "https://github.com/facebookresearch/sam2/blob/main/sam2/configs/sam2/sam2_hiera_l.yaml"
+preset       = "default"
 
 
 
@@ -119,9 +119,9 @@ type         = "hiera_tiny"
 checkpoint   = "sam2.1_hiera_tiny.pt"
 config       = "sam2.1_hiera_tiny.yaml"
 description  = "SAM2.1 Hiera Tiny (Sept 2024) — improved accuracy, very fast."
-url          = "https://huggingface.co/facebook/sam2.1_hiera_tiny/resolve/main/sam2.1_hiera_tiny.pt"
-config_url   = "https://huggingface.co/facebook/sam2.1_hiera_tiny/raw/main/sam2.1_hiera_tiny.yaml"
-mask_config  = "default"
+url          = "https://dl.fbaipublicfiles.com/segment_anything_2/092824/sam2.1_hiera_tiny.pt"
+config_url   = "https://raw.githubusercontent.com/facebookresearch/sam2/refs/heads/main/sam2/configs/sam2.1/sam2.1_hiera_t.yaml"
+preset       = "default"
 
 # ------ sam2.1_hiera_small ------
 [models.sam2_1_hiera_small]
@@ -130,9 +130,9 @@ type         = "hiera_small"
 checkpoint   = "sam2.1_hiera_small.pt"
 config       = "sam2.1_hiera_small.yaml"
 description  = "SAM2.1 Hiera Small (Sept 2024) — excellent speed/quality balance."
-url          = "https://huggingface.co/facebook/sam2.1_hiera_small/resolve/main/sam2.1_hiera_small.pt"
-config_url   = "https://huggingface.co/facebook/sam2.1_hiera_small/raw/main/sam2.1_hiera_small.yaml"
-mask_config  = "default"
+url          = "https://dl.fbaipublicfiles.com/segment_anything_2/092824/sam2.1_hiera_small.pt"
+config_url   = "https://github.com/facebookresearch/sam2/blob/main/sam2/configs/sam2.1/sam2.1_hiera_s.yaml"
+preset       = "default"
 
 # ------ sam2.1_hiera_base_plus ------
 [models.sam2_1_hiera_base_plus]
@@ -141,9 +141,9 @@ type         = "hiera_base_plus"
 checkpoint   = "sam2.1_hiera_base_plus.pt"
 config       = "sam2.1_hiera_base_plus.yaml"
 description  = "SAM2.1 Base+ (Sept 2024) — highest accuracy among Base models."
-url          = "https://huggingface.co/facebook/sam2.1_hiera_base_plus/resolve/main/sam2.1_hiera_base_plus.pt"
-config_url   = "https://huggingface.co/facebook/sam2.1_hiera_base_plus/raw/main/sam2.1_hiera_base_plus.yaml"
-mask_config  = "detailed"
+url          = "https://dl.fbaipublicfiles.com/segment_anything_2/092824/sam2.1_hiera_base_plus.pt"
+config_url   = "https://github.com/facebookresearch/sam2/blob/main/sam2/configs/sam2.1/sam2.1_hiera_b+.yaml"
+preset       = "default"
 
 # ------ sam2.1_hiera_large ------
 [models.sam2_1_hiera_large]
@@ -152,9 +152,9 @@ type         = "hiera_large"
 checkpoint   = "sam2.1_hiera_large.pt"
 config       = "sam2.1_hiera_large.yaml"
 description  = "SAM2.1 Hiera Large — top accuracy for SAM2.1."
-url          = "https://huggingface.co/facebook/sam2.1_hiera_large/resolve/main/sam2.1_hiera_large.pt"
-config_url   = "https://huggingface.co/facebook/sam2.1_hiera_large/raw/main/sam2.1_hiera_large.yaml"
-mask_config  = "detailed"
+url          = "https://dl.fbaipublicfiles.com/segment_anything_2/092824/sam2.1_hiera_large.pt"
+config_url   = "https://github.com/facebookresearch/sam2/blob/main/sam2/configs/sam2.1/sam2.1_hiera_l.yaml"
+preset       = "default"
 
 
 

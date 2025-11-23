@@ -2,14 +2,19 @@
 # Cross-platform Environment Detection
 # =========================================================
 ifeq ($(OS),Windows_NT)
+    # Use Git Bash, NOT PowerShell, not BusyBox
+    SHELL := C:/Program\ Files/Git/bin/bash.exe
     IS_WINDOWS := 1
-    SHELL := pwsh.exe -NoProfile -NoLogo -ExecutionPolicy Bypass
     OPEN := powershell.exe -NoProfile -Command "Start-Process"
 else
-    IS_WINDOWS := 0
     SHELL := /bin/bash
+    IS_WINDOWS := 0
     OPEN := xdg-open
 endif
+
+# Quoting helper
+QUOTE = "
+SPACE = $(null) $(null)
 
 # =========================================================
 # Target Descriptions
@@ -33,7 +38,7 @@ help:
 	@echo "Available commands:"
 	@echo "-------------------"
 	@grep -E '^[a-zA-Z0-9_.-]+\.title' $(MAKEFILE_LIST) | \
-	  sed -E 's/^(.*)\.title[ ]*=[ ]*(.*)/\1\t\2/' 
+	  sed -E 's/^(.*)\.title[ ]*=[ ]*(.*)/\1\t\2/'
 
 # =========================================================
 # Targets
@@ -52,4 +57,12 @@ stop-server:
 	cd forensics-backend && docker compose down
 
 open-webapp: start-server
-	$(OPEN) "http://localhost"
+	$(OPEN) http://localhost
+
+
+vendor-sync:
+	poetry run python tools/vendor_sync.py
+
+vendor-test:
+	poetry run python tools/test_vendor_imports.py
+

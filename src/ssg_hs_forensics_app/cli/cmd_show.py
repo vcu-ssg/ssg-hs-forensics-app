@@ -1,8 +1,9 @@
+# src/ssg_hs_forensics_app/cli/cmd_show.py
+
 import click
 from pathlib import Path
 from loguru import logger
 
-import base64
 import io
 import numpy as np
 from PIL import Image
@@ -11,7 +12,8 @@ from skimage import measure  # For contour detection
 
 from ssg_hs_forensics_app.config_loader import load_builtin_config
 from ssg_hs_forensics_app.config_logger import init_logging
-from ssg_hs_forensics_app.core.masks import (
+
+from ssg_hs_forensics_app.core.mask_writer import (
     load_masks_h5,
     list_mask_files,
 )
@@ -31,12 +33,12 @@ from ssg_hs_forensics_app.core.masks import (
 @click.option(
     "--no-image",
     is_flag=True,
-    help="Show masks-only overlay (but still show original image on the left).",
+    help="Show masks-only overlay (but still show the original image on the left).",
 )
 @click.option(
     "--drop-background",
     is_flag=True,
-    help="Remove masks covering more than --bg-threshold fraction of the image.",
+    help="Drop masks covering more than --bg-threshold fraction of the image.",
 )
 @click.option(
     "--bg-threshold",
@@ -56,7 +58,7 @@ from ssg_hs_forensics_app.core.masks import (
     type=int,
     default=2,
     show_default=True,
-    help="Pixel thickness of contours (Method 1 expansion).",
+    help="Pixel thickness of contours.",
 )
 def cmd_show(
     mask_file,
@@ -87,7 +89,8 @@ def cmd_show(
         click.echo(f"Mask folder:\n  {mask_folder}\n")
 
         mask_files = [
-            mf for mf in list_mask_files(mask_folder) if mf.suffix == ".h5"
+            mf for mf in list_mask_files(mask_folder)
+            if mf.suffix.lower() == ".h5"
         ]
 
         if not mask_files:
@@ -95,19 +98,21 @@ def cmd_show(
             return
 
         click.echo("Available HDF5 runs:\n")
+
         for mf in mask_files:
             try:
                 data = load_masks_h5(mf)
                 num = len(data.get("masks", []))
                 start = data.get("runinfo", {}).get("start_time", "unknown")
-                image = data.get("input", {}).get("image_name", "unknown")
+                image_name = data.get("input_info", {}).get("image_path", "unknown")
+
                 click.echo(f"  {mf.name}")
-                click.echo(f"     image:   {image}")
+                click.echo(f"     image:   {image_name}")
                 click.echo(f"     start:   {start}")
                 click.echo(f"     masks:   {num}\n")
+
             except Exception as e:
                 click.echo(f"  {mf.name}  (ERROR: {e})\n")
-
         return
 
     # ------------------------------------------------------------
@@ -115,29 +120,32 @@ def cmd_show(
     # ------------------------------------------------------------
     mask_path = Path(mask_file).resolve()
 
-    if mask_path.suffix != ".h5":
-        click.echo("ERROR: Mask file must end with '_masks.h5'.")
+    if mask_path.suffix.lower() != ".h5":
+        click.echo("ERROR: Mask file must end with '.h5'.")
         return
 
     click.echo(f"Loading run from:\n  {mask_path}\n")
 
     data = load_masks_h5(mask_path)
 
-    input_info = data.get("input", {})
-    model_info = data.get("model", {})
-    runinfo = data.get("runinfo", {})
-    masks = data.get("masks", [])
+    input_info = data["input_info"]
+    model_info = data["model_info"]
+    preset_info = data["preset_info"]
+    runinfo = data["runinfo"]
+    masks = data["masks"]
+    jpeg_bytes = data["jpeg_bytes"]
 
-    image_name = input_info.get("image_name", "unknown")
-    sha256 = input_info.get("sha256", "unknown")
+    image_name = input_info.get("image_path", "unknown")
+    width = input_info.get("width")
+    height = input_info.get("height")
 
     start = runinfo.get("start_time", "unknown")
     end = runinfo.get("end_time", "unknown")
     elapsed = runinfo.get("elapsed_seconds", "unknown")
 
     model_type = model_info.get("model_type", "unknown")
-    preset = model_info.get("mask_config", "unknown")
     checkpoint = model_info.get("checkpoint", "unknown")
+    preset = preset_info.get("preset", preset_info)
 
     num_masks = len(masks)
 
@@ -147,11 +155,11 @@ def cmd_show(
     click.echo("=== Run Metadata ===")
     click.echo(f"File:             {mask_path.name}")
     click.echo(f"Input Image:      {image_name}")
-    click.echo(f"SHA256:           {sha256}\n")
+    click.echo(f"Image Size:       {width} × {height}\n")
 
     click.echo("=== Model Info ===")
     click.echo(f"Model Type:       {model_type}")
-    click.echo(f"Mask Preset:      {preset}")
+    click.echo(f"Preset:           {preset}")
     click.echo(f"Checkpoint:       {checkpoint}\n")
 
     click.echo("=== Runtime Info ===")
@@ -168,10 +176,8 @@ def cmd_show(
     background_masks = []
 
     if num_masks > 0:
-        # get shape
-        first_seg = np.asarray(masks[0]["segmentation"], dtype=bool)
-        H, W = first_seg.shape
-        area = H * W
+        # Use stored image size
+        area = width * height
 
         for idx, m in enumerate(masks):
             seg = np.asarray(m["segmentation"], dtype=bool)
@@ -182,12 +188,9 @@ def cmd_show(
     if background_masks:
         click.echo("=== Possible Background Masks ===")
         for idx, cov in background_masks:
-            click.echo(f"Mask {idx}: {cov*100:.1f}% coverage")
+            click.echo(f"Mask {idx}: {cov*100:.2f}% coverage")
         click.echo("")
 
-    # ------------------------------------------------------------
-    # OPTIONAL DROP BACKGROUND MASKS
-    # ------------------------------------------------------------
     if drop_background and background_masks:
         to_remove = {idx for idx, _ in background_masks}
         masks = [m for i, m in enumerate(masks) if i not in to_remove]
@@ -201,20 +204,25 @@ def cmd_show(
         return
 
     # ------------------------------------------------------------
-    # LOAD THE ORIGINAL IMAGE (from base64 in H5)
+    # LOAD ORIGINAL JPEG IMAGE
     # ------------------------------------------------------------
     try:
-        decoded = base64.b64decode(input_info["base64"])
-        image = Image.open(io.BytesIO(decoded)).convert("RGB")
+        image = Image.open(io.BytesIO(jpeg_bytes)).convert("RGB")
         base_arr = np.array(image)
     except Exception as e:
-        click.echo(f"ERROR decoding base64 image: {e}")
+        click.echo(f"ERROR: Could not decode JPEG from H5: {e}")
         return
 
     H, W, _ = base_arr.shape
 
+    # Auto-resize segmentation masks if needed
+    def normalize_seg(seg):
+        if seg.shape == (H, W):
+            return seg
+        return np.array(Image.fromarray(seg.astype(np.uint8)).resize((W, H))).astype(bool)
+
     # ------------------------------------------------------------
-    # DRAWING THICK CONTOURS (Method 1)
+    # CONTOUR DRAWING
     # ------------------------------------------------------------
     def draw_thick_contours(img, seg):
         if not add_contours:
@@ -223,50 +231,41 @@ def cmd_show(
         contours = measure.find_contours(seg.astype(float), 0.5)
         t = max(1, contour_thickness)
 
-        # Offsets for thickness
+        # offsets for thickness
         offsets = [(0, 0)]
         for tt in range(1, t + 1):
             offsets.extend([
-                (tt, 0), (-tt, 0),
-                (0, tt), (0, -tt),
-                (tt, tt), (tt, -tt), (-tt, tt), (-tt, -tt),
+                (tt, 0), (-tt, 0), (0, tt), (0, -tt),
+                (tt, tt), (tt, -tt), (-tt, tt), (-tt, -tt)
             ])
 
-        for contour in contours:
-            contour = contour.astype(int)
-            rr = contour[:, 0]
-            cc = contour[:, 1]
+        for c in contours:
+            c = c.astype(int)
+            rr, cc = c[:, 0], c[:, 1]
             valid = (rr >= 0) & (rr < H) & (cc >= 0) & (cc < W)
-            rr = rr[valid]
-            cc = cc[valid]
+            rr, cc = rr[valid], cc[valid]
 
             for dy, dx in offsets:
                 rr2 = rr + dy
                 cc2 = cc + dx
                 ok = (rr2 >= 0) & (rr2 < H) & (cc2 >= 0) & (cc2 < W)
-                img[rr2[ok], cc2[ok]] = [0, 255, 255]  # Cyan
+                img[rr2[ok], cc2[ok]] = [0, 255, 255]
 
     # ------------------------------------------------------------
-    # BUILD MASK-ONLY OVERLAY
+    # BUILD MASK-ONLY VIEW
     # ------------------------------------------------------------
     gray_bg = np.full((H, W, 3), 128, dtype=np.uint8)
     mask_only = gray_bg.copy()
 
     for m in masks:
-        seg = np.asarray(m["segmentation"], dtype=bool)
-        if seg.shape != (H, W):
-            from PIL import Image as _PIL
-            seg = np.array(_PIL.fromarray(seg.astype(np.uint8)).resize((W, H))).astype(bool)
-
-        # Fill red
+        seg = normalize_seg(m["segmentation"])
         mask_only[seg] = (
             0.6 * mask_only[seg] + 0.4 * np.array([255, 0, 0])
         ).astype(np.uint8)
-
         draw_thick_contours(mask_only, seg)
 
     # ------------------------------------------------------------
-    # MODE A — masks-only (but original still shown)
+    # MODE A — masks-only view
     # ------------------------------------------------------------
     if no_image:
         fig, axes = plt.subplots(1, 2, figsize=(14, 8))
@@ -276,7 +275,7 @@ def cmd_show(
         axes[0].axis("off")
 
         axes[1].imshow(mask_only)
-        axes[1].set_title(f"Masks Only ({num_masks} masks)")
+        axes[1].set_title(f"Masks Only ({num_masks})")
         axes[1].axis("off")
 
         plt.tight_layout()
@@ -284,20 +283,15 @@ def cmd_show(
         return
 
     # ------------------------------------------------------------
-    # MODE B — normal overlay (base + masks)
+    # MODE B — overlay masks onto base image
     # ------------------------------------------------------------
     overlay = base_arr.copy()
 
     for m in masks:
-        seg = np.asarray(m["segmentation"], dtype=bool)
-        if seg.shape != (H, W):
-            from PIL import Image as _PIL
-            seg = np.array(_PIL.fromarray(seg.astype(np.uint8)).resize((W, H))).astype(bool)
-
+        seg = normalize_seg(m["segmentation"])
         overlay[seg] = (
             0.7 * overlay[seg] + 0.3 * np.array([255, 0, 0])
         ).astype(np.uint8)
-
         draw_thick_contours(overlay, seg)
 
     fig, axes = plt.subplots(1, 2, figsize=(14, 8))

@@ -9,10 +9,10 @@ services:
       - "8000"
     restart: always
     volumes:
-      - ../images/sample-gallery-images:/images/sample-gallery-images
-      - ../images/uploaded-images:/images/uploaded-images
-      - ../images/processed-images:/images/processed-images
-
+      - ../images:/images
+      - ../models:/models
+      - ../masks:/masks
+      - ../config:/config
 
   nginx:
     image: nginx:alpine
@@ -23,7 +23,6 @@ services:
       # bind mounts
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
       - ../forensics-ui/_site:/usr/share/nginx/html:ro
-      - ../images:/usr/share/nginx/images:ro
     depends_on:
       - fastapi
     restart: always

@@ -2,7 +2,6 @@ import click
 from pathlib import Path
 from loguru import logger
 
-from ssg_hs_forensics_app.config_loader import load_builtin_config
 from ssg_hs_forensics_app.config_logger import init_logging
 from ssg_hs_forensics_app.core.masks import list_mask_files
 
@@ -10,12 +9,14 @@ from ssg_hs_forensics_app.core.masks import list_mask_files
 IMAGE_EXTS = {".jpg", ".jpeg", ".png"}
 MODEL_EXTS = {".pth", ".pt", ".onnx"}
 
+
 @click.group(name="list")
-def cmd_list():
-    """List images or masks based on config settings."""
+@click.pass_context
+def cmd_list(ctx):
+    """List images, masks, or models based on config settings."""
+    ctx.ensure_object(dict)
     init_logging()
     logger.debug("cmd_list initialized")
-    pass
 
 
 # ------------------------------------------------------------
@@ -26,7 +27,6 @@ def _rel(path: Path) -> str:
     try:
         return str(path.relative_to(Path.cwd()))
     except ValueError:
-        # fallback: show only filename if not under cwd
         return str(path.name)
 
 
@@ -34,11 +34,10 @@ def _rel(path: Path) -> str:
 # LIST IMAGES
 # ------------------------------------------------------------
 @cmd_list.command("images")
-def list_images():
+@click.pass_context
+def list_images(ctx):
     """List all image files under the configured image_folder."""
-
-    init_logging()
-    cfg = load_builtin_config()
+    cfg = ctx.obj["config"]
 
     folder = cfg["application"].get("image_folder", ".")
     root = Path(folder).resolve()
@@ -65,11 +64,10 @@ def list_images():
 # LIST MASKS
 # ------------------------------------------------------------
 @cmd_list.command("masks")
-def list_masks():
-    """List all mask JSON files under the configured mask_folder."""
-
-    init_logging()
-    cfg = load_builtin_config()
+@click.pass_context
+def list_masks(ctx):
+    """List all mask JSON/HDF5 files under the configured mask_folder."""
+    cfg = ctx.obj["config"]
 
     folder = cfg["application"].get("mask_folder", ".")
     root = Path(folder).resolve()
@@ -81,7 +79,7 @@ def list_masks():
     click.echo(f"Listing masks under: {_rel(root)}")
     logger.debug(f"Searching recursively under: {root}")
 
-    # ✅ FIX: pass mask_folder to list_mask_files()
+    # Uses your existing list_mask_files utility
     mask_files = list_mask_files(root)
 
     if not mask_files:
@@ -99,13 +97,11 @@ def list_masks():
 # LIST MODELS
 # ------------------------------------------------------------
 @cmd_list.command("models")
-def list_models():
+@click.pass_context
+def list_models(ctx):
     """List all pre-trained SAM models under the configured models_folder."""
+    cfg = ctx.obj["config"]
 
-    init_logging()
-    cfg = load_builtin_config()
-
-    # default to "models" if not provided
     folder = cfg["application"].get("models_folder", "models")
     root = Path(folder).resolve()
 
@@ -125,4 +121,3 @@ def list_models():
     logger.info(f"Found {count} models")
     if count == 0:
         click.echo("No model files found.")
-

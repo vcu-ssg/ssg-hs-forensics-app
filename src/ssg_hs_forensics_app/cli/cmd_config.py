@@ -1,46 +1,66 @@
 """
-CLI commands for inspecting the built-in module configuration.
+CLI commands for inspecting application configuration.
 """
 
 from __future__ import annotations
 
 import click
-import tomllib
-import tomli_w  # For pretty TOML output (installed automatically with Poetry)
+import tomli_w
 from pathlib import Path
 
-from ssg_hs_forensics_app.config_loader import get_builtin_config_path, load_builtin_config
 from ssg_hs_forensics_app.config_logger import init_logging
+from ssg_hs_forensics_app.config_loader import (
+    load_builtin_config,
+    get_builtin_config_path,
+)
 
 
 @click.group(name="config")
-def cmd_config():
+@click.pass_context
+def cmd_config(ctx):
     """Configuration inspection commands."""
-    pass
-
-
-# ============================================================
-# SHOW
-# ============================================================
-
-@cmd_config.command("show")
-def config_show():
-    """
-    Display the built-in config.toml in a nicely formatted TOML structure.
-    """
-
-    # Ensure logger is initialized before printing logs anywhere
+    # Ensure our context is initialized
+    ctx.ensure_object(dict)
     init_logging()
 
-    cfg_path = get_builtin_config_path()
-    cfg = load_builtin_config()
 
-    click.echo(f"Using built-in config file:\n  {cfg_path}\n")
+# =====================================================================
+# merged (merged config)
+# =====================================================================
 
-    # Pretty TOML output via tomli_w
+@cmd_config.command("merged")
+@click.pass_context
+def config_merged(ctx):
+    """
+    Display the merged configuration (built-in + user override).
+    """
+    cfg = ctx.obj["config"]   # merged config injected by _main.py
+
+    click.echo("Merged configuration (built-in + user override):\n")
+
     try:
         text = tomli_w.dumps(cfg)
         click.echo(text)
     except Exception:
-        # fallback to raw dict printing
         click.echo(cfg)
+
+
+# =====================================================================
+# BUILT-IN ONLY (original module config)
+# =====================================================================
+
+@cmd_config.command("built-in")
+def config_built_in():
+    """
+    Display ONLY the built-in config.toml shipped with the module.
+    """
+    cfg_path = get_builtin_config_path()
+    builtin = load_builtin_config()
+
+    click.echo(f"Built-in config file:\n  {cfg_path}\n")
+
+    try:
+        text = tomli_w.dumps(builtin)
+        click.echo(text)
+    except Exception:
+        click.echo(builtin)

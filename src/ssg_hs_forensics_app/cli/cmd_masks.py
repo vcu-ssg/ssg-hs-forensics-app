@@ -1,4 +1,4 @@
-# src/ssg_hs_forensics_app/cli/cmd_show.py
+# src/ssg_hs_forensics_app/cli/cmd_masks.py
 
 import click
 from pathlib import Path
@@ -19,7 +19,7 @@ from ssg_hs_forensics_app.core.mask_writer import (
 )
 
 
-@click.command(name="show")
+@click.command(name="masks")
 @click.argument(
     "mask_file",
     required=False,
@@ -60,7 +60,7 @@ from ssg_hs_forensics_app.core.mask_writer import (
     show_default=True,
     help="Pixel thickness of contours.",
 )
-def cmd_show(
+def cmd_masks(
     mask_file,
     view,
     no_image,

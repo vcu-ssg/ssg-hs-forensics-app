@@ -6,13 +6,14 @@ from loguru import logger
 import time
 from datetime import datetime
 
-from ssg_hs_forensics_app.core.config import load_config
+from ssg_hs_forensics_app.core.config import get_config
 from ssg_hs_forensics_app.config_logger import init_logging
 
 from ssg_hs_forensics_app.core.images import load_image_as_numpy
-from ssg_hs_forensics_app.core.model_loader import load_model
-from ssg_hs_forensics_app.core.model_factory import generate_masks
-
+from ssg_hs_forensics_app.core.model_loader import (
+    load_model,
+    run_model_generate_masks,
+)
 from ssg_hs_forensics_app.core.mask_writer import (
     write_masks_h5,
     mask_output_path,
@@ -67,17 +68,13 @@ def cmd_generate(
     logger.debug("cmd_generate invoked")
 
     # ------------------------------------------------------------
-    # PRE-CHECK PHASE
+    # Load config + resolve model
     # ------------------------------------------------------------
     image_path = Path(image_path)
-    config = load_config()
+    config = get_config()
 
-    # Debug: show which config file was loaded
     cfg_file = config.get("__config_file__", "<unknown>")
-    logger.debug(f"Loaded built-in config from: {cfg_file}")
-
-    cfg_file = load_config()
-    logger.debug(f"Loaded config from: {cfg_file.get('__config_file__', '<unknown>')}")
+    logger.debug(f"Loaded config from: {cfg_file}")
 
     models_cfg = config["models"]
 
@@ -90,14 +87,12 @@ def cmd_generate(
         logger.debug(f"Using user-specified model: {model_key}")
 
     if model_key not in models_cfg:
-        raise click.ClickException(
-            f"Model '{model_key}' not found in [models] config."
-        )
+        raise click.ClickException(f"Model '{model_key}' not found in [models] config.")
 
     model_cfg = models_cfg[model_key]
 
     # ------------------------------------------------------------
-    # PRESET RESOLUTION + VALIDATION (global preset section)
+    # PRESET RESOLUTION & VALIDATION
     # ------------------------------------------------------------
     presets_cfg = config.get("presets", {})
 
@@ -109,25 +104,24 @@ def cmd_generate(
 
     model_presets = presets_cfg[model_key]
 
-    # Determine preset name: override → model default → error
+    # Determine preset
     if preset_override:
         preset_name = preset_override
     elif "preset" in model_cfg:
         preset_name = model_cfg["preset"]
     else:
         raise click.ClickException(
-            f"Model '{model_key}' has no default preset defined and "
-            "no --presets override was provided."
+            f"Model '{model_key}' has no default preset and "
+            "--presets was not provided."
         )
 
-    # Validate preset exists
     if preset_name not in model_presets:
         raise click.ClickException(
-            f"Preset '{preset_name}' is not defined for model '{model_key}'.\n"
+            f"Preset '{preset_name}' not defined for model '{model_key}'.\n"
             f"Available presets: {', '.join(model_presets.keys())}"
         )
 
-    preset_dict = model_presets[preset_name]
+    preset_params = model_presets[preset_name]
 
     logger.debug(
         f"Using preset '{preset_name}' for model '{model_key}' "
@@ -142,30 +136,33 @@ def cmd_generate(
     channels = image_np.shape[2] if image_np.ndim == 3 else 1
 
     # ------------------------------------------------------------
-    # Load model (fast)
+    # Load model (returns 4-tuple)
     # ------------------------------------------------------------
-    model_tuple = load_model(config, model_key=model_key, preset_name=preset_name)
-    family, runtime_model, preset_used, preset_from_loader = model_tuple
+    family, runtime_model, preset_name_used, preset_params_from_loader = load_model(
+        config,
+        model_key=model_key,
+        preset_name=preset_name,
+    )
 
     logger.debug(
-        f"load_model returned preset_used='{preset_used}' "
-        f"(input preset_name='{preset_name}')"
+        f"load_model returned preset_used='{preset_name_used}' "
+        f"(requested preset='{preset_name}')"
     )
 
     # ------------------------------------------------------------
-    # Output path + overwrite check
+    # Output file path
     # ------------------------------------------------------------
     out_path = mask_output_path(
         image_path=image_path,
         model_key=model_key,
-        preset=preset_used,
+        preset=preset_name_used,
         mask_folder=Path(config["application"]["mask_folder"]),
     )
 
     if out_path.exists() and not overwrite:
         raise click.ClickException(
             f"Mask file already exists: {out_path}\n"
-            f"Use --overwrite to replace it."
+            "Use --overwrite to replace it."
         )
 
     # ------------------------------------------------------------
@@ -183,17 +180,13 @@ def cmd_generate(
     model_info = {
         "family": family,
         "model_type": model_cfg.get("type"),
-        "checkpoint": (
-            runtime_model.checkpoint_path
-            if hasattr(runtime_model, "checkpoint_path")
-            else model_cfg.get("checkpoint")
-        ),
+        "checkpoint": model_cfg.get("checkpoint"),
         "config_yaml": model_cfg.get("config"),
-        "preset": preset_used,
+        "preset": preset_name_used,
         "model_key": model_key,
     }
 
-    preset_info = preset_dict or {}
+    preset_info = preset_params or {}
 
     # ------------------------------------------------------------
     # HEAVY PHASE — mask generation
@@ -204,7 +197,12 @@ def cmd_generate(
     start_perf = time.perf_counter()
 
     try:
-        masks = generate_masks(model_tuple, image_np)
+        masks = run_model_generate_masks(
+            family=family,
+            model_or_predictor=runtime_model,
+            image_np=image_np,
+            mg_config=preset_params_from_loader,
+        )
 
     except RuntimeError as e:
         msg = str(e).lower()
@@ -228,7 +226,7 @@ def cmd_generate(
         raise click.ClickException(f"Unexpected error: {e}")
 
     # ------------------------------------------------------------
-    # Timing + throughput
+    # Timing metrics
     # ------------------------------------------------------------
     end_ts = datetime.now()
     elapsed = time.perf_counter() - start_perf
@@ -249,9 +247,9 @@ def cmd_generate(
     }
 
     # ------------------------------------------------------------
-    # JPEG-only writer call
+    # Save JPEG
     # ------------------------------------------------------------
-    jpeg_bytes = image_path.read_bytes()   # <-- NEW: save original JPEG only
+    jpeg_bytes = image_path.read_bytes()
 
     logger.debug(
         f"Writing output HDF5 → {out_path} "

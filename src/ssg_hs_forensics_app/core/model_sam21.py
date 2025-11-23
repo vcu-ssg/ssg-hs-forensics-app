@@ -1,28 +1,20 @@
 # src/ssg_hs_forensics_app/core/model_sam21.py
 
 """
-SAM2.1 Loader + Preset-aware Mask Generator (Unified Schema)
+SAM2.1 Loader + Preset-aware Mask Generator
+Device-aware, Hydra-safe implementation.
 """
 
 from __future__ import annotations
 import numpy as np
 from typing import List, Dict
 from loguru import logger
+import torch
 
-# ----------------------------
-# SAM2 / SAM2.1 imports
-# ----------------------------
-
-# Correct builder for SAM2 & SAM2.1
 from sam2.build_sam import build_sam2
-
-# SAM2 image predictor API (works for SAM2.1)
 from sam2.sam2_image_predictor import SAM2ImagePredictor
 
-# -----------------------------------------------------------
-# Robust auto-mask-generator resolver (same logic as SAM2)
-# -----------------------------------------------------------
-
+# Robust import of the SAM2 mask generator class
 try:
     from sam2.automatic_mask_generator import SAM2AutomaticMaskGenerator as _MaskGen
 except ImportError:
@@ -36,92 +28,127 @@ except ImportError:
                 break
         else:
             raise ImportError(
-                "SAM2.1: no mask generator class found in sam2.automatic_mask_generator"
+                "SAM2.1: No mask generator class found in sam2.automatic_mask_generator."
             )
 
-# Unified storage format
 from ssg_hs_forensics_app.core.mask_schema import make_mask_record
-
-# Preset loader
 from ssg_hs_forensics_app.core.preset_loader import load_preset_params
 
 
-# -----------------------------------------------------------
-# Load SAM 2.1 Model
-# -----------------------------------------------------------
-def load_sam21(checkpoint: str, config: str):
+# =====================================================================
+# Device Resolver (same as SAM2)
+# =====================================================================
+
+def _resolve_device(requested: str) -> str:
     """
-    Load SAM2.1 variant using same builder as SAM2, but with SAM2.1 YAML.
+    Resolve device specification:
+
+        cpu     → CPU always
+        cuda    → CUDA required; error if unavailable
+        auto    → CUDA if available, else CPU
+    """
+    requested = (requested or "auto").lower()
+
+    if requested == "cpu":
+        return "cpu"
+
+    if requested == "cuda":
+        if torch.cuda.is_available():
+            return "cuda"
+        raise RuntimeError("Config requested device='cuda' but CUDA is unavailable.")
+
+    if requested == "auto":
+        return "cuda" if torch.cuda.is_available() else "cpu"
+
+    logger.warning(f"Unknown device '{requested}', using CPU fallback.")
+    return "cpu"
+
+
+# =====================================================================
+# Loader
+# =====================================================================
+
+def load_sam21(
+    checkpoint: str,
+    config: str,
+    device: str = "auto",
+):
+    """
+    Load a SAM2.1 model + predictor.
+
+    Args:
+        checkpoint: path to model weights
+        config:     path to .yaml config file
+        device:     "cpu", "cuda", or "auto"
 
     Returns:
-        model, predictor
+        (model, predictor)
     """
 
-    logger.debug(f"[SAM2.1] Loading model: checkpoint={checkpoint}, config={config}")
+    resolved_device = _resolve_device(device)
 
+    logger.debug(
+        f"[SAM2.1] Loading model:\n"
+        f"          checkpoint = {checkpoint}\n"
+        f"          config     = {config}\n"
+        f"          device     = {resolved_device}"
+    )
+
+    # MUST pass strings to Hydra's build_sam2
     model = build_sam2(
-        config_path=config,
-        checkpoint_path=checkpoint,
+        config_file=str(config),
+        ckpt_path=str(checkpoint),
+        device=resolved_device,
     )
 
     predictor = SAM2ImagePredictor(model)
-
-    # Assign model_key for preset lookup
-    # The model_type (e.g., "hiera_small") is not passed here, so store generic key.
-    predictor.model_key = "sam21"  # overridden by model_loader for specificity
+    predictor.model_key = "sam21"
 
     return model, predictor
 
 
-# -----------------------------------------------------------
-# Generate SAM2.1 Masks (Preset-aware)
-# -----------------------------------------------------------
+# =====================================================================
+# Mask Generation
+# =====================================================================
+
 def sam21_generate_masks(
     predictor,
     np_image: np.ndarray,
-    preset_name: str,
+    mg_config: Dict[str, any],
 ) -> List[Dict]:
     """
-    Generate unified SAM2.1 masks using presets:
+    Generate SAM2.1 masks.
 
-        [presets.sam2_1_<variant>.<preset>]
+    mg_config is already a fully expanded parameter dict, such as:
 
-    Each preset block must contain:
-        points_per_side
-        pred_iou_thresh
-        stability_score_thresh
-        crop_n_layers
-        min_mask_region_area
-        output_mode ("probability")
+        {
+            "points_per_side": 24,
+            "pred_iou_thresh": 0.90,
+            "stability_score_thresh": 0.96,
+            "crop_n_layers": 1,
+            "min_mask_region_area": 100,
+        }
+
+    This matches model_loader's behavior: it resolves presets *before*
+    calling this function.
     """
 
     model_key = getattr(predictor, "model_key", None)
     if model_key is None:
-        raise RuntimeError(
-            "SAM2.1 predictor is missing model_key. "
-            "Your load_sam21() must assign predictor.model_key."
-        )
+        raise RuntimeError("SAM2.1 predictor is missing model_key ('sam21').")
 
-    # Load preset block for SAM2.1
-    params = load_preset_params(model_key, preset_name)
+    logger.debug(f"[SAM2.1] Using mask parameters for '{model_key}': {mg_config}")
 
-    logger.debug(
-        f"[SAM2.1] Using preset '{preset_name}' "
-        f"for model '{model_key}': {params}"
-    )
-
-    # Build mask generator with preset parameters
     generator = _MaskGen(
         predictor.model,
-        points_per_side=params["points_per_side"],
-        pred_iou_thresh=params["pred_iou_thresh"],
-        stability_score_thresh=params["stability_score_thresh"],
-        crop_n_layers=params["crop_n_layers"],
-        min_mask_region_area=params["min_mask_region_area"],
-        output_mode=params["output_mode"],
+        points_per_side=mg_config["points_per_side"],
+        pred_iou_thresh=mg_config["pred_iou_thresh"],
+        stability_score_thresh=mg_config["stability_score_thresh"],
+        crop_n_layers=mg_config["crop_n_layers"],
+        min_mask_region_area=mg_config["min_mask_region_area"],
     )
 
-    logger.debug("[SAM2.1] Running generator.generate()")
+    logger.debug("[SAM2.1] Running mask generator...")
     raw = generator.generate(np_image)
 
     results = [
@@ -136,5 +163,5 @@ def sam21_generate_masks(
         for m in raw
     ]
 
-    logger.debug(f"[SAM2.1] Completed mask generation → {len(results)} masks")
+    logger.debug(f"[SAM2.1] Generated {len(results)} masks")
     return results

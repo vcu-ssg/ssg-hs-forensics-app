@@ -15,7 +15,7 @@ from pathlib import Path
 import tomllib
 from importlib.resources import files as pkg_files
 from typing import Dict, Any
-
+from functools import lru_cache
 
 CONFIG_FILENAME = "config.toml"
 
@@ -116,6 +116,7 @@ def _load_user_override_folder(builtin_cfg: dict) -> dict:
 # Public API
 # ======================================================================
 
+@lru_cache(maxsize=1)
 def load_config() -> dict:
     """
     Load and merge:

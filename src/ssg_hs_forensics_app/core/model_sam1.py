@@ -1,13 +1,17 @@
 # src/ssg_hs_forensics_app/core/model_sam1.py
 
 """
-SAM1 Loader (ViT-B / ViT-L / ViT-H) + Preset-aware Mask Generator
+SAM1 Loader (ViT-B / ViT-L / ViT-H) + unified mask generator
+
+Now supports device selection (cpu, cuda, mps).
+Matches the unified run_model_generate_masks API.
 """
 
 from __future__ import annotations
 from typing import Dict, List
 from pathlib import Path
 import numpy as np
+import torch
 from loguru import logger
 
 from ssg_hs_forensics_app.vendor.sam1.segment_anything.build_sam import (
@@ -19,87 +23,78 @@ from ssg_hs_forensics_app.vendor.sam1.segment_anything.automatic_mask_generator 
     SamAutomaticMaskGenerator,
 )
 from ssg_hs_forensics_app.core.mask_schema import make_mask_record
-from ssg_hs_forensics_app.core.preset_loader import load_preset_params
 
 
 # ------------------------------------------------------------
-# SAM1 Model Loader
+# SAM1 Model Loader (now with device support)
 # ------------------------------------------------------------
-def load_sam1(checkpoint: str, *, model_type: str):
+def load_sam1(*, checkpoint: str, model_type: str, device: str = "cpu"):
     """
-    Load SAM1 with the correct architecture.
+    Load SAM1 with the correct architecture and move it to 'device'.
+
     model_type ∈ {"vit_b", "vit_l", "vit_h"}
+    device ∈ {"cpu", "cuda", "mps"}  (resolved upstream in model_loader)
     """
 
     name = model_type.lower().strip()
-
     checkpoint = Path(checkpoint).expanduser().as_posix()
-    logger.debug(f"Loading SAM1 ({name}) checkpoint: {checkpoint}")
 
+    logger.debug(f"[SAM1] Loading model={name}, checkpoint={checkpoint}")
+    logger.debug(f"[SAM1] Requested device: {device}")
+
+    # --------------------------
+    # Select SAM1 architecture
+    # --------------------------
     if name == "vit_b":
         model = build_sam_vit_b(checkpoint)
-
     elif name == "vit_l":
         model = build_sam_vit_l(checkpoint)
-
     elif name == "vit_h":
         model = build_sam_vit_h(checkpoint)
-
     else:
-        raise ValueError(
-            f"Unknown SAM1 model type '{model_type}'. "
-            f"Allowed types: vit_b, vit_l, vit_h"
-        )
-
-    # Mark this model's key so preset loader knows which preset block to use
-    model.model_key = f"sam1_{name}"
+        raise ValueError(f"Unknown SAM1 model type '{model_type}'")
 
     model.eval()
+
+    # --------------------------
+    # Move to device
+    # --------------------------
+    try:
+        model.to(device)
+        logger.debug(f"[SAM1] Model moved to device: {device}")
+    except Exception as e:
+        logger.error(f"[SAM1] Failed to move model to '{device}': {e}")
+        raise
+
+    # Helpful metadata
+    model.model_key = f"sam1_{name}"
+
     return model
 
 
 # ------------------------------------------------------------
-# SAM1 Mask Generation (Preset-aware)
+# Unified SAM1 Mask Generation
 # ------------------------------------------------------------
 def sam1_generate_masks(
     model,
     np_image: np.ndarray,
-    preset_name: str,
+    mg_config: Dict[str, any],
 ) -> List[Dict]:
     """
-    Generate segmentation masks for SAM1 using the preset specified by:
-        [presets.sam1_<type>.<preset_name>]
-
-    Example:
-        presets.sam1_vit_b.default
-        presets.sam1_vit_b.fast
+    Mask generation for SAM1 using your unified mg_config and schema.
     """
 
-    model_key = getattr(model, "model_key", None)
-    if model_key is None:
-        raise RuntimeError(
-            "SAM1 model is missing model_key. "
-            "Did load_sam1() assign model.model_key?"
+    if not isinstance(mg_config, dict):
+        raise TypeError(
+            f"sam1_generate_masks expected mg_config to be dict, "
+            f"got {type(mg_config)}"
         )
 
-    # Load preset parameters from config
-    params = load_preset_params(model_key, preset_name)
+    logger.debug(f"[SAM1] Using mask parameters: {mg_config}")
 
-    logger.debug(
-        f"[SAM1] Using preset '{preset_name}' "
-        f"for model '{model_key}': {params}"
-    )
-
-    # Build mask generator *with preset parameters*
     generator = SamAutomaticMaskGenerator(
-        model,
-        points_per_side=params["points_per_side"],
-        pred_iou_thresh=params["pred_iou_thresh"],
-        stability_score_thresh=params["stability_score_thresh"],
-        crop_n_layers=params["crop_n_layers"],
-        crop_n_points_downscale_factor=params["crop_n_points_downscale_factor"],
-        min_mask_region_area=params["min_mask_region_area"],
-        output_mode=params["output_mode"],
+        model=model,
+        **mg_config
     )
 
     logger.debug("[SAM1] Running generator.generate()")

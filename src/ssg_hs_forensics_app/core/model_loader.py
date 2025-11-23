@@ -1,188 +1,306 @@
-# src/ssg_hs_forensics_app/core/model_loader.py
-
 """
-Model Loader (Functional API)
+Model loader for SAM1, SAM2, and SAM2.1 models.
 
-Reads the unified model registry from config.toml:
+Responsibilities:
+- Read model metadata from merged configuration
+- Resolve checkpoint + config YAML paths
+- Autodownload missing files when enabled
+- Load preset parameters
+- Dispatch to correct model-family loader
 
-    [models]
-    default = "sam1_vit_b"
-    autodownload = true
+Returns FOUR values:
+    (family, predictor_or_model, preset_name, preset_params)
 
-    [models.sam1_vit_b]
-    family     = "sam1"
-    type       = "vit_b"
-    checkpoint = "sam_vit_b_01ec64.pth"
-    url        = "https://..."
-    config     = ""
-    preset     = "default"
-
-Produces a unified functional model tuple via make_model().
+This matches what cmd_generate.py expects.
 """
 
 from __future__ import annotations
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Tuple, Any, Dict
+
 from loguru import logger
 import requests
+import torch
 
-from ssg_hs_forensics_app.core.model_factory import make_model
+
+# Family loaders
+from ssg_hs_forensics_app.core.model_sam1 import load_sam1, sam1_generate_masks
+from ssg_hs_forensics_app.core.model_sam2 import load_sam2, sam2_generate_masks
+from ssg_hs_forensics_app.core.model_sam21 import load_sam21, sam21_generate_masks
+
+# Preset loader
+from ssg_hs_forensics_app.core.preset_loader import load_preset_params
 
 
-# --------------------------------------------------------------------
-# load_model()
-# --------------------------------------------------------------------
-def load_model(
-    cfg: Dict,
-    *,
-    model_key: Optional[str] = None,
-    preset_name: Optional[str] = None,
-):
+# ======================================================================
+# Helpers
+# ======================================================================
+
+def _download_to(path: Path, url: str):
+    """Download a file from URL into the specified path."""
+    logger.debug(f"[model-loader] Downloading: {url}")
+    resp = requests.get(url)
+    resp.raise_for_status()
+    path.write_bytes(resp.content)
+    logger.debug(f"[model-loader] Saved file to: {path}")
+
+
+def _resolve_file(
+    folder: Path,
+    filename_or_url: str,
+    url_fallback: str | None,
+    autodownload: bool,
+    file_label: str,
+) -> Path:
     """
-    Load a specific model (if model_key supplied) or fall back to
-    the default model from config.
+    Resolve a required file such as a checkpoint or config YAML.
 
-    Args:
-        cfg: Entire application config dictionary
-        model_key: Optional explicit model to load
-        preset_name: Optional explicit preset override (e.g., 'fast')
-
-    Returns:
-        (family, runtime_model, preset_name, generator_fn)
+    Rules:
+      - If filename_or_url contains '://', treat it as a direct remote URL.
+      - Else treat as local filename under model folder.
+      - If missing locally and autodownload enabled → fetch from URL fallback.
     """
 
-    models_cfg = cfg.get("models")
-    if not models_cfg:
-        raise KeyError("config.toml missing [models] section")
+    # Case A: Direct URL explicitly provided
+    if "://" in filename_or_url:
+        direct_url = filename_or_url
+        local_name = Path(direct_url).name
+        local_path = folder / local_name
+        if not local_path.exists():
+            if autodownload:
+                _download_to(local_path, direct_url)
+            else:
+                raise FileNotFoundError(
+                    f"[Model Loader] {file_label} missing: {local_path}\n"
+                    f"Autodownload disabled; cannot fetch {direct_url}"
+                )
+        return local_path
 
-    # ------------------------------------------------------------
-    # Determine which model key to use
-    # ------------------------------------------------------------
-    if model_key is None:
-        model_key = models_cfg.get("default")
-        if not model_key:
-            raise KeyError("[models].default is missing")
-        logger.debug(f"[Model Loader] Using default model '{model_key}'")
-    else:
-        logger.debug(f"[Model Loader] Using explicitly requested model '{model_key}'")
+    # Case B: Filename inside models/ folder
+    local_path = folder / filename_or_url
 
-    if model_key not in models_cfg:
-        available = ", ".join(k for k in models_cfg.keys() if k != "default")
-        raise KeyError(
-            f"Model '{model_key}' not found in [models].\n"
-            f"Available models: {available}"
+    if local_path.exists():
+        return local_path
+
+    # Missing locally — need fallback URL
+    if not url_fallback:
+        raise FileNotFoundError(
+            f"[Model Loader] {file_label} not found:\n"
+            f"  {local_path}\n"
+            f"No URL fallback provided in config.toml"
         )
 
-    model_cfg = models_cfg[model_key]
+    if not autodownload:
+        raise FileNotFoundError(
+            f"[Model Loader] {file_label} not found:\n"
+            f"  {local_path}\n"
+            f"Autodownload disabled; cannot fetch from:\n"
+            f"  {url_fallback}"
+        )
 
-    # ------------------------------------------------------------
-    # Resolve required fields
-    # ------------------------------------------------------------
-    family = model_cfg["family"].lower()
-    model_type = model_cfg.get("type")  # SAM1 only
-    checkpoint = model_cfg["checkpoint"]
-    config_yaml = model_cfg.get("config") or None
+    # Download fallback
+    _download_to(local_path, url_fallback)
+    return local_path
 
-    # Preset resolution
-    preset = preset_name or model_cfg.get("preset", "default")
 
-    # ------------------------------------------------------------
-    # Resolve absolute file paths
-    # ------------------------------------------------------------
-    model_root = Path(cfg["application"]["model_folder"]).expanduser().resolve()
+# ======================================================================
+# Device resolution helper
+# ======================================================================
 
-    checkpoint_file = model_root / checkpoint
-    checkpoint_path = checkpoint_file.as_posix()
+def resolve_device(device_str: str) -> str:
+    """
+    Resolve 'cpu' | 'cuda' | 'auto' to the actual device the model should use.
+    Logs the final choice.
+    """
 
-    config_yaml_path = (
-        (model_root / config_yaml).as_posix()
-        if config_yaml not in (None, "")
-        else None
+    requested = device_str.strip().lower()
+
+    # Explicit CUDA request
+    if requested == "cuda":
+        if torch.cuda.is_available():
+            logger.debug("[Model Loader] Device request 'cuda' → using CUDA")
+            return "cuda"
+        logger.warning("[Model Loader] 'cuda' requested but no CUDA available → using CPU")
+        return "cpu"
+
+    # Automatic selection
+    if requested == "auto":
+        if torch.cuda.is_available():
+            logger.debug("[Model Loader] Device 'auto' resolved to CUDA")
+            return "cuda"
+        if torch.backends.mps.is_available():
+            logger.debug("[Model Loader] Device 'auto' resolved to Apple MPS")
+            return "mps"
+        logger.debug("[Model Loader] Device 'auto' resolved to CPU")
+        return "cpu"
+
+    # Default
+    logger.debug("[Model Loader] Device request 'cpu' → using CPU")
+    return "cpu"
+
+
+# ======================================================================
+# Public API
+# ======================================================================
+
+def load_model(
+    config: Dict[str, Any],
+    model_key: str,
+    preset_name: str,
+) -> Tuple[str, Any, str, Dict[str, Any]]:
+    """
+    Resolve and load a model described in config["models"][model_key].
+
+    Returns:
+        (family, predictor_or_model, preset_name, preset_params)
+    Matching exactly what cmd_generate.py expects.
+    """
+    logger.debug(f"[Model Loader] Using explicitly requested model '{model_key}'")
+
+    models_section = config.get("models", {})
+    if model_key not in models_section:
+        raise KeyError(f"[Model Loader] Unknown model key: '{model_key}'")
+
+    model_entry = models_section[model_key]
+
+    # ------------------------------------------------------------------
+    # Basic metadata
+    # ------------------------------------------------------------------
+    family = model_entry.get("family")
+    model_type = model_entry.get("type")
+
+    if not family:
+        raise ValueError(f"[Model Loader] Missing `family` for model '{model_key}'")
+    if not model_type:
+        raise ValueError(f"[Model Loader] Missing `type` for model '{model_key}'")
+
+    # ------------------------------------------------------------------
+    # Folder + autodownload
+    # ------------------------------------------------------------------
+    app_cfg = config.get("application", {})
+    model_folder = Path(app_cfg.get("model_folder", "./models")).expanduser().resolve()
+    model_folder.mkdir(parents=True, exist_ok=True)
+
+    autodownload = bool(models_section.get("autodownload", False))
+
+    # ------------------------------------------------------------------
+    # Resolve device (default: cpu)
+    # ------------------------------------------------------------------
+    raw_device = models_section.get("device", "cpu")
+    device = resolve_device(raw_device)
+    logger.debug(f"[Model Loader] Final resolved device: {device}")
+
+    # ------------------------------------------------------------------
+    # Resolve checkpoint
+    # ------------------------------------------------------------------
+    checkpoint_name = model_entry.get("checkpoint")
+    checkpoint_url = model_entry.get("url")
+
+    if not checkpoint_name:
+        raise ValueError(
+            f"[Model Loader] Missing `checkpoint` for model '{model_key}'"
+        )
+
+    ckpt_path = _resolve_file(
+        folder=model_folder,
+        filename_or_url=checkpoint_name,
+        url_fallback=checkpoint_url,
+        autodownload=autodownload,
+        file_label="Model checkpoint (.pt)",
     )
 
-    # ------------------------------------------------------------
-    # Auto-download logic
-    # ------------------------------------------------------------
-    autodownload = bool(models_cfg.get("autodownload", False))
-    url = model_cfg.get("url")
+    # ------------------------------------------------------------------
+    # Resolve config YAML
+    # ------------------------------------------------------------------
+    config_value = model_entry.get("config")
+    config_url = model_entry.get("config_url")
 
-    if not checkpoint_file.exists():
-
-        if not autodownload:
-            raise FileNotFoundError(
-                f"[Model Loader] Checkpoint file not found:\n"
-                f"  {checkpoint_file}\n"
-                f"Auto-download disabled (models.autodownload = false)."
+    # SAM1 does not require a config YAML
+    if family == "sam1":
+        yaml_path = None
+    else:
+        if not config_value:
+            raise ValueError(
+                f"[Model Loader] Missing `config` entry for model '{model_key}' "
+                f"in config.toml"
             )
 
-        if not url:
-            raise FileNotFoundError(
-                f"[Model Loader] Checkpoint file missing and no URL provided.\n"
-                f"Expected: {checkpoint_file}\n"
-                f"Add 'url = \"https://...\"' to [models.{model_key}]"
+        yaml_path = _resolve_file(
+            folder=model_folder,
+            filename_or_url=config_value,
+            url_fallback=config_url,
+            autodownload=autodownload,
+            file_label="Model config YAML",
+        )
+
+
+    # ------------------------------------------------------------------
+    # Load preset parameters
+    # ------------------------------------------------------------------
+    preset_params = load_preset_params(model_key, preset_name)
+
+    # ------------------------------------------------------------------
+    # Dispatch by family
+    # ------------------------------------------------------------------
+    if family == "sam1":
+        if not model_type:
+            raise ValueError(
+                f"[Model Loader] SAM1 model '{model_key}' requires a `type` "
+                f"(vit_b, vit_l, vit_h) in config.toml"
             )
 
-        # Ensure model_root exists
-        model_root.mkdir(parents=True, exist_ok=True)
+        # Pass checkpoint + model_type
+        model = load_sam1(
+            checkpoint=ckpt_path,
+            model_type=model_type,
+            device=device,
+        )
 
-        logger.info(f"[Model Loader] Auto-downloading checkpoint for '{model_key}'")
-        logger.info(f"  URL → {url}")
-        logger.info(f"  Saving to → {checkpoint_file}")
+        # SAM1 has no predictor wrapper, so runtime_model = model
+        return ("sam1", model, preset_name, preset_params)
+    
+    elif family == "sam2":
+        model, predictor = load_sam2(
+            checkpoint=ckpt_path,
+            config=yaml_path,
+            device=device,
+        )
+        return ("sam2", predictor, preset_name, preset_params)
 
-        try:
-            response = requests.get(url, stream=True)
-            response.raise_for_status()
+    elif family in ("sam2.1", "sam21"):
+        model, predictor = load_sam21(
+            checkpoint=ckpt_path,
+            config=yaml_path,
+            device=device,
+        )
+        return ("sam21", predictor, preset_name, preset_params)
 
-            with open(checkpoint_file, "wb") as f:
-                for chunk in response.iter_content(chunk_size=8192):
-                    if chunk:
-                        f.write(chunk)
+    else:
+        raise ValueError(
+            f"[Model Loader] Unknown model family '{family}' for '{model_key}'"
+        )
 
-        except Exception as e:
-            raise RuntimeError(
-                f"[Model Loader] Failed to download checkpoint:\n"
-                f"  URL: {url}\n"
-                f"  Error: {e}"
-            )
 
-        # Validate
-        if not checkpoint_file.exists():
-            raise RuntimeError(
-                f"[Model Loader] Downloaded checkpoint missing:\n"
-                f"  {checkpoint_file}"
-            )
+# ======================================================================
+# Mask-generation dispatcher
+# ======================================================================
 
-    # ------------------------------------------------------------
-    # Validate config YAML file (if applicable)
-    # ------------------------------------------------------------
-    if config_yaml_path is not None:
-        config_file = Path(config_yaml_path)
-        if not config_file.exists():
-            raise FileNotFoundError(
-                f"[Model Loader] Model config YAML not found:\n"
-                f"  {config_file}\n"
-                f"Check [models.{model_key}].config in config.toml"
-            )
+def run_model_generate_masks(
+    family: str,
+    model_or_predictor: Any,
+    image_np,
+    mg_config: Dict[str, Any],
+):
+    """
+    Dispatch mask generation based on model family.
+    """
+    if family == "sam1":
+        return sam1_generate_masks(model_or_predictor, image_np, mg_config)
 
-    # ------------------------------------------------------------
-    # Logging
-    # ------------------------------------------------------------
-    logger.debug(f"[Model Loader] Selected model: {model_key}")
-    logger.debug("Resolved Model Info:")
-    logger.debug(f"  model_key:       {model_key}")
-    logger.debug(f"  family:          {family}")
-    logger.debug(f"  type:            {model_type}")
-    logger.debug(f"  checkpoint_path: {checkpoint_path}")
-    logger.debug(f"  config_yaml:     {config_yaml_path}")
-    logger.debug(f"  preset:          {preset}")
+    if family == "sam2":
+        return sam2_generate_masks(model_or_predictor, image_np, mg_config)
 
-    # ------------------------------------------------------------
-    # Build and return functional model wrapper from model_factory
-    # ------------------------------------------------------------
-    return make_model(
-        family=family,
-        model_type=model_type,
-        checkpoint=checkpoint_path,
-        config=config_yaml_path,
-        preset=preset,
-    )
+    if family == "sam21":
+        return sam21_generate_masks(model_or_predictor, image_np, mg_config)
+
+    raise ValueError(f"[Model Loader] Unsupported model family: {family}")

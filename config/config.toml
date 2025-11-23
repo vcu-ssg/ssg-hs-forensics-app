@@ -21,6 +21,7 @@ image_extensions = ["jpg", "jpeg", "png", "bmp", "tif", "tiff"]
 [models]
 default      = "sam1_vit_b"      # ← default model to use for cmd_generate
 autodownload = true              # ← automatically download missing checkpoints?
+device       = "cuda"            # NEW — "cpu" | "cuda" | "auto"
 
 
 
@@ -117,7 +118,7 @@ preset       = "default"
 family       = "sam2.1"
 type         = "hiera_tiny"
 checkpoint   = "sam2.1_hiera_tiny.pt"
-config       = "sam2.1_hiera_tiny.yaml"
+config       = "sam2.1_hiera_t.yaml"
 description  = "SAM2.1 Hiera Tiny (Sept 2024) — improved accuracy, very fast."
 url          = "https://dl.fbaipublicfiles.com/segment_anything_2/092824/sam2.1_hiera_tiny.pt"
 config_url   = "https://raw.githubusercontent.com/facebookresearch/sam2/refs/heads/main/sam2/configs/sam2.1/sam2.1_hiera_t.yaml"
@@ -168,15 +169,15 @@ preset       = "default"
 # SAM1 — ViT-B  (lightest model → can handle larger grids)
 ############################################################
 [presets.sam1_vit_b.default]
-auto_resize = true
-max_dimension = 1536
+#auto_resize = true
+#max_dimension = 1536
 points_per_side = 24
 pred_iou_thresh = 0.90
 stability_score_thresh = 0.96
 crop_n_layers = 0
 crop_n_points_downscale_factor = 2
 min_mask_region_area = 150
-output_mode = "binary_mask"
+#output_mode = "binary_mask"
 
 [presets.sam1_vit_b.fast]
 auto_resize = true
@@ -279,15 +280,15 @@ output_mode = "binary_mask"
 # SAM1 — ViT-B  (Most stable model on Windows)
 ############################################################
 [presets.sam1_vit_b.default_windows]
-auto_resize = true
-max_dimension = 1280
+#auto_resize = true
+#max_dimension = 1280
 points_per_side = 16
 pred_iou_thresh = 0.90
 stability_score_thresh = 0.965
 crop_n_layers = 0
 crop_n_points_downscale_factor = 2
 min_mask_region_area = 200
-output_mode = "binary_mask"
+#output_mode = "binary_mask"
 
 [presets.sam1_vit_b.fast_windows]
 auto_resize = true
@@ -391,12 +392,11 @@ output_mode = "binary_mask"
 # ---
 
 [presets.sam2_hiera_tiny.default]
-points_per_side = 24
-pred_iou_thresh = 0.90
-stability_score_thresh = 0.96
+points_per_side = 16
+pred_iou_thresh = 0.85
+stability_score_thresh = 0.95
 crop_n_layers = 1
-min_mask_region_area = 100
-output_mode = "probability"
+min_mask_region_area = 200
 
 [presets.sam2_hiera_tiny.fast]
 points_per_side = 16
@@ -486,13 +486,14 @@ crop_n_layers = 4
 min_mask_region_area = 125
 output_mode = "probability"
 
+# ===================================================
+
 [presets.sam2_1_hiera_tiny.default]
-points_per_side = 28
-pred_iou_thresh = 0.91
-stability_score_thresh = 0.965
+points_per_side = 16
+pred_iou_thresh = 0.85
+stability_score_thresh = 0.95
 crop_n_layers = 1
-min_mask_region_area = 100
-output_mode = "probability"
+min_mask_region_area = 200
 
 [presets.sam2_1_hiera_tiny.fast]
 points_per_side = 20

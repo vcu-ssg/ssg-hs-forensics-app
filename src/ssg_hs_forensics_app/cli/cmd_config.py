@@ -1,5 +1,8 @@
+# src/ssg_hs_forensics_app/cli/cmd_config.py
+
 """
-CLI commands for inspecting application configuration.
+Configuration commands for inspecting Sammy configuration.
+Matches structure of cli/cmd_images.py.
 """
 
 from __future__ import annotations
@@ -8,59 +11,113 @@ import click
 import tomli_w
 from pathlib import Path
 
-from ssg_hs_forensics_app.config_logger import init_logging
 from ssg_hs_forensics_app.config_loader import (
     load_builtin_config,
     get_builtin_config_path,
 )
+from ssg_hs_forensics_app.core.system import get_system_summary
 
 
-@click.group(name="config")
+@click.group(name="config", invoke_without_command=True)
 @click.pass_context
 def cmd_config(ctx):
-    """Configuration inspection commands."""
-    # Ensure our context is initialized
+    """
+    Inspect configuration settings.
+
+    """
     ctx.ensure_object(dict)
-    init_logging()
+
+    # If invoked without subcommand → show help and summary
+    if ctx.invoked_subcommand is None:
+        #click.echo(ctx.get_help())
+        click.echo("\nConfiguration summary:\n")
+        _show_config_summary(ctx.obj["config"])
+        ctx.exit(0)
 
 
 # =====================================================================
-# merged (merged config)
+# Internal: summary printer
 # =====================================================================
 
-@cmd_config.command("merged")
-@click.pass_context
-def config_merged(ctx):
-    """
-    Display the merged configuration (built-in + user override).
-    """
-    cfg = ctx.obj["config"]   # merged config injected by _main.py
+def _show_config_summary(cfg: dict):
+    """Pretty-print selected configuration settings + system + models."""
 
-    click.echo("Merged configuration (built-in + user override):\n")
+    app = cfg.get("application", {})
+    models = cfg.get("models", {})
+    model_folder = Path(app.get("model_folder", ""))
 
-    try:
-        text = tomli_w.dumps(cfg)
-        click.echo(text)
-    except Exception:
-        click.echo(cfg)
+    click.echo("  Active config file:")
+    click.echo(f"    {cfg.get('_loaded_from')}")
 
+    # ------------------------------------------------------------
+    # APPLICATION
+    # ------------------------------------------------------------
+    click.echo("\n  [application]")
+    click.echo(f"    log_level      = {app.get('log_level')}")
+    click.echo(f"    config_folder  = {app.get('config_folder')}")
+    click.echo(f"    image_folder   = {app.get('image_folder')}")
+    click.echo(f"    mask_folder    = {app.get('mask_folder')}")
+    click.echo(f"    model_folder   = {app.get('model_folder')}")
 
-# =====================================================================
-# BUILT-IN ONLY (original module config)
-# =====================================================================
+    # ------------------------------------------------------------
+    # MODEL SETTINGS
+    # ------------------------------------------------------------
+    click.echo("\n  [models]")
+    click.echo(f"    default        = {models.get('default')}")
+    click.echo(f"    autodownload   = {models.get('autodownload')}")
+    click.echo(f"    device         = {models.get('device')}")
 
-@cmd_config.command("built-in")
-def config_built_in():
-    """
-    Display ONLY the built-in config.toml shipped with the module.
-    """
-    cfg_path = get_builtin_config_path()
-    builtin = load_builtin_config()
+    # ------------------------------------------------------------
+    # SYSTEM DETAILS
+    # ------------------------------------------------------------
+    click.echo("\n  [system]")
 
-    click.echo(f"Built-in config file:\n  {cfg_path}\n")
+    system = get_system_summary()
 
-    try:
-        text = tomli_w.dumps(builtin)
-        click.echo(text)
-    except Exception:
-        click.echo(builtin)
+    click.echo(f"    os             = {system['os_name']}")
+    click.echo(f"    os_version     = {system['os_version']}")
+    click.echo(f"    cuda_hardware  = {'Available' if system['cuda_hardware'] else 'Not available'}")
+    click.echo(f"    cuda_detail    = {system['cuda_hardware_detail']}")
+    click.echo(f"    torch          = {'Installed' if system['torch_installed'] else 'Not installed'}")
+    click.echo(f"    torch_cuda     = {'cuda' if system['torch_cuda'] else 'No cuda'} ({system['torch_detail']})")
+
+    # ------------------------------------------------------------
+    # Model recommendations (but do NOT override loader logic!)
+    # ------------------------------------------------------------
+    desired_device = models.get("device", "cpu")
+
+    if system["cuda_hardware"] and desired_device == "cpu":
+        click.echo("    ⚠ Recommendation: CUDA available, but config requests CPU.")
+        click.echo("      Consider setting models.device = 'cuda' or 'auto'.")
+
+    if not system["cuda_hardware"] and desired_device == "cuda":
+        click.echo("    ⚠ Warning: config requests CUDA, but CUDA hardware not detected.")
+        click.echo("      model_loader will fall back to CPU.")
+
+    if ("Windows" in system["os_name"]
+        and system["cuda_hardware"]
+        and not system["torch_cuda"]):
+        click.echo("    ⚠ Windows + CUDA hardware detected but Torch is CPU-only.")
+        click.echo("      Installing CUDA-enabled Torch on Windows is difficult.")
+        click.echo("      Consider using WSL for easier CUDA support.")
+
+    # ------------------------------------------------------------
+    # AVAILABLE MODELS
+    # ------------------------------------------------------------
+    click.echo("\n  Available models:")
+
+    for name, info in models.items():
+        if not isinstance(info, dict) or "checkpoint" not in info:
+            continue
+
+        desc = info.get("description", "(no description)")
+        ckpt_path = model_folder / info["checkpoint"]
+        downloaded = ckpt_path.exists()
+        status = "[DOWNLOADED]" if downloaded else ""
+
+        click.echo(f"    • {name:<20} — {desc} {status}")
+
+    if models.get("autodownload", False):
+        click.echo("  Per autodownload setting, models WILL be auto-downloaded.")
+    else:
+        click.echo("  Per autodownload setting, models WILL NOT be auto-downloaded.")

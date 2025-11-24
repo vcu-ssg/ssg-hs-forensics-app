@@ -1,12 +1,4 @@
-"""
-Unified configuration loader.
-
-Responsibilities:
-- Load built-in config from package (required)
-- Optionally load user config override from application.config_folder
-- Deep-merge the two configs
-- Expose a single load_config() method
-"""
+# src/ssg_hs_forensics_app/config_loader.py
 
 from __future__ import annotations
 
@@ -14,7 +6,7 @@ import sys
 from pathlib import Path
 import tomllib
 from importlib.resources import files as pkg_files
-from typing import Dict, Any
+from typing import Dict, Any, Tuple
 from functools import lru_cache
 
 CONFIG_FILENAME = "config.toml"
@@ -26,7 +18,6 @@ CONFIG_FILENAME = "config.toml"
 
 def _deep_merge(base: Dict[str, Any], override: Dict[str, Any]) -> Dict[str, Any]:
     """Recursively merge two dictionaries, with `override` taking precedence."""
-
     result = base.copy()
     for key, value in override.items():
         if (
@@ -45,15 +36,16 @@ def _deep_merge(base: Dict[str, Any], override: Dict[str, Any]) -> Dict[str, Any
 # ======================================================================
 
 def get_builtin_config_path() -> Path:
-    """Return the path to the built-in config.toml bundled inside the package."""
+    """
+    Return the path to the built-in config.toml.
+    FATAL if missing (OK to print here since application cannot run).
+    """
     try:
         pkg_root = pkg_files("ssg_hs_forensics_app") / "config"
         cfg_file = pkg_root / CONFIG_FILENAME
-
         cfg_path = Path(cfg_file)
         if cfg_path.is_file():
             return cfg_path
-
     except Exception:
         pass
 
@@ -66,50 +58,41 @@ def get_builtin_config_path() -> Path:
 
 
 def load_builtin_config() -> dict:
-    """Load the built-in TOML config shipped with the package."""
+    """Load the built-in TOML config shipped inside the package."""
     path = get_builtin_config_path()
     with path.open("rb") as f:
-        data = tomllib.load(f)
-
-    # ❌ REMOVE this line:
-    # data["__config_file__"] = str(path)
-
-    return data
+        return tomllib.load(f)
 
 
 # ======================================================================
-# User override config loader
+# User override config loader (silent)
 # ======================================================================
 
-def _load_user_override_folder(builtin_cfg: dict) -> dict:
+def _load_user_override_folder(builtin_cfg: dict) -> Tuple[dict, str | None]:
     """
     Attempt to load user config.toml from application.config_folder.
-    Return empty dict if not found.
+    Returns:
+        (user_cfg: dict, source_path: str|None)
+    Never prints/logs — pure silent operation.
     """
-
     app_cfg = builtin_cfg.get("application", {})
     folder = app_cfg.get("config_folder")
 
     if not folder:
-        return {}
+        return {}, None
 
     folder_path = Path(folder).expanduser().resolve()
     cfg_path = folder_path / CONFIG_FILENAME
 
     if not cfg_path.exists():
-        print(
-            f"[config] No user config override found at: {cfg_path}",
-            file=sys.stderr,
-        )
-        return {}
+        return {}, None
 
     try:
         with cfg_path.open("rb") as f:
-            print(f"[config] Loaded user override: {cfg_path}")
-            return tomllib.load(f)
-    except Exception as e:
-        print(f"[config] WARNING: Failed to load user config: {e}", file=sys.stderr)
-        return {}
+            return tomllib.load(f), str(cfg_path)
+    except Exception:
+        # Failed user config is silently ignored (CLI will report)
+        return {}, None
 
 
 # ======================================================================
@@ -117,17 +100,31 @@ def _load_user_override_folder(builtin_cfg: dict) -> dict:
 # ======================================================================
 
 @lru_cache(maxsize=1)
-def load_config() -> dict:
+def load_config(config_file_override: str | None = None) -> dict:
     """
     Load and merge:
-        1. built-in config (required)
-        2. user config override (optional)
+        1. Built-in config (required)
+        2. User override folder (optional)
+        3. --config-file override (highest precedence)
+
+    No prints/logging — caller logs events after Loguru initialization.
     """
 
     builtin = load_builtin_config()
-    user = _load_user_override_folder(builtin)
 
-    # Deep merge user → builtin
-    merged = _deep_merge(builtin, user)
+    # --- Case 1: explicit CLI override file ---
+    if config_file_override:
+        override_path = Path(config_file_override)
+        with override_path.open("rb") as f:
+            override_cfg = tomllib.load(f)
+
+        merged = _deep_merge(builtin, override_cfg)
+        merged["_loaded_from"] = str(override_path)
+        return merged
+
+    # --- Case 2: built-in + user config folder (normal flow) ---
+    user_cfg, user_path = _load_user_override_folder(builtin)
+    merged = _deep_merge(builtin, user_cfg)
+    merged["_loaded_from"] = user_path or "<built-in defaults>"
 
     return merged

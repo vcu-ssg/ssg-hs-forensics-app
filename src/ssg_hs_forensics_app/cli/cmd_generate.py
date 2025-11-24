@@ -9,7 +9,13 @@ from datetime import datetime
 from ssg_hs_forensics_app.core.config import get_config
 from ssg_hs_forensics_app.config_logger import init_logging
 
-from ssg_hs_forensics_app.core.images import load_image_as_numpy
+from ssg_hs_forensics_app.core.images import (
+    load_image_as_numpy,
+    list_images,
+    get_image_by_index,
+    get_image_by_name,
+)
+
 from ssg_hs_forensics_app.core.model_loader import (
     load_model,
     run_model_generate_masks,
@@ -21,7 +27,7 @@ from ssg_hs_forensics_app.core.mask_writer import (
 
 
 @click.command(name="generate")
-@click.argument("image_path", type=click.Path(exists=True, dir_okay=False))
+@click.argument("image_path", type=str)
 @click.option(
     "--model",
     "model_name",
@@ -68,11 +74,47 @@ def cmd_generate(
     logger.debug("cmd_generate invoked")
 
     # ------------------------------------------------------------
-    # Load config + resolve model
+    # Load config
     # ------------------------------------------------------------
-    image_path = Path(image_path)
     config = get_config()
 
+    # ============================================================
+    # RESOLVE image_path AS:  filename OR numeric index
+    # ============================================================
+    logger.debug(f"Resolving image target: {image_path}")
+
+    image_folder = Path(config["application"]["image_folder"]).expanduser().resolve()
+    records = list_images(image_folder)
+
+    if not records:
+        raise click.ClickException(
+            f"No images found under configured image folder:\n  {image_folder}"
+        )
+
+    meta = None
+
+    # Case A — numeric sequence number
+    if image_path.isdigit():
+        idx = int(image_path)
+        meta = get_image_by_index(records, idx)
+
+    # Case B — filename
+    if meta is None:
+        meta = get_image_by_name(records, image_path)
+
+    if meta is None:
+        raise click.ClickException(
+            f"Image '{image_path}' not found by name or index.\n"
+            f"Use 'sammy images' to list available images."
+        )
+
+    # Resolved concrete filesystem path
+    image_path = Path(meta["path"]).resolve()
+    logger.debug(f"Resolved to actual file: {image_path}")
+
+    # ------------------------------------------------------------
+    # Resolve model
+    # ------------------------------------------------------------
     cfg_file = config.get("__config_file__", "<unknown>")
     logger.debug(f"Loaded config from: {cfg_file}")
 

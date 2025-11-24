@@ -3,7 +3,7 @@
 # =====================================================================
 
 [application]
-log_level      = "DEBUG"
+log_level      = "SUCCESS"     # Valid value: TRACE, DEBUG, INFO, SUCCESS, WARNING, ERROR, CRITICAL
 config_folder  = "./config"
 image_folder   = "./images"
 mask_folder    = "./masks"

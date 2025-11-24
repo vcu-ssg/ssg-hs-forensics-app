@@ -13,18 +13,17 @@ from skimage import measure  # For contour detection
 from ssg_hs_forensics_app.config_loader import load_builtin_config
 from ssg_hs_forensics_app.config_logger import init_logging
 
-from ssg_hs_forensics_app.core.mask_writer import (
-    load_masks_h5,
-    list_mask_files,
+# NEW imports – separation of concerns
+from ssg_hs_forensics_app.core.masks import (
+    list_mask_records,
+    get_mask_by_index,
+    get_mask_by_name,
+    load_mask_file,
 )
 
 
 @click.command(name="masks")
-@click.argument(
-    "mask_file",
-    required=False,
-    type=click.Path(exists=True),
-)
+@click.argument("mask_target", required=False)
 @click.option(
     "--view",
     is_flag=True,
@@ -61,7 +60,7 @@ from ssg_hs_forensics_app.core.mask_writer import (
     help="Pixel thickness of contours.",
 )
 def cmd_masks(
-    mask_file,
+    mask_target,
     view,
     no_image,
     drop_background,
@@ -71,62 +70,71 @@ def cmd_masks(
 ):
     """
     Show metadata or visualizations for HDF5 mask files produced by 'sammy generate'.
+
+    With no argument: lists available mask files with sequence numbers.
+    With a number: loads that sequence number.
+    With a filename: loads that file.
     """
 
     # ------------------------------------------------------------
-    # Init
+    # Init logging
     # ------------------------------------------------------------
     init_logging()
-    logger.debug("cmd_show invoked")
+    logger.debug("cmd_masks invoked")
 
     cfg = load_builtin_config()
     mask_folder = Path(cfg["application"]["mask_folder"]).expanduser().resolve()
 
+    # Load available mask summaries
+    records = list_mask_records(mask_folder)
+
     # ------------------------------------------------------------
-    # NO ARGUMENT → LIST ALL MASK FILES
+    # NO ARGUMENT — LIST ALL MASK FILES
     # ------------------------------------------------------------
-    if mask_file is None:
+    if mask_target is None:
         click.echo(f"Mask folder:\n  {mask_folder}\n")
 
-        mask_files = [
-            mf for mf in list_mask_files(mask_folder)
-            if mf.suffix.lower() == ".h5"
-        ]
-
-        if not mask_files:
+        if not records:
             click.echo("No HDF5 mask files found.")
             return
 
         click.echo("Available HDF5 runs:\n")
-
-        for mf in mask_files:
-            try:
-                data = load_masks_h5(mf)
-                num = len(data.get("masks", []))
-                start = data.get("runinfo", {}).get("start_time", "unknown")
-                image_name = data.get("input_info", {}).get("image_path", "unknown")
-
-                click.echo(f"  {mf.name}")
-                click.echo(f"     image:   {image_name}")
-                click.echo(f"     start:   {start}")
-                click.echo(f"     masks:   {num}\n")
-
-            except Exception as e:
-                click.echo(f"  {mf.name}  (ERROR: {e})\n")
+        for rec in records:
+            if "error" in rec:
+                click.echo(f"  {rec['index']:3d}: {rec['name']}   (ERROR: {rec['error']})")
+            else:
+                click.echo(
+                    f"  {rec['index']:3d}: {rec['name']}   "
+                    f"(masks={rec['num_masks']}, image={rec['image_path']})"
+                )
         return
 
     # ------------------------------------------------------------
-    # LOAD SPECIFIC MASK FILE
+    # RESOLVE mask_target AS: index OR filename
     # ------------------------------------------------------------
-    mask_path = Path(mask_file).resolve()
+    record = None
 
-    if mask_path.suffix.lower() != ".h5":
-        click.echo("ERROR: Mask file must end with '.h5'.")
-        return
+    # numeric index
+    if mask_target.isdigit():
+        record = get_mask_by_index(records, int(mask_target))
 
+    # filename lookup
+    if record is None:
+        record = get_mask_by_name(records, mask_target)
+
+    if record is None:
+        raise click.ClickException(
+            f"Mask file '{mask_target}' not found.\n"
+            "Use `sammy masks` to list available mask files."
+        )
+
+    mask_path = Path(record["path"]).resolve()
     click.echo(f"Loading run from:\n  {mask_path}\n")
 
-    data = load_masks_h5(mask_path)
+    # ------------------------------------------------------------
+    # LOAD FULL MASK FILE — UNCHANGED
+    # ------------------------------------------------------------
+    data = load_mask_file(mask_path)
 
     input_info = data["input_info"]
     model_info = data["model_info"]
@@ -150,7 +158,7 @@ def cmd_masks(
     num_masks = len(masks)
 
     # ------------------------------------------------------------
-    # PRINT METADATA
+    # PRINT METADATA — UNCHANGED
     # ------------------------------------------------------------
     click.echo("=== Run Metadata ===")
     click.echo(f"File:             {mask_path.name}")
@@ -171,14 +179,12 @@ def cmd_masks(
     click.echo(f"Total Masks:      {num_masks}\n")
 
     # ------------------------------------------------------------
-    # DETECT BACKGROUND MASKS
+    # BACKGROUND MASK DETECTION — UNCHANGED
     # ------------------------------------------------------------
     background_masks = []
 
     if num_masks > 0:
-        # Use stored image size
         area = width * height
-
         for idx, m in enumerate(masks):
             seg = np.asarray(m["segmentation"], dtype=bool)
             coverage = seg.sum() / area
@@ -198,13 +204,13 @@ def cmd_masks(
         click.echo(f"Dropped {len(to_remove)} background mask(s). New count: {num_masks}\n")
 
     # ------------------------------------------------------------
-    # STOP IF NO VISUALIZATION REQUESTED
+    # STOP IF NOT VIEWING
     # ------------------------------------------------------------
     if not view:
         return
 
     # ------------------------------------------------------------
-    # LOAD ORIGINAL JPEG IMAGE
+    # LOAD ORIGINAL JPEG FROM H5 — UNCHANGED
     # ------------------------------------------------------------
     try:
         image = Image.open(io.BytesIO(jpeg_bytes)).convert("RGB")
@@ -215,14 +221,15 @@ def cmd_masks(
 
     H, W, _ = base_arr.shape
 
-    # Auto-resize segmentation masks if needed
     def normalize_seg(seg):
         if seg.shape == (H, W):
             return seg
-        return np.array(Image.fromarray(seg.astype(np.uint8)).resize((W, H))).astype(bool)
+        return np.array(
+            Image.fromarray(seg.astype(np.uint8)).resize((W, H))
+        ).astype(bool)
 
     # ------------------------------------------------------------
-    # CONTOUR DRAWING
+    # CONTOUR DRAWING — UNCHANGED
     # ------------------------------------------------------------
     def draw_thick_contours(img, seg):
         if not add_contours:
@@ -231,7 +238,6 @@ def cmd_masks(
         contours = measure.find_contours(seg.astype(float), 0.5)
         t = max(1, contour_thickness)
 
-        # offsets for thickness
         offsets = [(0, 0)]
         for tt in range(1, t + 1):
             offsets.extend([
@@ -252,7 +258,7 @@ def cmd_masks(
                 img[rr2[ok], cc2[ok]] = [0, 255, 255]
 
     # ------------------------------------------------------------
-    # BUILD MASK-ONLY VIEW
+    # BUILD MASK-ONLY VIEW — UNCHANGED
     # ------------------------------------------------------------
     gray_bg = np.full((H, W, 3), 128, dtype=np.uint8)
     mask_only = gray_bg.copy()
@@ -265,7 +271,7 @@ def cmd_masks(
         draw_thick_contours(mask_only, seg)
 
     # ------------------------------------------------------------
-    # MODE A — masks-only view
+    # MODE A — masks-only view — UNCHANGED
     # ------------------------------------------------------------
     if no_image:
         fig, axes = plt.subplots(1, 2, figsize=(14, 8))
@@ -283,7 +289,7 @@ def cmd_masks(
         return
 
     # ------------------------------------------------------------
-    # MODE B — overlay masks onto base image
+    # MODE B — overlay masks on image — UNCHANGED
     # ------------------------------------------------------------
     overlay = base_arr.copy()
 

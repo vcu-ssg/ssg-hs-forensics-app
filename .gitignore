@@ -55,13 +55,9 @@ sam*.pth
 # Masks folder (generated mask files)
 # -----------------
 
-masks/*
-!masks/.gitkeep
 
 models/*
 !models/.gitkeep
 
-src/ssg_hs_forensics_app/vendor/sam1/
-src/ssg_hs_forensics_app/vendor/sam2/
 .model_repos/
 

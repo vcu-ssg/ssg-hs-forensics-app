@@ -60,3 +60,15 @@ def load_preset_params(model_key: str, preset_name: str) -> dict:
     )
 
     return params
+
+# src/ssg_hs_forensics_app/core/preset_loader.py
+
+def load_all_presets_for_model(cfg, model_key):
+    """
+    Return a dict of all preset definitions for the given model.
+    Example:
+        { "default": {...}, "fast": {...}, ... }
+    """
+    presets = cfg.get("presets", {})
+    return presets.get(model_key, {})
+

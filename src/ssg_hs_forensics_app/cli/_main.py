@@ -38,16 +38,13 @@ def cli(ctx, log_level, config_file):
     \b
     Workflow:
         1) sammy images - to list available images
-        2) sammy generate <image file name> to create mask file for image
-        3) sammy masks  <mask file name> to view mask file
+        2) sammy generate <image id or file name> - to run SAM to create mask package for image
+        3) sammy masks - to list available mask packages
+        4) sammy masks <mask id or file name> - to view mask package
 
-    \b
-    Helpers
-        * sammy masks  to view available mask files
-        * sammy models to view available models
-        * sammy images <image file name> to view image and details
+    Models - all SAM models are available and selectable.  See: sammy config  or sammy models
 
-    Details are available using --help for any command
+    Additional info is available by adding --help to any command
     """
 
     ctx.ensure_object(dict)

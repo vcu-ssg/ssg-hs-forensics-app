@@ -1,165 +1,148 @@
 # src/ssg_hs_forensics_app/cli/cmd_models.py
 
+"""
+Model inspection command for Sammy.
+
+Supports:
+    - Listing models with sequence numbers
+    - Selecting a model by key or by index
+    - Showing default + available presets
+"""
+
+from __future__ import annotations
+
 import click
 from pathlib import Path
-from tabulate import tabulate
-from loguru import logger
 
-from ssg_hs_forensics_app.config_logger import init_logging
-from ssg_hs_forensics_app.core.config import get_config
+from ssg_hs_forensics_app.core.preset_loader import load_all_presets_for_model
 
 
-@click.group(name="models")
+@click.command(name="models")
+@click.argument("target", required=False)
 @click.pass_context
-def cmd_models(ctx):
-    """Inspect installed and available segmentation models."""
-    init_logging()
-    ctx.ensure_object(dict)
-    logger.debug("cmd_models initialized")
-
-
-# ---------------------------------------------------------------------
-# Helper functions
-# ---------------------------------------------------------------------
-
-def _exists(path: Path | None) -> bool:
-    return path is not None and path.exists()
-
-
-def _status_icon(path: Path | None) -> str:
-    return "✔" if _exists(path) else "✘"
-
-
-def _resolve_paths(model_folder: Path, entry: dict):
+def cmd_models(ctx, target):
     """
-    Given a config model entry, return (ckpt_path, yaml_path).
-    YAML is None for SAM1 models.
-    """
-    ckpt = entry.get("checkpoint")
-    yaml = entry.get("config")
+    Inspect SAM model registry.
 
-    ckpt_path = model_folder / ckpt if ckpt else None
-    yaml_path = model_folder / yaml if yaml else None
+    Usage:
+        sammy models
+            - List all models
 
-    return ckpt_path, yaml_path
+        sammy models 3
+            - Show details for model #3
 
+        sammy models sam2_hiera_small
+            - Show details by model key
 
-def _is_downloaded(entry: dict, ckpt_path: Path | None, yaml_path: Path | None) -> bool:
-    """
-    Determine whether the model is fully downloaded.
-
-    - SAM1: checkpoint only
-    - SAM2/SAM2.1: checkpoint + YAML
-    """
-    family = entry.get("family", "").lower()
-
-    if family == "sam1":
-        return _exists(ckpt_path)
-
-    # SAM2 / SAM2.1
-    return _exists(ckpt_path) and _exists(yaml_path)
-
-
-# ---------------------------------------------------------------------
-#  models list
-# ---------------------------------------------------------------------
-
-@cmd_models.command("list")
-@click.pass_context
-def models_list(ctx):
-    """
-    Show all models defined in config.toml, including:
-        key, family, type, downloaded?, default marker.
     """
     cfg = ctx.obj["config"]
-    model_folder = Path(cfg["application"]["model_folder"]).expanduser().resolve()
+    models_cfg = cfg.get("models", {})
+    app_cfg = cfg.get("application", {})
+    model_folder = Path(app_cfg.get("model_folder", "./models")).expanduser().resolve()
 
-    models = cfg.get("models", {})
-    default_key = models.get("default")
-
-    rows = []
-
-    # Loop through model records
-    for key, entry in models.items():
-        if key in ("default", "autodownload", "registry_file"):
+    # ------------------------------------------------------------
+    # Build list of model-entries (sequence-numbered)
+    # ------------------------------------------------------------
+    records = []
+    seq = 1
+    for key, info in models_cfg.items():
+        if not isinstance(info, dict):
+            continue
+        if "checkpoint" not in info:
             continue
 
-        ckpt_path, yaml_path = _resolve_paths(model_folder, entry)
-        downloaded = "✔" if _is_downloaded(entry, ckpt_path, yaml_path) else "✘"
+        records.append({
+            "index": seq,
+            "key": key,
+            "info": info,
+        })
+        seq += 1
 
-        rows.append([
-            key,
-            entry.get("family"),
-            entry.get("type"),
-            downloaded,
-            "<-- default" if key == default_key else "",
-        ])
+    # ------------------------------------------------------------
+    # NO TARGET → LIST MODELS
+    # ------------------------------------------------------------
+    if not target:
+        click.echo("\n[models]")
+        click.echo(f"default        = {models_cfg.get('default')}")
+        click.echo(f"autodownload   = {models_cfg.get('autodownload')}")
+        click.echo(f"device         = {models_cfg.get('device')}")
 
-    headers = ["Key", "Family", "Type", "Downloaded", "Default"]
-    click.echo(tabulate(rows, headers=headers, tablefmt="github"))
+        click.echo("\nAvailable models:\n")
+        for r in records:
+            key = r["key"]
+            info = r["info"]
+            desc = info.get("description", "(no description)")
+            ckpt_path = model_folder / info["checkpoint"]
+            downloaded = ckpt_path.exists()
+            status = "[DOWNLOADED]" if downloaded else ""
+            click.echo(f"  {r['index']:2d}: {key:<20} — {desc} {status}")
 
-    click.echo(f"\nModel folder: {model_folder}")
-    click.echo("✔ = available, ✘ = missing\n")
+        return
 
+    # ------------------------------------------------------------
+    # TARGET GIVEN → RESOLVE MODEL
+    # ------------------------------------------------------------
+    record = None
 
-# ---------------------------------------------------------------------
-#  models show <model_key>
-# ---------------------------------------------------------------------
+    # Numeric sequence index?
+    if target.isdigit():
+        idx = int(target)
+        record = next((r for r in records if r["index"] == idx), None)
 
-@cmd_models.command("show")
-@click.argument("model_key")
-@click.pass_context
-def models_show(ctx, model_key):
-    """
-    Show detailed information about a specific model key
-    (or the default model).
-    """
-    cfg = ctx.obj["config"]
-    models = cfg.get("models", {})
+    # Model key?
+    if record is None:
+        record = next((r for r in records if r["key"] == target), None)
 
-    # Allow "sammy models show default"
-    if model_key == "default":
-        model_key = models.get("default")
+    if record is None:
+        click.echo(f"Model not found: {target}")
+        return
 
-    if model_key not in models:
-        raise click.ClickException(f"Model '{model_key}' not found in config.toml")
+    # ------------------------------------------------------------
+    # SHOW MODEL DETAIL
+    # ------------------------------------------------------------
+    key = record["key"]
+    info = record["info"]
 
-    entry = models[model_key]
-    model_folder = Path(cfg["application"]["model_folder"]).expanduser().resolve()
+    click.echo(f"\nModel #{record['index']}: {key}")
+    click.echo(f"  Family:      {info.get('family')}")
+    click.echo(f"  Type:        {info.get('type')}")
+    click.echo(f"  Description: {info.get('description', '(no description)')}")
 
-    ckpt_path, yaml_path = _resolve_paths(model_folder, entry)
-
-    click.echo(f"\n=== Model: {model_key} ===\n")
-
-    click.echo(f"Family:        {entry.get('family')}")
-    click.echo(f"Type:          {entry.get('type')}")
-    click.echo(f"Description:   {entry.get('description', '(none)')}\n")
-
-    # ---------------------------------------------
     # Checkpoint
-    # ---------------------------------------------
-    ckpt = entry.get("checkpoint")
-    click.echo(f"Checkpoint:    {ckpt}")
-    click.echo(f"  Exists:      {_status_icon(ckpt_path)}   {ckpt_path}")
+    ckpt_name = info.get("checkpoint")
+    ckpt_path = model_folder / ckpt_name
+    downloaded = ckpt_path.exists()
+    click.echo(f"\n  Checkpoint:")
+    click.echo(f"    file:      {ckpt_name}")
+    click.echo(f"    path:      {ckpt_path}")
+    click.echo(f"    exists:    {downloaded}")
+    if url := info.get("url"):
+        click.echo(f"    url:       {url}")
 
-    # ---------------------------------------------
-    # YAML (SAM2 / SAM2.1 only)
-    # ---------------------------------------------
-    yaml = entry.get("config")
-    if yaml:
-        click.echo(f"\nConfig YAML:   {yaml}")
-        click.echo(f"  Exists:      {_status_icon(yaml_path)}   {yaml_path}")
+    # Config YAML
+    if info.get("family") != "sam1":
+        yaml_name = info.get("config")
+        yaml_path = model_folder / yaml_name
+        click.echo("\n  Config YAML:")
+        click.echo(f"    file:      {yaml_name}")
+        click.echo(f"    path:      {yaml_path}")
+        if url := info.get("config_url"):
+            click.echo(f"    url:       {url}")
     else:
-        click.echo("\nConfig YAML:   (not required for SAM1)")
+        click.echo("\n  Config YAML: (not required for SAM1)")
 
-    # ---------------------------------------------
-    # URLs
-    # ---------------------------------------------
-    click.echo(f"\nDownload URL:  {entry.get('url', '(none)')}")
-    click.echo(f"Config URL:    {entry.get('config_url', '(none)')}\n")
+    # Default preset
+    default_preset = info.get("preset", "(none)")
+    click.echo(f"\n  Default preset: {default_preset}")
 
-    # ---------------------------------------------
-    # Default?
-    # ---------------------------------------------
-    if model_key == models.get("default"):
-        click.echo("(This is the DEFAULT model)\n")
+    # Available presets
+    click.echo("\n  Available presets:")
+    presets = load_all_presets_for_model(cfg, key)
+
+    if not presets:
+        click.echo("    (none)")
+    else:
+        for pname in sorted(presets.keys()):
+            click.echo(f"    • {pname}")
+
+    click.echo("")  # final spacing

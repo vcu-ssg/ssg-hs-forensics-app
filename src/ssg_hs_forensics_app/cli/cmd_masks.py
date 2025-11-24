@@ -8,12 +8,12 @@ import io
 import numpy as np
 from PIL import Image
 import matplotlib.pyplot as plt
-from skimage import measure  # For contour detection
+from skimage import measure  # contour detection
 
 from ssg_hs_forensics_app.config_loader import load_builtin_config
 from ssg_hs_forensics_app.config_logger import init_logging
 
-# NEW imports – separation of concerns
+# Cleaner mask helpers
 from ssg_hs_forensics_app.core.masks import (
     list_mask_records,
     get_mask_by_index,
@@ -32,7 +32,7 @@ from ssg_hs_forensics_app.core.masks import (
 @click.option(
     "--no-image",
     is_flag=True,
-    help="Show masks-only overlay (but still show the original image on the left).",
+    help="Show masks-only overlay (still shows original on left).",
 )
 @click.option(
     "--drop-background",
@@ -72,8 +72,9 @@ def cmd_masks(
     Show metadata or visualizations for HDF5 mask files produced by 'sammy generate'.
 
     With no argument: lists available mask files with sequence numbers.
-    With a number: loads that sequence number.
-    With a filename: loads that file.
+    With number: loads that sequence number.
+    With filename: loads that file.
+    With 'newest': loads most recent mask file.
     """
 
     # ------------------------------------------------------------
@@ -89,7 +90,7 @@ def cmd_masks(
     records = list_mask_records(mask_folder)
 
     # ------------------------------------------------------------
-    # NO ARGUMENT — LIST ALL MASK FILES
+    # NO ARGUMENT — LIST FILES
     # ------------------------------------------------------------
     if mask_target is None:
         click.echo(f"Mask folder:\n  {mask_folder}\n")
@@ -110,15 +111,28 @@ def cmd_masks(
         return
 
     # ------------------------------------------------------------
-    # RESOLVE mask_target AS: index OR filename
+    # SPECIAL TARGET: "newest"
     # ------------------------------------------------------------
     record = None
+    if mask_target.lower() == "newest":
+        if not records:
+            raise click.ClickException("No mask files exist.")
 
-    # numeric index
-    if mask_target.isdigit():
+        def file_mtime(rec):
+            try:
+                return Path(rec["path"]).stat().st_mtime
+            except Exception:
+                return 0  # treat unreadable files as oldest
+
+        newest = max(records, key=file_mtime)
+        record = newest
+        
+    # ------------------------------------------------------------
+    # RESOLVE TARGET AS index OR name (if not "newest")
+    # ------------------------------------------------------------
+    if record is None and mask_target.isdigit():
         record = get_mask_by_index(records, int(mask_target))
 
-    # filename lookup
     if record is None:
         record = get_mask_by_name(records, mask_target)
 
@@ -132,7 +146,7 @@ def cmd_masks(
     click.echo(f"Loading run from:\n  {mask_path}\n")
 
     # ------------------------------------------------------------
-    # LOAD FULL MASK FILE — UNCHANGED
+    # LOAD FILE (unchanged)
     # ------------------------------------------------------------
     data = load_mask_file(mask_path)
 
@@ -158,7 +172,7 @@ def cmd_masks(
     num_masks = len(masks)
 
     # ------------------------------------------------------------
-    # PRINT METADATA — UNCHANGED
+    # METADATA
     # ------------------------------------------------------------
     click.echo("=== Run Metadata ===")
     click.echo(f"File:             {mask_path.name}")
@@ -179,7 +193,7 @@ def cmd_masks(
     click.echo(f"Total Masks:      {num_masks}\n")
 
     # ------------------------------------------------------------
-    # BACKGROUND MASK DETECTION — UNCHANGED
+    # BACKGROUND MASK DETECTION (unchanged)
     # ------------------------------------------------------------
     background_masks = []
 
@@ -210,7 +224,7 @@ def cmd_masks(
         return
 
     # ------------------------------------------------------------
-    # LOAD ORIGINAL JPEG FROM H5 — UNCHANGED
+    # DISPLAYING (unchanged below)
     # ------------------------------------------------------------
     try:
         image = Image.open(io.BytesIO(jpeg_bytes)).convert("RGB")
@@ -228,9 +242,7 @@ def cmd_masks(
             Image.fromarray(seg.astype(np.uint8)).resize((W, H))
         ).astype(bool)
 
-    # ------------------------------------------------------------
-    # CONTOUR DRAWING — UNCHANGED
-    # ------------------------------------------------------------
+    # --- CONTOUR HANDLING ---
     def draw_thick_contours(img, seg):
         if not add_contours:
             return
@@ -257,9 +269,7 @@ def cmd_masks(
                 ok = (rr2 >= 0) & (rr2 < H) & (cc2 >= 0) & (cc2 < W)
                 img[rr2[ok], cc2[ok]] = [0, 255, 255]
 
-    # ------------------------------------------------------------
-    # BUILD MASK-ONLY VIEW — UNCHANGED
-    # ------------------------------------------------------------
+    # --- MASK-ONLY VIEW ---
     gray_bg = np.full((H, W, 3), 128, dtype=np.uint8)
     mask_only = gray_bg.copy()
 
@@ -270,9 +280,7 @@ def cmd_masks(
         ).astype(np.uint8)
         draw_thick_contours(mask_only, seg)
 
-    # ------------------------------------------------------------
-    # MODE A — masks-only view — UNCHANGED
-    # ------------------------------------------------------------
+    # --- MODE A: masks-only ---
     if no_image:
         fig, axes = plt.subplots(1, 2, figsize=(14, 8))
 
@@ -288,9 +296,7 @@ def cmd_masks(
         plt.show()
         return
 
-    # ------------------------------------------------------------
-    # MODE B — overlay masks on image — UNCHANGED
-    # ------------------------------------------------------------
+    # --- MODE B: overlay ---
     overlay = base_arr.copy()
 
     for m in masks:

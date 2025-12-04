@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import click
 import tomli_w
+from loguru import logger
 from pathlib import Path
 
 from ssg_hs_forensics_app.config_loader import (
@@ -29,6 +30,7 @@ def cmd_config(ctx):
 
     # If invoked without subcommand → show help and summary
     if ctx.invoked_subcommand is None:
+        logger.debug("Default config group command")
         #click.echo(ctx.get_help())
         click.echo("\nConfiguration summary:\n")
         _show_config_summary(ctx.obj["config"])

@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import click
 from pathlib import Path
+from loguru import logger
 
 from ssg_hs_forensics_app.core.preset_loader import load_all_presets_for_model
 
@@ -35,6 +36,7 @@ def cmd_models(ctx, target):
             - Show details by model key
 
     """
+    logger.debug("running cmd_models")
     cfg = ctx.obj["config"]
     models_cfg = cfg.get("models", {})
     app_cfg = cfg.get("application", {})

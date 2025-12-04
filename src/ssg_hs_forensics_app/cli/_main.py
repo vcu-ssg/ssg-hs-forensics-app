@@ -1,16 +1,19 @@
 # src/ssg_hs_forensics_app/cli/_main.py
 
+import sys
 import click
 from pathlib import Path
+from loguru import logger
 
 from ssg_hs_forensics_app.core.config import get_config
-from ssg_hs_forensics_app.core.logger import get_logger
+from ssg_hs_forensics_app.config_logger import init_logging
 
 from .cmd_generate import cmd_generate
 from .cmd_masks import cmd_masks
 from .cmd_config import cmd_config
 from .cmd_images import cmd_images
 from .cmd_models import cmd_models
+from .cmd_microscope import cmd_microscope
 
 
 @click.group(
@@ -63,9 +66,11 @@ def cli(ctx, log_level, config_file):
     ctx.obj["log_level_effective"] = effective_log_level
     ctx.obj["log_level_original"] = cfg["application"]["log_level"]
 
-    log = get_logger(level_override=log_level)
-    loaded_from = cfg.get("_loaded_from")
-    log.debug(f"Loaded configuration from: {loaded_from}")
+    # ------------------------------------------------------------
+    # Initialize logging here (only once)
+    # ------------------------------------------------------------
+    init_logging(level=log_level)
+    logger.debug(f"Loaded configuration from: {cfg.get('_loaded_from')}")
 
     # ------------------------------------------------------------
     # If no subcommand → JUST show help (NOT summary)
@@ -82,3 +87,4 @@ cli.add_command(cmd_masks)
 cli.add_command(cmd_config)
 cli.add_command(cmd_images)
 cli.add_command(cmd_models)
+cli.add_command(cmd_microscope)

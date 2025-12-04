@@ -8,7 +8,6 @@ from loguru import logger
 import matplotlib.pyplot as plt
 import numpy as np
 
-from ssg_hs_forensics_app.core.logger import get_logger
 from ssg_hs_forensics_app.core.images import (
     list_images,
     get_image_by_index,
@@ -43,7 +42,6 @@ def cmd_images(ctx, target, view):
     """
 
     cfg = ctx.obj["config"]
-    log = get_logger()
 
     folder = Path(cfg["application"]["image_folder"]).expanduser().resolve()
     if not folder.exists():

@@ -7,7 +7,6 @@ import time
 from datetime import datetime
 
 from ssg_hs_forensics_app.core.config import get_config
-from ssg_hs_forensics_app.config_logger import init_logging
 
 from ssg_hs_forensics_app.core.images import (
     load_image_as_numpy,
@@ -67,10 +66,6 @@ def cmd_generate(
     All validation is performed BEFORE running the heavy SAM inference.
     """
 
-    # ------------------------------------------------------------
-    # Logging init
-    # ------------------------------------------------------------
-    init_logging()
     logger.debug("cmd_generate invoked")
 
     # ------------------------------------------------------------

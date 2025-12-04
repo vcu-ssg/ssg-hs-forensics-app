@@ -11,7 +11,6 @@ import matplotlib.pyplot as plt
 from skimage import measure  # contour detection
 
 from ssg_hs_forensics_app.config_loader import load_builtin_config
-from ssg_hs_forensics_app.config_logger import init_logging
 
 # Cleaner mask helpers
 from ssg_hs_forensics_app.core.masks import (
@@ -77,10 +76,6 @@ def cmd_masks(
     With 'newest': loads most recent mask file.
     """
 
-    # ------------------------------------------------------------
-    # Init logging
-    # ------------------------------------------------------------
-    init_logging()
     logger.debug("cmd_masks invoked")
 
     cfg = load_builtin_config()

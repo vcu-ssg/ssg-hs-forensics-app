@@ -4,7 +4,7 @@ from loguru import logger
 
 from ssg_hs_forensics_app.microscope.workflow import run_full_workflow
 from ssg_hs_forensics_app.microscope.download import list_images
-
+from ssg_hs_forensics_app.microscope.workflow_monitor import run_monitor
 
 
 @click.group(name="microscope", invoke_without_command=True)
@@ -15,13 +15,21 @@ def cmd_microscope(ctx):
     """
     ctx.ensure_object(dict)
 
-    # If invoked without subcommand → show help and summary
     if ctx.invoked_subcommand is None:
         logger.debug("Default microscope group command")
         click.echo(ctx.get_help())
         ctx.exit(0)
 
 
+@cmd_microscope.command("debug-downloads")
+def debug_downloads():
+    from ssg_hs_forensics_app.microscope.capture_helpers import find_downloads_folder
+    print("Downloads folder detected:", find_downloads_folder())
+
+    
+# ------------------------------------------------------------
+# FULL WORKFLOW
+# ------------------------------------------------------------
 @cmd_microscope.command()
 @click.pass_context
 def run(ctx):
@@ -41,9 +49,9 @@ def run(ctx):
         click.echo(f"{key}: {value}")
 
 
-# ------------------------------
+# ------------------------------------------------------------
 # LIST COMMAND
-# ------------------------------
+# ------------------------------------------------------------
 @cmd_microscope.command("list")
 @click.pass_context
 def list_cmd(ctx):
@@ -57,20 +65,12 @@ def list_cmd(ctx):
         click.echo(f"\nFound {len(result)} image(s).")
 
 
-# ------------------------------
-# RUN WORKFLOW COMMAND
-# ------------------------------
-@cmd_microscope.command("run")
+# ------------------------------------------------------------
+# WORKFLOW MONITOR (incremental scaffold)
+# ------------------------------------------------------------
+@cmd_microscope.command("monitor")
 @click.pass_context
-def run_cmd(ctx):
-    """Run the full microscope acquisition workflow."""
-    config = {
-        "ssid": "iolight",
-        "ui_url": "http://192.168.1.1",
-    }
-
-    result = asyncio.run(run_full_workflow(config))
-
-    click.echo("\n=== WORKFLOW SUMMARY ===")
-    for k, v in result.items():
-        click.echo(f"{k}: {v}")
+def monitor_cmd(ctx):
+    """Run the incremental workflow monitor (scaffold)."""
+    logger.info("Launching workflow monitor…")
+    asyncio.run(run_monitor())

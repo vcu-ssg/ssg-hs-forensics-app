@@ -60,3 +60,4 @@ masks/*
 
 models/*
 !models/.gitkeep
+.python-version

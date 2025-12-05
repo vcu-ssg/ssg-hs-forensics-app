@@ -1,28 +1,28 @@
+# src/ssg_hs_forensics_app/cli/cmd_masks.py
+
 import click
 from pathlib import Path
 from loguru import logger
 
-import base64
 import io
 import numpy as np
 from PIL import Image
 import matplotlib.pyplot as plt
-from skimage import measure  # For contour detection
+from skimage import measure  # contour detection
 
 from ssg_hs_forensics_app.config_loader import load_builtin_config
-from ssg_hs_forensics_app.config_logger import init_logging
+
+# Cleaner mask helpers
 from ssg_hs_forensics_app.core.masks import (
-    load_masks_h5,
-    list_mask_files,
+    list_mask_records,
+    get_mask_by_index,
+    get_mask_by_name,
+    load_mask_file,
 )
 
 
-@click.command(name="show")
-@click.argument(
-    "mask_file",
-    required=False,
-    type=click.Path(exists=True),
-)
+@click.command(name="masks")
+@click.argument("mask_target", required=False)
 @click.option(
     "--view",
     is_flag=True,
@@ -31,12 +31,12 @@ from ssg_hs_forensics_app.core.masks import (
 @click.option(
     "--no-image",
     is_flag=True,
-    help="Show masks-only overlay (but still show original image on the left).",
+    help="Show masks-only overlay (still shows original on left).",
 )
 @click.option(
     "--drop-background",
     is_flag=True,
-    help="Remove masks covering more than --bg-threshold fraction of the image.",
+    help="Drop masks covering more than --bg-threshold fraction of the image.",
 )
 @click.option(
     "--bg-threshold",
@@ -56,10 +56,10 @@ from ssg_hs_forensics_app.core.masks import (
     type=int,
     default=2,
     show_default=True,
-    help="Pixel thickness of contours (Method 1 expansion).",
+    help="Pixel thickness of contours.",
 )
-def cmd_show(
-    mask_file,
+def cmd_masks(
+    mask_target,
     view,
     no_image,
     drop_background,
@@ -69,89 +69,114 @@ def cmd_show(
 ):
     """
     Show metadata or visualizations for HDF5 mask files produced by 'sammy generate'.
+
+    With no argument: lists available mask files with sequence numbers.
+    With number: loads that sequence number.
+    With filename: loads that file.
+    With 'newest': loads most recent mask file.
     """
 
-    # ------------------------------------------------------------
-    # Init
-    # ------------------------------------------------------------
-    init_logging()
-    logger.debug("cmd_show invoked")
+    logger.debug("cmd_masks invoked")
 
     cfg = load_builtin_config()
     mask_folder = Path(cfg["application"]["mask_folder"]).expanduser().resolve()
 
+    # Load available mask summaries
+    records = list_mask_records(mask_folder)
+
     # ------------------------------------------------------------
-    # NO ARGUMENT → LIST ALL MASK FILES
+    # NO ARGUMENT — LIST FILES
     # ------------------------------------------------------------
-    if mask_file is None:
+    if mask_target is None:
         click.echo(f"Mask folder:\n  {mask_folder}\n")
 
-        mask_files = [
-            mf for mf in list_mask_files(mask_folder) if mf.suffix == ".h5"
-        ]
-
-        if not mask_files:
+        if not records:
             click.echo("No HDF5 mask files found.")
             return
 
         click.echo("Available HDF5 runs:\n")
-        for mf in mask_files:
+        for rec in records:
+            if "error" in rec:
+                click.echo(f"  {rec['index']:3d}: {rec['name']}   (ERROR: {rec['error']})")
+            else:
+                click.echo(
+                    f"  {rec['index']:3d}: {rec['name']}   "
+                    f"(masks={rec['num_masks']}, image={rec['image_path']})"
+                )
+        return
+
+    # ------------------------------------------------------------
+    # SPECIAL TARGET: "newest"
+    # ------------------------------------------------------------
+    record = None
+    if mask_target.lower() == "newest":
+        if not records:
+            raise click.ClickException("No mask files exist.")
+
+        def file_mtime(rec):
             try:
-                data = load_masks_h5(mf)
-                num = len(data.get("masks", []))
-                start = data.get("runinfo", {}).get("start_time", "unknown")
-                image = data.get("input", {}).get("image_name", "unknown")
-                click.echo(f"  {mf.name}")
-                click.echo(f"     image:   {image}")
-                click.echo(f"     start:   {start}")
-                click.echo(f"     masks:   {num}\n")
-            except Exception as e:
-                click.echo(f"  {mf.name}  (ERROR: {e})\n")
+                return Path(rec["path"]).stat().st_mtime
+            except Exception:
+                return 0  # treat unreadable files as oldest
 
-        return
-
+        newest = max(records, key=file_mtime)
+        record = newest
+        
     # ------------------------------------------------------------
-    # LOAD SPECIFIC MASK FILE
+    # RESOLVE TARGET AS index OR name (if not "newest")
     # ------------------------------------------------------------
-    mask_path = Path(mask_file).resolve()
+    if record is None and mask_target.isdigit():
+        record = get_mask_by_index(records, int(mask_target))
 
-    if mask_path.suffix != ".h5":
-        click.echo("ERROR: Mask file must end with '_masks.h5'.")
-        return
+    if record is None:
+        record = get_mask_by_name(records, mask_target)
 
+    if record is None:
+        raise click.ClickException(
+            f"Mask file '{mask_target}' not found.\n"
+            "Use `sammy masks` to list available mask files."
+        )
+
+    mask_path = Path(record["path"]).resolve()
     click.echo(f"Loading run from:\n  {mask_path}\n")
 
-    data = load_masks_h5(mask_path)
+    # ------------------------------------------------------------
+    # LOAD FILE (unchanged)
+    # ------------------------------------------------------------
+    data = load_mask_file(mask_path)
 
-    input_info = data.get("input", {})
-    model_info = data.get("model", {})
-    runinfo = data.get("runinfo", {})
-    masks = data.get("masks", [])
+    input_info = data["input_info"]
+    model_info = data["model_info"]
+    preset_info = data["preset_info"]
+    runinfo = data["runinfo"]
+    masks = data["masks"]
+    jpeg_bytes = data["jpeg_bytes"]
 
-    image_name = input_info.get("image_name", "unknown")
-    sha256 = input_info.get("sha256", "unknown")
+    image_name = input_info.get("image_path", "unknown")
+    width = input_info.get("width")
+    height = input_info.get("height")
 
     start = runinfo.get("start_time", "unknown")
     end = runinfo.get("end_time", "unknown")
     elapsed = runinfo.get("elapsed_seconds", "unknown")
 
     model_type = model_info.get("model_type", "unknown")
-    preset = model_info.get("mask_config", "unknown")
     checkpoint = model_info.get("checkpoint", "unknown")
+    preset = preset_info.get("preset", preset_info)
 
     num_masks = len(masks)
 
     # ------------------------------------------------------------
-    # PRINT METADATA
+    # METADATA
     # ------------------------------------------------------------
     click.echo("=== Run Metadata ===")
     click.echo(f"File:             {mask_path.name}")
     click.echo(f"Input Image:      {image_name}")
-    click.echo(f"SHA256:           {sha256}\n")
+    click.echo(f"Image Size:       {width} × {height}\n")
 
     click.echo("=== Model Info ===")
     click.echo(f"Model Type:       {model_type}")
-    click.echo(f"Mask Preset:      {preset}")
+    click.echo(f"Preset:           {preset}")
     click.echo(f"Checkpoint:       {checkpoint}\n")
 
     click.echo("=== Runtime Info ===")
@@ -163,16 +188,12 @@ def cmd_show(
     click.echo(f"Total Masks:      {num_masks}\n")
 
     # ------------------------------------------------------------
-    # DETECT BACKGROUND MASKS
+    # BACKGROUND MASK DETECTION (unchanged)
     # ------------------------------------------------------------
     background_masks = []
 
     if num_masks > 0:
-        # get shape
-        first_seg = np.asarray(masks[0]["segmentation"], dtype=bool)
-        H, W = first_seg.shape
-        area = H * W
-
+        area = width * height
         for idx, m in enumerate(masks):
             seg = np.asarray(m["segmentation"], dtype=bool)
             coverage = seg.sum() / area
@@ -182,12 +203,9 @@ def cmd_show(
     if background_masks:
         click.echo("=== Possible Background Masks ===")
         for idx, cov in background_masks:
-            click.echo(f"Mask {idx}: {cov*100:.1f}% coverage")
+            click.echo(f"Mask {idx}: {cov*100:.2f}% coverage")
         click.echo("")
 
-    # ------------------------------------------------------------
-    # OPTIONAL DROP BACKGROUND MASKS
-    # ------------------------------------------------------------
     if drop_background and background_masks:
         to_remove = {idx for idx, _ in background_masks}
         masks = [m for i, m in enumerate(masks) if i not in to_remove]
@@ -195,27 +213,31 @@ def cmd_show(
         click.echo(f"Dropped {len(to_remove)} background mask(s). New count: {num_masks}\n")
 
     # ------------------------------------------------------------
-    # STOP IF NO VISUALIZATION REQUESTED
+    # STOP IF NOT VIEWING
     # ------------------------------------------------------------
     if not view:
         return
 
     # ------------------------------------------------------------
-    # LOAD THE ORIGINAL IMAGE (from base64 in H5)
+    # DISPLAYING (unchanged below)
     # ------------------------------------------------------------
     try:
-        decoded = base64.b64decode(input_info["base64"])
-        image = Image.open(io.BytesIO(decoded)).convert("RGB")
+        image = Image.open(io.BytesIO(jpeg_bytes)).convert("RGB")
         base_arr = np.array(image)
     except Exception as e:
-        click.echo(f"ERROR decoding base64 image: {e}")
+        click.echo(f"ERROR: Could not decode JPEG from H5: {e}")
         return
 
     H, W, _ = base_arr.shape
 
-    # ------------------------------------------------------------
-    # DRAWING THICK CONTOURS (Method 1)
-    # ------------------------------------------------------------
+    def normalize_seg(seg):
+        if seg.shape == (H, W):
+            return seg
+        return np.array(
+            Image.fromarray(seg.astype(np.uint8)).resize((W, H))
+        ).astype(bool)
+
+    # --- CONTOUR HANDLING ---
     def draw_thick_contours(img, seg):
         if not add_contours:
             return
@@ -223,51 +245,37 @@ def cmd_show(
         contours = measure.find_contours(seg.astype(float), 0.5)
         t = max(1, contour_thickness)
 
-        # Offsets for thickness
         offsets = [(0, 0)]
         for tt in range(1, t + 1):
             offsets.extend([
-                (tt, 0), (-tt, 0),
-                (0, tt), (0, -tt),
-                (tt, tt), (tt, -tt), (-tt, tt), (-tt, -tt),
+                (tt, 0), (-tt, 0), (0, tt), (0, -tt),
+                (tt, tt), (tt, -tt), (-tt, tt), (-tt, -tt)
             ])
 
-        for contour in contours:
-            contour = contour.astype(int)
-            rr = contour[:, 0]
-            cc = contour[:, 1]
+        for c in contours:
+            c = c.astype(int)
+            rr, cc = c[:, 0], c[:, 1]
             valid = (rr >= 0) & (rr < H) & (cc >= 0) & (cc < W)
-            rr = rr[valid]
-            cc = cc[valid]
+            rr, cc = rr[valid], cc[valid]
 
             for dy, dx in offsets:
                 rr2 = rr + dy
                 cc2 = cc + dx
                 ok = (rr2 >= 0) & (rr2 < H) & (cc2 >= 0) & (cc2 < W)
-                img[rr2[ok], cc2[ok]] = [0, 255, 255]  # Cyan
+                img[rr2[ok], cc2[ok]] = [0, 255, 255]
 
-    # ------------------------------------------------------------
-    # BUILD MASK-ONLY OVERLAY
-    # ------------------------------------------------------------
+    # --- MASK-ONLY VIEW ---
     gray_bg = np.full((H, W, 3), 128, dtype=np.uint8)
     mask_only = gray_bg.copy()
 
     for m in masks:
-        seg = np.asarray(m["segmentation"], dtype=bool)
-        if seg.shape != (H, W):
-            from PIL import Image as _PIL
-            seg = np.array(_PIL.fromarray(seg.astype(np.uint8)).resize((W, H))).astype(bool)
-
-        # Fill red
+        seg = normalize_seg(m["segmentation"])
         mask_only[seg] = (
             0.6 * mask_only[seg] + 0.4 * np.array([255, 0, 0])
         ).astype(np.uint8)
-
         draw_thick_contours(mask_only, seg)
 
-    # ------------------------------------------------------------
-    # MODE A — masks-only (but original still shown)
-    # ------------------------------------------------------------
+    # --- MODE A: masks-only ---
     if no_image:
         fig, axes = plt.subplots(1, 2, figsize=(14, 8))
 
@@ -276,28 +284,21 @@ def cmd_show(
         axes[0].axis("off")
 
         axes[1].imshow(mask_only)
-        axes[1].set_title(f"Masks Only ({num_masks} masks)")
+        axes[1].set_title(f"Masks Only ({num_masks})")
         axes[1].axis("off")
 
         plt.tight_layout()
         plt.show()
         return
 
-    # ------------------------------------------------------------
-    # MODE B — normal overlay (base + masks)
-    # ------------------------------------------------------------
+    # --- MODE B: overlay ---
     overlay = base_arr.copy()
 
     for m in masks:
-        seg = np.asarray(m["segmentation"], dtype=bool)
-        if seg.shape != (H, W):
-            from PIL import Image as _PIL
-            seg = np.array(_PIL.fromarray(seg.astype(np.uint8)).resize((W, H))).astype(bool)
-
+        seg = normalize_seg(m["segmentation"])
         overlay[seg] = (
             0.7 * overlay[seg] + 0.3 * np.array([255, 0, 0])
         ).astype(np.uint8)
-
         draw_thick_contours(overlay, seg)
 
     fig, axes = plt.subplots(1, 2, figsize=(14, 8))

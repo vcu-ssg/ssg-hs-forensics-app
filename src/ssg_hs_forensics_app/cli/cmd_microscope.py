@@ -1,34 +1,35 @@
 import click
 import asyncio
-from ssg_hs_forensics_app.microscope.workflow import run_full_session
-from ssg_hs_forensics_app.microscope.platform import get_wifi_adapter
+from loguru import logger
+
+from ssg_hs_forensics_app.microscope.workflow import run_full_workflow
+from ssg_hs_forensics_app.microscope.download import list_images
+from ssg_hs_forensics_app.microscope.workflow_monitor import run_monitor
 
 
-@click.group(name="microscope")
-def cmd_microscope():
-    """Microscope automation workflow."""
-    pass
+@click.group(name="microscope", invoke_without_command=True)
+@click.pass_context
+def cmd_microscope(ctx):
+    """
+    Microscope group help goes here
+
+    
+    """
+    ctx.ensure_object(dict)
+
+    if ctx.invoked_subcommand is None:
+        logger.debug("Default microscope group command")
+        click.echo(ctx.get_help())
+        ctx.exit(0)
 
 
-@cmd_microscope.command()
-def run():
-    """Run the full microscope workflow."""
-    asyncio.run(run_full_session())
-    click.echo("Microscope workflow completed.")
-
-
-@cmd_microscope.command()
-def connect():
-    """Connect to microscope Wi-Fi only."""
-    wifi = get_wifi_adapter()
-    asyncio.run(wifi.connect("iolight"))
-    click.echo("Connected to microscope Wi-Fi.")
-
-
-@cmd_microscope.command()
-@click.argument("ssid")
-def restore(ssid):
-    """Restore a specific Wi-Fi network by SSID."""
-    wifi = get_wifi_adapter()
-    asyncio.run(wifi.restore(ssid))
-    click.echo(f"Restored Wi-Fi network: {ssid}")
+    
+# ------------------------------------------------------------
+# WORKFLOW MONITOR (incremental scaffold)
+# ------------------------------------------------------------
+@cmd_microscope.command("run")
+@click.pass_context
+def monitor_cmd(ctx):
+    """Run and monitor the microscope download process."""
+    logger.info("Launching workflow monitor…")
+    asyncio.run(run_monitor())

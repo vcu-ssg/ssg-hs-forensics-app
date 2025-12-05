@@ -55,9 +55,10 @@ sam*.pth
 # Masks folder (generated mask files)
 # -----------------
 
-masks/*
-!masks/.gitkeep
 
 models/*
 !models/.gitkeep
+
+.model_repos/
+
 .python-version

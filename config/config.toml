@@ -1,0 +1,585 @@
+# =====================================================================
+# APPLICATION
+# =====================================================================
+
+[application]
+log_level      = "DEBUG"     # Valid value: TRACE, DEBUG, INFO, SUCCESS, WARNING, ERROR, CRITICAL
+config_folder  = "./config"
+image_folder   = "./images"
+mask_folder    = "./masks"
+model_folder   = "./models"
+
+# Supported file extensions for image scanning
+image_extensions = ["jpg", "jpeg", "png", "bmp", "tif", "tiff"]
+
+
+
+# =====================================================================
+# MODELS — unified model registry
+# =====================================================================
+
+[models]
+default      = "sam1_vit_b"      # ← default model to use for cmd_generate
+autodownload = true              # ← automatically download missing checkpoints?
+device       = "cuda"            # NEW — "cpu" | "cuda" | "auto"
+
+
+
+# ------------------------------
+# SAM1 (Segment Anything v1)
+# ------------------------------
+
+[models.sam1_vit_b]
+family       = "sam1"
+type         = "vit_b"
+checkpoint   = "sam_vit_b_01ec64.pth"
+config       = ""     # SAM1 has no external config file
+description  = "SAM1 ViT-B checkpoint (01ec64), standard and widely used."
+url          = "https://dl.fbaipublicfiles.com/segment_anything/sam_vit_b_01ec64.pth"
+preset       = "default_windows"
+
+# ------ sam1_vit_l ------
+[models.sam1_vit_l]
+family       = "sam1"
+type         = "vit_l"
+checkpoint   = "sam_vit_l_0b3195.pth"
+config       = ""   # SAM1 has no external config file
+description  = "SAM1 ViT-L checkpoint (0b3195) — large model, high quality."
+url          = "https://dl.fbaipublicfiles.com/segment_anything/sam_vit_l_0b3195.pth"
+preset       = "default_windows"
+
+
+# ------ sam1_vit_h ------
+[models.sam1_vit_h]
+family       = "sam1"
+type         = "vit_h"
+checkpoint   = "sam_vit_h_4b8939.pth"
+config       = ""   # SAM1 has no external config file
+description  = "SAM1 ViT-H checkpoint (4b8939) — highest accuracy for SAM1."
+url          = "https://dl.fbaipublicfiles.com/segment_anything/sam_vit_h_4b8939.pth"
+preset       = "default_windows"
+
+# =====================================================================
+# SAM2 (July 2024 release)
+# =====================================================================
+
+# ------ sam2_hiera_tiny ------
+[models.sam2_hiera_tiny]
+family       = "sam2"
+type         = "hiera_tiny"
+checkpoint   = "sam2_hiera_tiny.pt"
+config       = "sam2_hiera_t.yaml"
+description  = "SAM2 Hiera Tiny (July 2024) — fastest, lightweight segmentation."
+url          = "https://dl.fbaipublicfiles.com/segment_anything_2/072824/sam2_hiera_tiny.pt"
+config_url   = "https://raw.githubusercontent.com/facebookresearch/sam2/refs/heads/main/sam2/configs/sam2/sam2_hiera_t.yaml"
+preset       = "default"
+
+# ------ sam2_hiera_small ------
+[models.sam2_hiera_small]
+family       = "sam2"
+type         = "hiera_small"
+checkpoint   = "sam2_hiera_small.pt"
+config       = "sam2_hiera_small.yaml"
+description  = "SAM2 Hiera Small (July 2024) — balanced accuracy vs. speed."
+url          = "https://dl.fbaipublicfiles.com/segment_anything_2/072824/sam2_hiera_small.pt"
+config_url   = "https://github.com/facebookresearch/sam2/blob/main/sam2/configs/sam2/sam2_hiera_s.yaml"
+preset       = "default"
+
+# ------ sam2_hiera_base_plus ------
+[models.sam2_hiera_base_plus]
+family       = "sam2"
+type         = "hiera_base_plus"
+checkpoint   = "sam2_hiera_base_plus.pt"
+config       = "sam2_hiera_base_plus.yaml"
+description  = "SAM2 Hiera Base+ (July 2024) — best all-around SAM2 model."
+url          = "https://dl.fbaipublicfiles.com/segment_anything_2/072824/sam2_hiera_base_plus.pt"
+config_url   = "https://github.com/facebookresearch/sam2/blob/main/sam2/configs/sam2/sam2_hiera_b+.yaml"
+preset       = "default"
+
+# ------ sam2_hiera_large ------
+[models.sam2_hiera_large]
+family       = "sam2"
+type         = "hiera_large"
+checkpoint   = "sam2_hiera_large.pt"
+config       = "sam2_hiera_large.yaml"
+description  = "SAM2 Hiera Large (July 2024) — highest accuracy for SAM2."
+url          = "https://dl.fbaipublicfiles.com/segment_anything_2/072824/sam2_hiera_large.pt"
+config_url   = "https://github.com/facebookresearch/sam2/blob/main/sam2/configs/sam2/sam2_hiera_l.yaml"
+preset       = "default"
+
+
+
+# =====================================================================
+# SAM2.1 (Sept 2024 release — improved checkpoints)
+# =====================================================================
+
+# ------ sam2.1_hiera_tiny ------
+[models.sam2_1_hiera_tiny]
+family       = "sam2.1"
+type         = "hiera_tiny"
+checkpoint   = "sam2.1_hiera_tiny.pt"
+config       = "sam2.1_hiera_t.yaml"
+description  = "SAM2.1 Hiera Tiny (Sept 2024) — improved accuracy, very fast."
+url          = "https://dl.fbaipublicfiles.com/segment_anything_2/092824/sam2.1_hiera_tiny.pt"
+config_url   = "https://raw.githubusercontent.com/facebookresearch/sam2/refs/heads/main/sam2/configs/sam2.1/sam2.1_hiera_t.yaml"
+preset       = "default"
+
+# ------ sam2.1_hiera_small ------
+[models.sam2_1_hiera_small]
+family       = "sam2.1"
+type         = "hiera_small"
+checkpoint   = "sam2.1_hiera_small.pt"
+config       = "sam2.1_hiera_small.yaml"
+description  = "SAM2.1 Hiera Small (Sept 2024) — excellent speed/quality balance."
+url          = "https://dl.fbaipublicfiles.com/segment_anything_2/092824/sam2.1_hiera_small.pt"
+config_url   = "https://github.com/facebookresearch/sam2/blob/main/sam2/configs/sam2.1/sam2.1_hiera_s.yaml"
+preset       = "default"
+
+# ------ sam2.1_hiera_base_plus ------
+[models.sam2_1_hiera_base_plus]
+family       = "sam2.1"
+type         = "hiera_base_plus"
+checkpoint   = "sam2.1_hiera_base_plus.pt"
+config       = "sam2.1_hiera_base_plus.yaml"
+description  = "SAM2.1 Base+ (Sept 2024) — highest accuracy among Base models."
+url          = "https://dl.fbaipublicfiles.com/segment_anything_2/092824/sam2.1_hiera_base_plus.pt"
+config_url   = "https://github.com/facebookresearch/sam2/blob/main/sam2/configs/sam2.1/sam2.1_hiera_b+.yaml"
+preset       = "default"
+
+# ------ sam2.1_hiera_large ------
+[models.sam2_1_hiera_large]
+family       = "sam2.1"
+type         = "hiera_large"
+checkpoint   = "sam2.1_hiera_large.pt"
+config       = "sam2.1_hiera_large.yaml"
+description  = "SAM2.1 Hiera Large — top accuracy for SAM2.1."
+url          = "https://dl.fbaipublicfiles.com/segment_anything_2/092824/sam2.1_hiera_large.pt"
+config_url   = "https://github.com/facebookresearch/sam2/blob/main/sam2/configs/sam2.1/sam2.1_hiera_l.yaml"
+preset       = "default"
+
+
+
+# =====================================================================
+# MASK GENERATOR PRESETS
+# =====================================================================
+
+[presets]
+
+############################################################
+# SAM1 — ViT-B  (lightest model → can handle larger grids)
+############################################################
+[presets.sam1_vit_b.default]
+#auto_resize = true
+#max_dimension = 1536
+points_per_side = 24
+pred_iou_thresh = 0.90
+stability_score_thresh = 0.96
+crop_n_layers = 0
+crop_n_points_downscale_factor = 2
+min_mask_region_area = 150
+#output_mode = "binary_mask"
+
+[presets.sam1_vit_b.fast]
+auto_resize = true
+max_dimension = 1280
+points_per_side = 12
+pred_iou_thresh = 0.93
+stability_score_thresh = 0.97
+crop_n_layers = 0
+crop_n_points_downscale_factor = 2
+min_mask_region_area = 300
+output_mode = "binary_mask"
+
+[presets.sam1_vit_b.detailed]
+auto_resize = true
+max_dimension = 1536
+points_per_side = 32      # safe upper limit for ViT-B
+pred_iou_thresh = 0.88
+stability_score_thresh = 0.95
+crop_n_layers = 0
+crop_n_points_downscale_factor = 2
+min_mask_region_area = 75
+output_mode = "binary_mask"
+
+
+############################################################
+# SAM1 — ViT-L  (your problematic model → aggressive tuning)
+############################################################
+[presets.sam1_vit_l.default]
+auto_resize = true
+max_dimension = 1536
+points_per_side = 14      # large reduction (prevents 2.7 GB allocation)
+pred_iou_thresh = 0.92
+stability_score_thresh = 0.96
+crop_n_layers = 0
+crop_n_points_downscale_factor = 2
+min_mask_region_area = 175
+output_mode = "binary_mask"
+
+[presets.sam1_vit_l.fast]
+auto_resize = true
+max_dimension = 1280
+points_per_side = 8
+pred_iou_thresh = 0.94
+stability_score_thresh = 0.98
+crop_n_layers = 0
+crop_n_points_downscale_factor = 2
+min_mask_region_area = 350
+output_mode = "binary_mask"
+
+[presets.sam1_vit_l.detailed]
+auto_resize = true
+max_dimension = 1536
+points_per_side = 20      # safe upper bound for ViT-L
+pred_iou_thresh = 0.90
+stability_score_thresh = 0.95
+crop_n_layers = 0
+crop_n_points_downscale_factor = 2
+min_mask_region_area = 100
+output_mode = "binary_mask"
+
+
+############################################################
+# SAM1 — ViT-H  (heaviest → most memory-sensitive)
+############################################################
+[presets.sam1_vit_h.default]
+auto_resize = true
+max_dimension = 1400
+points_per_side = 12
+pred_iou_thresh = 0.94
+stability_score_thresh = 0.98
+crop_n_layers = 0
+crop_n_points_downscale_factor = 2
+min_mask_region_area = 250
+output_mode = "binary_mask"
+
+[presets.sam1_vit_h.fast]
+auto_resize = true
+max_dimension = 1280
+points_per_side = 6        # lowest grid → fastest/safest
+pred_iou_thresh = 0.96
+stability_score_thresh = 0.985
+crop_n_layers = 0
+crop_n_points_downscale_factor = 2
+min_mask_region_area = 450
+output_mode = "binary_mask"
+
+[presets.sam1_vit_h.detailed]
+auto_resize = true
+max_dimension = 1536
+points_per_side = 16       # absolute safe upper bound for ViT-H
+pred_iou_thresh = 0.92
+stability_score_thresh = 0.96
+crop_n_layers = 0
+crop_n_points_downscale_factor = 2
+min_mask_region_area = 150
+output_mode = "binary_mask"
+
+
+############################################################
+# SAM1 — ViT-B  (Most stable model on Windows)
+############################################################
+[presets.sam1_vit_b.default_windows]
+#auto_resize = true
+#max_dimension = 1280
+points_per_side = 16
+pred_iou_thresh = 0.90
+stability_score_thresh = 0.965
+crop_n_layers = 0
+crop_n_points_downscale_factor = 2
+min_mask_region_area = 200
+#output_mode = "binary_mask"
+
+[presets.sam1_vit_b.fast_windows]
+auto_resize = true
+max_dimension = 1024
+points_per_side = 10
+pred_iou_thresh = 0.92
+stability_score_thresh = 0.97
+crop_n_layers = 0
+crop_n_points_downscale_factor = 2
+min_mask_region_area = 350
+output_mode = "binary_mask"
+
+[presets.sam1_vit_b.detailed_windows]
+auto_resize = true
+max_dimension = 1280
+points_per_side = 20
+pred_iou_thresh = 0.88
+stability_score_thresh = 0.955
+crop_n_layers = 0
+crop_n_points_downscale_factor = 2
+min_mask_region_area = 120
+output_mode = "binary_mask"
+
+
+############################################################
+# SAM1 — ViT-L  (Requires strict limits on Windows)
+############################################################
+[presets.sam1_vit_l.default_windows]
+auto_resize = true
+max_dimension = 1280
+points_per_side = 10
+pred_iou_thresh = 0.91
+stability_score_thresh = 0.96
+crop_n_layers = 0
+crop_n_points_downscale_factor = 2
+min_mask_region_area = 250
+output_mode = "binary_mask"
+
+[presets.sam1_vit_l.fast_windows]
+auto_resize = true
+max_dimension = 1024
+points_per_side = 6
+pred_iou_thresh = 0.94
+stability_score_thresh = 0.98
+crop_n_layers = 0
+crop_n_points_downscale_factor = 2
+min_mask_region_area = 400
+output_mode = "binary_mask"
+
+[presets.sam1_vit_l.detailed_windows]
+auto_resize = true
+max_dimension = 1280
+points_per_side = 14
+pred_iou_thresh = 0.88
+stability_score_thresh = 0.955
+crop_n_layers = 0
+crop_n_points_downscale_factor = 2
+min_mask_region_area = 150
+output_mode = "binary_mask"
+
+
+############################################################
+# SAM1 — ViT-H  (Very unstable on Windows → extremely conservative)
+############################################################
+[presets.sam1_vit_h.default_windows]
+auto_resize = true
+max_dimension = 1152
+points_per_side = 8
+pred_iou_thresh = 0.93
+stability_score_thresh = 0.975
+crop_n_layers = 0
+crop_n_points_downscale_factor = 2
+min_mask_region_area = 350
+output_mode = "binary_mask"
+
+[presets.sam1_vit_h.fast_windows]
+auto_resize = true
+max_dimension = 896
+points_per_side = 5
+pred_iou_thresh = 0.95
+stability_score_thresh = 0.985
+crop_n_layers = 0
+crop_n_points_downscale_factor = 2
+min_mask_region_area = 450
+output_mode = "binary_mask"
+
+[presets.sam1_vit_h.detailed_windows]
+auto_resize = true
+max_dimension = 1280
+points_per_side = 10
+pred_iou_thresh = 0.90
+stability_score_thresh = 0.96
+crop_n_layers = 0
+crop_n_points_downscale_factor = 2
+min_mask_region_area = 200
+output_mode = "binary_mask"
+
+
+# ----
+# SAM2 presets
+# ---
+
+[presets.sam2_hiera_tiny.default]
+points_per_side = 16
+pred_iou_thresh = 0.85
+stability_score_thresh = 0.95
+crop_n_layers = 1
+min_mask_region_area = 200
+
+[presets.sam2_hiera_tiny.fast]
+points_per_side = 16
+pred_iou_thresh = 0.92
+stability_score_thresh = 0.97
+crop_n_layers = 0
+min_mask_region_area = 200
+output_mode = "probability"
+
+[presets.sam2_hiera_tiny.detailed]
+points_per_side = 36
+pred_iou_thresh = 0.88
+stability_score_thresh = 0.95
+crop_n_layers = 1
+min_mask_region_area = 75
+output_mode = "probability"
+
+[presets.sam2_hiera_small.default]
+points_per_side = 28
+pred_iou_thresh = 0.90
+stability_score_thresh = 0.965
+crop_n_layers = 1
+min_mask_region_area = 125
+output_mode = "probability"
+
+[presets.sam2_hiera_small.fast]
+points_per_side = 20
+pred_iou_thresh = 0.93
+stability_score_thresh = 0.975
+crop_n_layers = 0
+min_mask_region_area = 250
+output_mode = "probability"
+
+[presets.sam2_hiera_small.detailed]
+points_per_side = 40
+pred_iou_thresh = 0.88
+stability_score_thresh = 0.96
+crop_n_layers = 2
+min_mask_region_area = 80
+output_mode = "probability"
+
+[presets.sam2_hiera_base_plus.default]
+points_per_side = 32
+pred_iou_thresh = 0.92
+stability_score_thresh = 0.97
+crop_n_layers = 2
+min_mask_region_area = 150
+output_mode = "probability"
+
+[presets.sam2_hiera_base_plus.fast]
+points_per_side = 24
+pred_iou_thresh = 0.95
+stability_score_thresh = 0.98
+crop_n_layers = 1
+min_mask_region_area = 300
+output_mode = "probability"
+
+[presets.sam2_hiera_base_plus.detailed]
+points_per_side = 48
+pred_iou_thresh = 0.90
+stability_score_thresh = 0.965
+crop_n_layers = 3
+min_mask_region_area = 100
+output_mode = "probability"
+
+[presets.sam2_hiera_large.default]
+points_per_side = 36
+pred_iou_thresh = 0.93
+stability_score_thresh = 0.975
+crop_n_layers = 3
+min_mask_region_area = 200
+output_mode = "probability"
+
+[presets.sam2_hiera_large.fast]
+points_per_side = 28
+pred_iou_thresh = 0.96
+stability_score_thresh = 0.99
+crop_n_layers = 1
+min_mask_region_area = 400
+output_mode = "probability"
+
+[presets.sam2_hiera_large.detailed]
+points_per_side = 56
+pred_iou_thresh = 0.91
+stability_score_thresh = 0.97
+crop_n_layers = 4
+min_mask_region_area = 125
+output_mode = "probability"
+
+# ===================================================
+
+[presets.sam2_1_hiera_tiny.default]
+points_per_side = 16
+pred_iou_thresh = 0.85
+stability_score_thresh = 0.95
+crop_n_layers = 1
+min_mask_region_area = 200
+
+[presets.sam2_1_hiera_tiny.fast]
+points_per_side = 20
+pred_iou_thresh = 0.94
+stability_score_thresh = 0.98
+crop_n_layers = 0
+min_mask_region_area = 225
+output_mode = "probability"
+
+[presets.sam2_1_hiera_tiny.detailed]
+points_per_side = 44
+pred_iou_thresh = 0.89
+stability_score_thresh = 0.96
+crop_n_layers = 2
+min_mask_region_area = 60
+output_mode = "probability"
+
+[presets.sam2_1_hiera_small.default]
+points_per_side = 32
+pred_iou_thresh = 0.92
+stability_score_thresh = 0.97
+crop_n_layers = 1
+min_mask_region_area = 125
+output_mode = "probability"
+
+[presets.sam2_1_hiera_small.fast]
+points_per_side = 24
+pred_iou_thresh = 0.95
+stability_score_thresh = 0.98
+crop_n_layers = 0
+min_mask_region_area = 300
+output_mode = "probability"
+
+[presets.sam2_1_hiera_small.detailed]
+points_per_side = 48
+pred_iou_thresh = 0.90
+stability_score_thresh = 0.965
+crop_n_layers = 2
+min_mask_region_area = 80
+output_mode = "probability"
+
+[presets.sam2_1_hiera_base_plus.default]
+points_per_side = 36
+pred_iou_thresh = 0.93
+stability_score_thresh = 0.975
+crop_n_layers = 2
+min_mask_region_area = 150
+output_mode = "probability"
+
+[presets.sam2_1_hiera_base_plus.fast]
+points_per_side = 28
+pred_iou_thresh = 0.96
+stability_score_thresh = 0.985
+crop_n_layers = 1
+min_mask_region_area = 350
+output_mode = "probability"
+
+[presets.sam2_1_hiera_base_plus.detailed]
+points_per_side = 56
+pred_iou_thresh = 0.91
+stability_score_thresh = 0.97
+crop_n_layers = 3
+min_mask_region_area = 100
+output_mode = "probability"
+
+[presets.sam2_1_hiera_large.default]
+points_per_side = 40
+pred_iou_thresh = 0.94
+stability_score_thresh = 0.98
+crop_n_layers = 3
+min_mask_region_area = 200
+output_mode = "probability"
+
+[presets.sam2_1_hiera_large.fast]
+points_per_side = 32
+pred_iou_thresh = 0.97
+stability_score_thresh = 0.99
+crop_n_layers = 1
+min_mask_region_area = 450
+output_mode = "probability"
+
+[presets.sam2_1_hiera_large.detailed]
+points_per_side = 64
+pred_iou_thresh = 0.92
+stability_score_thresh = 0.97
+crop_n_layers = 4
+min_mask_region_area = 150
+output_mode = "probability"
+

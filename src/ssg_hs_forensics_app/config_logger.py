@@ -1,58 +1,48 @@
-"""
-Centralized Loguru initialization based on application config.
-
-This module provides:
-    • init_logging()  -> initialize Loguru according to config.toml
-    • get_logger()    -> return the global logger (optional convenience)
-"""
-
 from __future__ import annotations
 
 import sys
 from loguru import logger
-
-from ssg_hs_forensics_app.config_loader import load_builtin_config
-
-
-# ============================================================
-# Logging Initialization
-# ============================================================
-
-_initialized = False
+from ssg_hs_forensics_app.core.config import get_config
 
 
-def init_logging() -> None:
+# Loguru’s valid level names
+_LOGURU_LEVELS = {
+    "TRACE",
+    "DEBUG",
+    "INFO",
+    "SUCCESS",
+    "WARNING",
+    "ERROR",
+    "CRITICAL",
+}
+
+
+def init_logging(level: str | None = None) -> None:
     """
-    Initialize Loguru using settings from config.toml:
-
-    [application]
-    log_level = "DEBUG"
-
-    Safe to call multiple times — only runs once.
+    Initialize Loguru with a merged-config or CLI override log level.
+    Supports Loguru-specific levels: TRACE and SUCCESS.
     """
-    global _initialized
-    if _initialized:
-        return
 
-    cfg = load_builtin_config()
-    app_cfg = cfg.get("application", {})
-    level = app_cfg.get("log_level", "INFO").upper()
+    # Determine effective log level
+    if level:
+        candidate = level.upper()
+    else:
+        cfg = get_config()
+        candidate = cfg.get("application", {}).get("log_level", "INFO").upper()
 
-    # Remove default Loguru handler
+    # Validate — if someone provides something invalid, default to INFO
+    effective = candidate if candidate in _LOGURU_LEVELS else "INFO"
+
+    # Reset handlers
     logger.remove()
 
-    # Configure the new handler
+    # Add clean stderr handler
     logger.add(
         sys.stderr,
-        level=level,
+        level=effective,
         format="<green>{time}</green> | <level>{level}</level> | <level>{message}</level>",
+        backtrace=False,
+        diagnose=False,
     )
 
-    logger.debug(f"Loguru initialized at level: {level}")
-    _initialized = True
-
-
-def get_logger():
-    """Optional convenience method."""
-    init_logging()
-    return logger
+    logger.debug(f"Loguru initialized at level: {effective}")

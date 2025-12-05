@@ -62,14 +62,6 @@ def _show_config_summary(cfg: dict):
     click.echo(f"    model_folder   = {app.get('model_folder')}")
 
     # ------------------------------------------------------------
-    # MODEL SETTINGS
-    # ------------------------------------------------------------
-    click.echo("\n  [models]")
-    click.echo(f"    default        = {models.get('default')}")
-    click.echo(f"    autodownload   = {models.get('autodownload')}")
-    click.echo(f"    device         = {models.get('device')}")
-
-    # ------------------------------------------------------------
     # SYSTEM DETAILS
     # ------------------------------------------------------------
     click.echo("\n  [system]")
@@ -104,9 +96,23 @@ def _show_config_summary(cfg: dict):
         click.echo("      Consider using WSL for easier CUDA support.")
 
     # ------------------------------------------------------------
+    # MODEL SETTINGS
+    # ------------------------------------------------------------
+    click.echo("\n  [models]")
+    click.echo(f"    default        = {models.get('default')}")
+    click.echo(f"    autodownload   = {models.get('autodownload')}")
+    click.echo(f"    device         = {models.get('device')}")
+
+
+
+    # ------------------------------------------------------------
     # AVAILABLE MODELS
     # ------------------------------------------------------------
-    click.echo("\n  Available models:")
+    click.echo("\n  [Available models]\n")
+    if models.get("autodownload", False):
+        click.echo("    Per autodownload setting, models WILL be auto-downloaded. Use --model=<NAME> from list below in generate.\n")
+    else:
+        click.echo("    Per autodownload setting, models WILL NOT be auto-downloaded.\n")
 
     for name, info in models.items():
         if not isinstance(info, dict) or "checkpoint" not in info:
@@ -119,7 +125,3 @@ def _show_config_summary(cfg: dict):
 
         click.echo(f"    • {name:<20} — {desc} {status}")
 
-    if models.get("autodownload", False):
-        click.echo("  Per autodownload setting, models WILL be auto-downloaded.")
-    else:
-        click.echo("  Per autodownload setting, models WILL NOT be auto-downloaded.")

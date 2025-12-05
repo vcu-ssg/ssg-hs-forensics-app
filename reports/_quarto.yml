@@ -12,7 +12,7 @@ website:
         text: Example 1
       - href: https://github.com/vcu-ssg/ssg-hs-forensics-app
         text: Repository
-      - href: ../forensics-ui/cell-gallery/gallery.qmd
+      - href: ../forensics-ui/_site/cell-gallery/gallery.html
         text: "Gallery"
 
 format:

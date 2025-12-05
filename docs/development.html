@@ -6,12 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="SSG Forensics Team">
+<meta name="dcterms.date" content="2025-12-05">
 
-<<<<<<< HEAD:forensics-ui/_site/Upload/upload.html
-<title>Upload – FORENSICS-UI</title>
-=======
 <title>Developer Documentation – SSG - HS Forensics</title>
->>>>>>> main:docs/development.html
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -24,29 +22,44 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
-<<<<<<< HEAD:forensics-ui/_site/Upload/upload.html
-<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="../site_libs/quarto-nav/headroom.min.js"></script>
-<script src="../site_libs/clipboard/clipboard.min.js"></script>
-<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="../site_libs/quarto-search/fuse.min.js"></script>
-<script src="../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../">
-<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
-<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
-<script src="../site_libs/quarto-html/popper.min.js"></script>
-<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="../site_libs/quarto-html/anchor.min.js"></script>
-<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-532dc14c29ca403b9379c33abf0778c6.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
-=======
 <script src="site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="site_libs/quarto-nav/headroom.min.js"></script>
 <script src="site_libs/clipboard/clipboard.min.js"></script>
@@ -64,8 +77,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-5b4ad623e5705c0698d39aec6f10cf02.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
->>>>>>> main:docs/development.html
+<link href="site_libs/bootstrap/bootstrap-96c35273f248d8504b1562e194f76070.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -105,17 +117,10 @@ ul.task-list li input[type="checkbox"] {
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-<<<<<<< HEAD:forensics-ui/_site/Upload/upload.html
-    <a href="../index.html" class="navbar-brand navbar-brand-logo">
-    </a>
-    <a class="navbar-brand" href="../index.html">
-    <span class="navbar-title">FORENSICS-UI</span>
-=======
     <a href="./index.html" class="navbar-brand navbar-brand-logo">
     </a>
     <a class="navbar-brand" href="./index.html">
     <span class="navbar-title">SSG - HS Forensics</span>
->>>>>>> main:docs/development.html
     </a>
   </div>
             <div id="quarto-search" class="" title="Search"></div>
@@ -137,7 +142,7 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">Repository</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./cell-gallery/gallery.qmd"> 
+    <a class="nav-link" href="./../forensics-ui/_site/cell-gallery/gallery.html"> 
 <span class="menu-text">Gallery</span></a>
   </li>  
 </ul>
@@ -156,53 +161,62 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#who-this-page-is-for" id="toc-who-this-page-is-for" class="nav-link active" data-scroll-target="#who-this-page-is-for">Who This Page Is For</a></li>
-  <li><a href="#location-of-files" id="toc-location-of-files" class="nav-link" data-scroll-target="#location-of-files">Location of Files</a></li>
-  <li><a href="#overview-of-coding-languages-used" id="toc-overview-of-coding-languages-used" class="nav-link" data-scroll-target="#overview-of-coding-languages-used">Overview of Coding Languages Used</a></li>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">Overview</a></li>
+  <li><a href="#important-notes" id="toc-important-notes" class="nav-link" data-scroll-target="#important-notes">Important Notes</a></li>
+  <li><a href="#project-structure" id="toc-project-structure" class="nav-link" data-scroll-target="#project-structure">Project Structure</a>
+  <ul class="collapse">
+  <li><a href="#frontend-forensics-ui" id="toc-frontend-forensics-ui" class="nav-link" data-scroll-target="#frontend-forensics-ui">Frontend: <code>forensics-ui/</code></a></li>
+  <li><a href="#backend-forensics-backend" id="toc-backend-forensics-backend" class="nav-link" data-scroll-target="#backend-forensics-backend">Backend: <code>forensics-backend/</code></a></li>
+  <li><a href="#image-storage-images" id="toc-image-storage-images" class="nav-link" data-scroll-target="#image-storage-images">Image Storage: <code>images/</code></a></li>
+  <li><a href="#documentation-reports" id="toc-documentation-reports" class="nav-link" data-scroll-target="#documentation-reports">Documentation: <code>reports/</code></a></li>
+  </ul></li>
+  <li><a href="#technology-stack" id="toc-technology-stack" class="nav-link" data-scroll-target="#technology-stack">Technology Stack</a>
+  <ul class="collapse">
+  <li><a href="#frontend-technologies" id="toc-frontend-technologies" class="nav-link" data-scroll-target="#frontend-technologies">Frontend Technologies</a></li>
+  <li><a href="#backend-technologies" id="toc-backend-technologies" class="nav-link" data-scroll-target="#backend-technologies">Backend Technologies</a></li>
+  <li><a href="#processing-pipeline" id="toc-processing-pipeline" class="nav-link" data-scroll-target="#processing-pipeline">Processing Pipeline</a></li>
+  </ul></li>
+  <li><a href="#key-architectural-patterns" id="toc-key-architectural-patterns" class="nav-link" data-scroll-target="#key-architectural-patterns">Key Architectural Patterns</a>
+  <ul class="collapse">
+  <li><a href="#frontend-backend-communication" id="toc-frontend-backend-communication" class="nav-link" data-scroll-target="#frontend-backend-communication">Frontend-Backend Communication</a></li>
+  <li><a href="#image-processing-workflow" id="toc-image-processing-workflow" class="nav-link" data-scroll-target="#image-processing-workflow">Image Processing Workflow</a></li>
+  <li><a href="#container-architecture" id="toc-container-architecture" class="nav-link" data-scroll-target="#container-architecture">Container Architecture</a></li>
+  </ul></li>
+  <li><a href="#development-best-practices" id="toc-development-best-practices" class="nav-link" data-scroll-target="#development-best-practices">Development Best Practices</a>
+  <ul class="collapse">
+  <li><a href="#code-organization" id="toc-code-organization" class="nav-link" data-scroll-target="#code-organization">Code Organization</a></li>
+  <li><a href="#debugging-and-logging" id="toc-debugging-and-logging" class="nav-link" data-scroll-target="#debugging-and-logging">Debugging and Logging</a></li>
+  <li><a href="#testing-considerations" id="toc-testing-considerations" class="nav-link" data-scroll-target="#testing-considerations">Testing Considerations</a></li>
+  </ul></li>
+  <li><a href="#building-and-deployment" id="toc-building-and-deployment" class="nav-link" data-scroll-target="#building-and-deployment">Building and Deployment</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
-<<<<<<< HEAD:forensics-ui/_site/Upload/upload.html
-<main class="content column-page" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"><h1 class="title display-7">Upload</h1></header>
-
-<header id="title-block-header">
-
-
-</header>
-
-
-<div class="shell">
-<main class="card">
-<h1 class="title">
-SSG Forensics
-</h1>
-<p class="subtitle">
-Upload microscope images to automatically segment and count cells, while also distinguishing between different cell types. The system highlights cells in the image, generates size data, and allows you to save annotated results for classroom learning or forensic analysis.
-</p>
-<section class="upload-zone">
-<h2 class="upload-title anchored">
-Upload Image
-</h2>
-<p class="upload-hint">
-Upload your own image, or choose one from our gallery.
-</p>
-<div class="btn-row">
-<p><a href="../gallery.html"> <button class="btn">Gallery</button> </a> <a href="../next-step.html"> <button class="btn">Next</button> </a></p>
-=======
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
 <h1 class="title">Developer Documentation</h1>
->>>>>>> main:docs/development.html
 </div>
 
 
 
 <div class="quarto-title-meta">
 
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>SSG Forensics Team </p>
+          </div>
+  </div>
     
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">December 5, 2025</p>
+    </div>
+  </div>
   
     
   </div>
@@ -212,23 +226,264 @@ Upload your own image, or choose one from our gallery.
 </header>
 
 
-<p>NOTE 1 - TODO: We likely need to adjust the images folder. The sample gallery images should also contain the processed gallery images so (1) users don’t need to wait for sample images to be processed and (2) the processed gallery images are kept separate from the user processed images.</p>
-<p>NOTE 2: What else needs to be added to this page of documentation? I don’t want to get too into the weeds, especially since a lot of information for developers should be found in comments near the code in question.</p>
-<section id="who-this-page-is-for" class="level2">
-<h2 class="anchored" data-anchor-id="who-this-page-is-for">Who This Page Is For</h2>
-<p>This section of the documentation is intended for developers or those who are hoping to look under the hood of this project. If you know little about coding or are trying to figure out how to add your own lessons to the application, then this section of documentation is NOT for you. If you are looking for documentation about how to make your own lesson, please see the <a href="./lesson-creation-guide.html">Creating New Lessons</a> guide.</p>
+<section id="overview" class="level2">
+<h2 class="anchored" data-anchor-id="overview">Overview</h2>
+<p>This guide is intended for developers and contributors interested in understanding the architecture and implementation details of the SSG High School Forensics Application. It provides insights into the project structure, technology stack, and key components.</p>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Warning
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>If you are looking for documentation on how to create lessons for the application, please see the <a href="./lesson-creation-guide.html">Creating New Lessons</a> guide instead.</p>
+</div>
+</div>
 </section>
-<section id="location-of-files" class="level2">
-<h2 class="anchored" data-anchor-id="location-of-files">Location of Files</h2>
-<p>These file locations will be relative to the root directory (<code>ssg-hs-forensics-app/</code>).</p>
-<p><code>forensics-ui/</code> - contains the files used to generate the graphics (the actual website itself). Within this directory: * <code>_site/</code> - contains the rendered pages of the website. * <code>.quarto</code> - contains the intermediate files generated by Quarto before the files in ’_site/’ are created. (DOUBLE CHECK THAT THIS IS CORRECT) * <code>cell-gallery/</code> - contains the Quarto/QMD and CSS files needed to generate the interactive cell gallery; whenever the ‘process’ button is pressed, it sends the specific image to the backend for processing and retrieves the processed image. * <code>lesson-1/</code> - contains the QMD and CSS files needed to generate the lesson pages of the first lesson. * <code>upload/</code> - contains the QMD and CSS files responsible for upload functionality; sends uploaded images to the backend for processing and retrieves the results. * <code>_quarto.yml</code> - file responsible for coordinating the other files for the front-end, and provides the website bar necessary to navigate the different pages of the website.</p>
-<p><code>forensics-backend/</code> - contains the files that manage the whole system and process uploaded images. Within this directory: * <code>app/</code> - contains the following files: - <code>Dockerfile</code> - manages setting up the Docker compartments and running the server. - <code>main.py</code> - contains the server functions, which allow images to be processed and retrieved. - <code>requirements.txt</code> - contains the names of Python libraries required for this project; ‘Dockerfile’ uses this file to know what libraries to install when setting up the Docker compartments and webserver. - <code>run_sam2.py</code> - responsible for processing uploaded images; used by ‘main.py’. * <code>nginx/</code> - contains the following file: - <code>default.conf</code> - configurations for the Docker compartments; manages pathways between systems, including connecting containers to the outside world and rerouting calls to their intended compartments. * <code>docker-compose.yml</code> - responsible for Docker container creation, and leaves ‘windows’ open so files outside certain compartments can be used.</p>
-<p><code>images/</code> - contains the images used in the website. Within this directory: * <code>processed-images/</code> - contains the processed images (images that have been run through the SAM model). * <code>sample-gallery-images/</code> - contains the sample images that are pre-loaded into the gallery. * <code>uploaded-images/</code> - contains the images users have uploaded.</p>
-<p><code>reports/</code> - contains the QMD files that render into the documentation for this project. Within this directory: (TODO: ADD TO) * <code>development.qmd</code> - the file that renders this very file; documentation indended for developers or those who are interested in the behind-the-scenes information.</p>
+<section id="important-notes" class="level2">
+<h2 class="anchored" data-anchor-id="important-notes">Important Notes</h2>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Image Folder Optimization</strong>: The sample gallery images directory should ideally contain pre-processed images so that (1) users don’t need to wait for initial processing and (2) user-processed images remain separate from sample images.</p>
+</div>
+</div>
+<p>For more detailed implementation information, developers should refer to code comments and docstrings located directly in the relevant source files.</p>
 </section>
-<section id="overview-of-coding-languages-used" class="level2">
-<h2 class="anchored" data-anchor-id="overview-of-coding-languages-used">Overview of Coding Languages Used</h2>
-<p>This project primarily uses Python, JavaScript, CSS, and HTML (through Quarto). The actual processing of files relies on Python code. JavaScript is used within the QMD (Quarto) files in order to add interactivity to the generated HTML pages, including APIs that allow images to be sent to the backend server for processing and to request images from the server. Quarto is used to generate the HTML files that make up the website.</p>
+<section id="project-structure" class="level2">
+<h2 class="anchored" data-anchor-id="project-structure">Project Structure</h2>
+<p>All file locations are relative to the root directory: <code>ssg-hs-forensics-app/</code></p>
+<section id="frontend-forensics-ui" class="level3">
+<h3 class="anchored" data-anchor-id="frontend-forensics-ui">Frontend: <code>forensics-ui/</code></h3>
+<p>This directory contains all files used to generate the application website and user interface.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Directory/File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>_site/</code></td>
+<td>Rendered HTML pages of the website (output from Quarto build)</td>
+</tr>
+<tr class="even">
+<td><code>.quarto/</code></td>
+<td>Intermediate files generated by Quarto during the build process</td>
+</tr>
+<tr class="odd">
+<td><code>_quarto.yml</code></td>
+<td>Master configuration file that coordinates all frontend components and generates the navigation bar</td>
+</tr>
+<tr class="even">
+<td><code>cell-gallery/</code></td>
+<td>Interactive cell image gallery; sends user selections to backend for processing</td>
+</tr>
+<tr class="odd">
+<td><code>lesson-1/</code>, <code>lesson-3/</code></td>
+<td>Lesson content files (QMD format) with associated stylesheets</td>
+</tr>
+<tr class="even">
+<td><code>upload/</code></td>
+<td>Upload functionality for user-submitted microscope images</td>
+</tr>
+<tr class="odd">
+<td><code>styles.css</code></td>
+<td>Global styling for the application</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="backend-forensics-backend" class="level3">
+<h3 class="anchored" data-anchor-id="backend-forensics-backend">Backend: <code>forensics-backend/</code></h3>
+<p>This directory manages image processing and server functionality.</p>
+<pre><code>forensics-backend/
+├── app/
+│   ├── Dockerfile           # Docker image configuration
+│   ├── main.py              # FastAPI server with image processing endpoints
+│   ├── requirements.txt      # Python dependencies
+│   ├── run_sam2.py          # SAM2 model execution
+│   └── runsam.py            # Legacy SAM model execution
+├── nginx/
+│   └── default.conf         # NGINX reverse proxy configuration
+└── docker-compose.yml       # Docker multi-container orchestration</code></pre>
+<p><strong>Key Components:</strong></p>
+<ul>
+<li><strong><code>main.py</code></strong>: Contains FastAPI endpoints for image processing and retrieval</li>
+<li><strong><code>run_sam2.py</code></strong>: Handles image segmentation and analysis using the SAM2 model</li>
+<li><strong><code>docker-compose.yml</code></strong>: Orchestrates FastAPI and NGINX containers</li>
+<li><strong><code>default.conf</code></strong>: Routes requests between frontend and backend services</li>
+</ul>
+</section>
+<section id="image-storage-images" class="level3">
+<h3 class="anchored" data-anchor-id="image-storage-images">Image Storage: <code>images/</code></h3>
+<p>Images are organized by processing state:</p>
+<pre><code>images/
+├── sample-gallery-images/   # Pre-loaded reference images (organized by cell type)
+│   ├── buccal_cells/
+│   ├── epidermal_cells/
+│   └── saliva_cells/
+├── uploaded-images/         # User-submitted images
+└── processed-images/        # Results from SAM model processing</code></pre>
+</section>
+<section id="documentation-reports" class="level3">
+<h3 class="anchored" data-anchor-id="documentation-reports">Documentation: <code>reports/</code></h3>
+<p>Contains Quarto markdown files that generate developer and user documentation.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>development.qmd</code></td>
+<td>This file; developer-focused documentation</td>
+</tr>
+<tr class="even">
+<td><code>lesson-creation-guide.qmd</code></td>
+<td>Guide for educators creating new lessons</td>
+</tr>
+<tr class="odd">
+<td><code>image-gallery-guide.qmd</code></td>
+<td>User guide for the image gallery and upload features</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="technology-stack" class="level2">
+<h2 class="anchored" data-anchor-id="technology-stack">Technology Stack</h2>
+<p>This project utilizes a modern, modular architecture with clear separation between frontend and backend components.</p>
+<section id="frontend-technologies" class="level3">
+<h3 class="anchored" data-anchor-id="frontend-technologies">Frontend Technologies</h3>
+<ul>
+<li><strong>Quarto</strong>: Generates static HTML pages from markdown (QMD) files</li>
+<li><strong>HTML/CSS</strong>: Structure and styling of user interface</li>
+<li><strong>JavaScript</strong>: Client-side interactivity and API communication</li>
+</ul>
+</section>
+<section id="backend-technologies" class="level3">
+<h3 class="anchored" data-anchor-id="backend-technologies">Backend Technologies</h3>
+<ul>
+<li><strong>Python</strong>: Core processing logic and server implementation</li>
+<li><strong>FastAPI</strong>: RESTful API framework for image processing endpoints</li>
+<li><strong>SAM2 Model</strong>: AI-powered image segmentation for cell identification</li>
+<li><strong>Docker &amp; NGINX</strong>: Container orchestration and reverse proxy configuration</li>
+</ul>
+</section>
+<section id="processing-pipeline" class="level3">
+<h3 class="anchored" data-anchor-id="processing-pipeline">Processing Pipeline</h3>
+<p>The image processing workflow follows this architecture:</p>
+<pre><code>User Browser
+    ↓
+Frontend (JavaScript/HTML)
+    ↓
+NGINX Reverse Proxy
+    ↓
+FastAPI Backend (main.py)
+    ↓
+SAM2 Model (run_sam2.py)
+    ↓
+File System (processed-images/)
+    ↓
+Results returned to Frontend</code></pre>
+</section>
+</section>
+<section id="key-architectural-patterns" class="level2">
+<h2 class="anchored" data-anchor-id="key-architectural-patterns">Key Architectural Patterns</h2>
+<section id="frontend-backend-communication" class="level3">
+<h3 class="anchored" data-anchor-id="frontend-backend-communication">Frontend-Backend Communication</h3>
+<p>The frontend communicates with the backend through HTTP requests:</p>
+<ul>
+<li><strong>Upload images</strong>: POST to <code>/api/process-img</code></li>
+<li><strong>Retrieve images</strong>: GET from <code>/api/gallery/</code> endpoints</li>
+<li><strong>Status queries</strong>: GET requests for processing status</li>
+</ul>
+</section>
+<section id="image-processing-workflow" class="level3">
+<h3 class="anchored" data-anchor-id="image-processing-workflow">Image Processing Workflow</h3>
+<ol type="1">
+<li>User selects or uploads an image</li>
+<li>Frontend encodes image as blob and sends to backend</li>
+<li>Backend receives image and queues for SAM2 processing</li>
+<li>SAM2 model generates cell segmentation masks</li>
+<li>Processed image is saved to disk</li>
+<li>Response sent back to frontend</li>
+<li>Gallery automatically refreshes</li>
+</ol>
+</section>
+<section id="container-architecture" class="level3">
+<h3 class="anchored" data-anchor-id="container-architecture">Container Architecture</h3>
+<p>The Docker Compose setup creates isolated, interconnected containers:</p>
+<ul>
+<li><strong>FastAPI Container</strong>: Runs the Python application server</li>
+<li><strong>NGINX Container</strong>: Acts as reverse proxy and load balancer</li>
+<li><strong>Volume Mounts</strong>: Allow containers to access shared image directories</li>
+</ul>
+</section>
+</section>
+<section id="development-best-practices" class="level2">
+<h2 class="anchored" data-anchor-id="development-best-practices">Development Best Practices</h2>
+<section id="code-organization" class="level3">
+<h3 class="anchored" data-anchor-id="code-organization">Code Organization</h3>
+<p>When adding new features, follow these patterns:</p>
+<ul>
+<li><strong>Backend endpoints</strong>: Define in <code>forensics-backend/app/main.py</code></li>
+<li><strong>Frontend logic</strong>: Add to lesson/gallery QMD files as JavaScript code blocks</li>
+<li><strong>Shared utilities</strong>: Consider adding to dedicated modules rather than inline code</li>
+<li><strong>Configuration</strong>: Use environment variables and config files rather than hardcoding values</li>
+</ul>
+</section>
+<section id="debugging-and-logging" class="level3">
+<h3 class="anchored" data-anchor-id="debugging-and-logging">Debugging and Logging</h3>
+<ul>
+<li>Backend logs are available through Docker: <code>docker compose logs -f app</code></li>
+<li>Frontend errors appear in browser console (F12)</li>
+<li>Add print statements or logging in Python for backend diagnostics</li>
+</ul>
+</section>
+<section id="testing-considerations" class="level3">
+<h3 class="anchored" data-anchor-id="testing-considerations">Testing Considerations</h3>
+<ul>
+<li>Test image processing with various image formats and sizes</li>
+<li>Verify NGINX routing between containers</li>
+<li>Test frontend-backend communication with different network conditions</li>
+</ul>
+</section>
+</section>
+<section id="building-and-deployment" class="level2">
+<h2 class="anchored" data-anchor-id="building-and-deployment">Building and Deployment</h2>
+<p>To set up the development environment:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Install dependencies</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> install</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Start the application</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> run</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Build documentation</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> docs</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Refer to the <code>Makefile</code> and <code>README.md</code> for complete build instructions and advanced deployment options.</p>
 
 
 </section>

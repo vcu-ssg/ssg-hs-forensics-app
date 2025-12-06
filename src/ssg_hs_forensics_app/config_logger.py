@@ -40,7 +40,8 @@ def init_logging(level: str | None = None) -> None:
     logger.add(
         sys.stderr,
         level=effective,
-        format="<green>{time}</green> | <level>{level}</level> | <level>{message}</level>",
+#        format="<green>{time}</green> | <level>{level}</level> | <level>{message}</level>",
+        format="<level>{level:7}</level> | <level>{message}</level>",
         backtrace=False,
         diagnose=False,
     )

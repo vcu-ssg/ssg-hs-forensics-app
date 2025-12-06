@@ -101,7 +101,7 @@ def cmd_masks(
             else:
                 click.echo(
                     f"  {rec['index']:3d}: {rec['name']}   "
-                    f"(masks={rec['num_masks']}, image={rec['image_path']})"
+                    f"(masks={rec['num_masks']}, image={rec['image_name']})"
                 )
         return
 

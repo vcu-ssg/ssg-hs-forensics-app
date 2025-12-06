@@ -1,11 +1,11 @@
 import sys
 import asyncio
 import itertools
-import time
 from loguru import logger
 
+from .browser import open_ui
 from .ssid_helpers import ssid_worker
-from .connectivity_helpers import connectivity_worker
+from .connectivity_helpers import connectivity_worker, open_wifi_settings_screen
 from .capture_helpers import (
     find_downloads_folder,
     scan_iolight_files,

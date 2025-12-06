@@ -20,6 +20,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import List, Dict, Optional
 from datetime import datetime
+from loguru import logger
 
 from ssg_hs_forensics_app.core.mask_writer import load_masks_h5, list_mask_files
 
@@ -46,7 +47,10 @@ def extract_mask_metadata(path: Path) -> Dict:
         meta["end_time"] = runinfo.get("end_time")
 
         input_info = data.get("input_info", {})
+        logger.trace( f"{input_info}" )
+
         meta["image_path"] = input_info.get("image_path", "unknown")
+        meta["image_name"] = Path(meta["image_path"]).name
 
     except Exception as e:
         meta["error"] = str(e)

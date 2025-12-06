@@ -57,6 +57,7 @@ def cmd_generate(
     Generate segmentation masks using a selected SAM model + preset.
     Writes an HDF5 file containing:
 
+    \b
       • Raw SAM masks
       • Original JPEG file (bytes only)
       • Image metadata
@@ -64,9 +65,13 @@ def cmd_generate(
       • Timing benchmark metadata
 
     All validation is performed BEFORE running the heavy SAM inference.
+
+    run `sammy models` for list of available models and their key names.
     """
 
     logger.debug("cmd_generate invoked")
+
+    logger.info("Running SAM model")
 
     # ------------------------------------------------------------
     # Load config
@@ -228,7 +233,7 @@ def cmd_generate(
     # ------------------------------------------------------------
     # HEAVY PHASE — mask generation
     # ------------------------------------------------------------
-    logger.debug("All pre-checks passed. Beginning SAM mask inference...")
+    logger.info("All pre-checks passed. Beginning SAM mask inference...")
 
     start_ts = datetime.now()
     start_perf = time.perf_counter()
@@ -271,7 +276,7 @@ def cmd_generate(
     masks_per_sec = len(masks) / elapsed if elapsed > 0 else None
     mp_per_sec = megapixels / elapsed if elapsed > 0 else None
 
-    logger.debug(f"Generated {len(masks)} masks in {elapsed:.2f} seconds")
+    logger.info(f"Generated {len(masks)} masks in {elapsed:.2f} seconds")
 
     runinfo = {
         "filtering": "none",
@@ -288,9 +293,8 @@ def cmd_generate(
     # ------------------------------------------------------------
     jpeg_bytes = image_path.read_bytes()
 
-    logger.debug(
+    logger.info(
         f"Writing output HDF5 → {out_path} "
-        f"(jpeg_bytes={len(jpeg_bytes)} bytes)"
     )
 
     write_masks_h5(
@@ -303,8 +307,3 @@ def cmd_generate(
         runinfo=runinfo,
     )
 
-    click.echo(
-        f"✓ Wrote {len(masks)} raw masks to:\n"
-        f"  {out_path}\n"
-        f"Elapsed: {elapsed:.2f} seconds"
-    )
